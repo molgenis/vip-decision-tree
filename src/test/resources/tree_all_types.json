@@ -1,0 +1,62 @@
+{
+  "rootNode": "my_score",
+  "nodes": {
+    "my_score": {
+      "type": "BOOL",
+      "description": "my_score description",
+      "query": {
+        "field": "INFO/SCORE",
+        "operator": ">=",
+        "value": 0
+      },
+      "outcomeTrue": {
+        "nextNode": "include",
+        "label": "negative"
+      },
+      "outcomeFalse": {
+        "nextNode": "my_cat",
+        "label": "positive"
+      },
+      "outcomeMissing": {
+        "nextNode": "exclude",
+        "label": "no_score"
+      }
+    },
+    "my_cat": {
+      "type": "CATEGORICAL",
+      "description": "my_cat description",
+      "field": "INFO/CAT",
+      "outcomeMap": {
+        "high": {
+          "nextNode": "include",
+          "label": "cat_high"
+        },
+        "low": {
+          "nextNode": "exclude",
+          "label": "cat_low"
+        }
+      },
+      "outcomeMissing": {
+        "nextNode": "exclude",
+        "label": "no_cat"
+      },
+      "outcomeDefault": {
+        "nextNode": "exclude",
+        "label": "cat_unknown"
+      }
+    },
+    "include": {
+      "type": "LEAF",
+      "class": "in"
+    },
+    "exclude": {
+      "type": "LEAF",
+      "class": "out"
+    }
+  },
+  "labels": {
+    "cap_low": {
+      "description": "low capice score"
+    }
+  }
+}

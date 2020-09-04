@@ -1,0 +1,84 @@
+{
+  "rootNode": "capice",
+  "nodes": {
+    "capice": {
+      "type": "BOOL",
+      "description": "CAPICE score >= 0.9",
+      "query": {
+        "field": "INFO/CAP",
+        "operator": ">=",
+        "value": 0.9
+      },
+      "outcomeTrue": {
+        "nextNode": "done_include",
+        "label": "1"
+      },
+      "outcomeFalse": {
+        "nextNode": "done_exclude",
+        "label": "3"
+      },
+      "outcomeMissing": {
+        "nextNode": "gnomad",
+        "label": "2"
+      }
+    },
+    "gnomad": {
+      "type": "BOOL",
+      "query": {
+        "field": "INFO/GNOMAD",
+        "operator": ">=",
+        "value": 0.9
+      },
+      "outcomeTrue": {
+        "nextNode": "done_include"
+      },
+      "outcomeFalse": {
+        "nextNode": "done_include",
+        "label": "GNOMAD_F"
+      },
+      "outcomeMissing": {
+        "nextNode": "vkgl"
+      }
+    },
+    "vkgl": {
+      "type": "CATEGORICAL",
+      "field": "INFO/VKGL",
+      "outcomeMap": {
+        "LP": {
+          "nextNode": "done_exclude"
+        },
+        "LB": {
+          "nextNode": "done_exclude",
+          "label": "LB"
+        },
+        "VUS": {
+          "nextNode": "done_exclude",
+          "label": "VUS"
+        }
+      },
+      "outcomeMissing": {
+        "nextNode": "done_include",
+        "label": "VKLG_MISSING"
+      },
+      "outcomeDefault": {
+        "nextNode": "done_exclude"
+      }
+    },
+    "done_include": {
+      "type": "LEAF",
+      "class": "in"
+    },
+    "done_exclude": {
+      "type": "LEAF",
+      "class": "out"
+    }
+  },
+  "labels": {
+    "CAP_T": {
+      "description": "Capice filter true"
+    },
+    "CAP_F": {
+      "description": "Capice filter false"
+    }
+  }
+}

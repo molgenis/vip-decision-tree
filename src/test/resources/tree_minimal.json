@@ -1,0 +1,30 @@
+{
+  "rootNode": "capice",
+  "nodes": {
+    "capice": {
+      "type": "BOOL",
+      "query": {
+        "field": "INFO/CAP",
+        "operator": ">=",
+        "value": 0.9
+      },
+      "outcomeTrue": {
+        "nextNode": "include"
+      },
+      "outcomeFalse": {
+        "nextNode": "exclude"
+      },
+      "outcomeMissing": {
+        "nextNode": "exclude"
+      }
+    },
+    "include": {
+      "type": "LEAF",
+      "class": "in"
+    },
+    "exclude": {
+      "type": "LEAF",
+      "class": "out"
+    }
+  }
+}
