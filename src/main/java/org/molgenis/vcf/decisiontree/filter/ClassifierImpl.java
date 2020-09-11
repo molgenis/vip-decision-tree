@@ -4,7 +4,6 @@ import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +23,13 @@ public class ClassifierImpl implements Classifier {
   }
 
   @Override
-  public void classify(VCFFileReader reader, DecisionTree decisionTree, DecisionWriter writer) {
-    VCFHeader header = reader.getFileHeader();
+  public void classify(
+      Iterable<VariantContext> records,
+      DecisionTree decisionTree,
+      DecisionWriter writer,
+      VCFHeader header) {
     int nrRecord = 0;
-    for (VariantContext vcfRecord : reader) {
+    for (VariantContext vcfRecord : records) {
       ++nrRecord;
 
       List<Decision> decisions = processRecord(vcfRecord, decisionTree, header);
@@ -44,12 +46,12 @@ public class ClassifierImpl implements Classifier {
     int nrAltAlleles = vcfRecord.getNAlleles() - 1;
     List<Decision> decisions;
     if (nrAltAlleles == 1) {
-      Decision decision = processVariant(vcfRecord, 0, decisionTree, header);
+      Decision decision = processVariant(vcfRecord, 1, decisionTree, header);
       decisions = singletonList(decision);
     } else {
       decisions = new ArrayList<>(nrAltAlleles);
       for (int i = 0; i < nrAltAlleles; ++i) {
-        Decision decision = processVariant(vcfRecord, i, decisionTree, header);
+        Decision decision = processVariant(vcfRecord, i + 1, decisionTree, header);
         decisions.add(decision);
       }
     }
@@ -57,8 +59,7 @@ public class ClassifierImpl implements Classifier {
   }
 
   private Decision processVariant(
-      VariantContext vcfRecord, int altAlleleIndex, DecisionTree decisionTree, VCFHeader header) {
-    int alleleIndex = altAlleleIndex + 1;
+      VariantContext vcfRecord, int alleleIndex, DecisionTree decisionTree, VCFHeader header) {
     Variant variant = new Variant(header, vcfRecord, alleleIndex);
     return decisionTreeExecutor.execute(decisionTree, variant);
   }
