@@ -20,4 +20,4 @@ deploy:
   prerelease: true
     on:
       tags: true
-  skip_cleanup: 'true'
+  edge: true # opt in to dpl v2
