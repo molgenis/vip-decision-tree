@@ -30,7 +30,7 @@ class AppRunnerImpl implements AppRunner {
 
   public void run() {
     LOGGER.info("classifying variants with decision tree ...");
-    classifier.classify(vcfFileReader, decisionTree, decisionWriter);
+    classifier.classify(vcfFileReader, decisionTree, decisionWriter, vcfFileReader.getFileHeader());
     LOGGER.info("done");
   }
 

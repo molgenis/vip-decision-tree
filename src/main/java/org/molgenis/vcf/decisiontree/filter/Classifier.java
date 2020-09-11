@@ -1,9 +1,15 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import htsjdk.variant.vcf.VCFFileReader;
+import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.vcf.VCFHeader;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 
 public interface Classifier {
 
-  void classify(VCFFileReader reader, DecisionTree decisionTree, DecisionWriter decisionWriter);
+  // TODO remove VCFHeader argument (see TODO in VcfUtils)
+  void classify(
+      Iterable<VariantContext> records,
+      DecisionTree decisionTree,
+      DecisionWriter decisionWriter,
+      VCFHeader vcfHeader);
 }
