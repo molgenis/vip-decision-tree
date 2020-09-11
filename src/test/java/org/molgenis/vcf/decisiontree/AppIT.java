@@ -35,7 +35,7 @@ class AppIT {
     // output differs every run
     outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
-    outputVcf = outputVcf.replaceAll("\\R", "\n");
+    outputVcf = outputVcf.replaceAll("\\R+", "\n");
 
     Path expectedOutputFile = ResourceUtils.getFile("classpath:example-classified.vcf").toPath();
     String expectedOutputVcf = Files.readString(expectedOutputFile);
@@ -58,7 +58,7 @@ class AppIT {
     // output differs every run
     outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
-    outputVcf = outputVcf.replaceAll("\\R", "\n");
+    outputVcf = outputVcf.replaceAll("\\R+", "\n");
 
     Path expectedOutputFile = ResourceUtils.getFile("classpath:example-classified_paths-labels.vcf")
         .toPath();
