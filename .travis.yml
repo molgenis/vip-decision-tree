@@ -18,6 +18,6 @@ deploy:
     secure: flAkb1fMyrE6zk0GnFXIo3RYYn9OC2QdvJXfSPzX0RoyuXMY/xvRuNJbH+KRsR03H9exo6H+Gi+iFWxWTFxjpoq3lInlYTMu4JRaxOcsgab3NEXE6qa9lBCv9F0VSVqGbNgND/ndzdZ34db3s2a4vIEc9rGH9ek0lAxVM5liEfhn+gl6k4ld7al+PWDyVYyQ8sNDUgdUQieAOuXhkaXph11alJTw74TskUQ1qg1279ONoRFfTdu19gyHOeTD8eUS9A1MLr4HlEqZas5bNtS/nonK/7/j5+cbkGlBVWiwkvc4p5sCBEBmYvuHw0hjfkTF/S9y9ZAbyDtdwRw0ZeXfoJDM16k8P/A9YUR8MPPcTmU+yqobq57bt86zW/qUfiMPfpGnUj5dKJeLQJ/uoSSVg/eQjX1z9SoN1tsjJXV4H2oStTyshcrYpbSJrGEgbuYUYbDMmIQEa+wB/G0J2JHwfOat59PVw6fjgOL4k+j82m3h3xPFcJm5PF6V1g3PRACVipCknAq/OwhjUtGutTPAiDyhk5/QmNdc+MvpN2UeDXgd3FbKygMjAknZaEH/lEF1kgEJyVJDpyIGfdhh/NeIVP4+XMDeu+MCry4PNgkPzKrJCHCA1K7e9ybo78N/n1k7yUdKveiykBgtDB88FQVYA+6EzVfEXW4kC2OFzIlJb4w=
   file: target/vcf-decision-tree.jar
   prerelease: true
-    on:
-      tags: true
+  on:
+    tags: true
   edge: true # opt in to dpl v2
