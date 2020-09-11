@@ -32,7 +32,7 @@ class AppIT {
 
     String outputVcf = Files.readString(Path.of(outputFile));
 
-    // output differs every run
+    // output differs every run (different tmp dir)
     outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
 
@@ -54,7 +54,7 @@ class AppIT {
     String outputVcf =
         Files.readString(Path.of(outputFile));
 
-    // output differs every run
+    // output differs every run due (different tmp dir)
     outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
 
