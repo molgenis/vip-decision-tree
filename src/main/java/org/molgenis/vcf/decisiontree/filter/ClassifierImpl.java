@@ -10,8 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ClassifierImpl implements Classifier {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassifierImpl.class);
+
   private final DecisionTreeExecutor decisionTreeExecutor;
 
   ClassifierImpl(DecisionTreeExecutor decisionTreeExecutor) {
@@ -21,9 +26,16 @@ public class ClassifierImpl implements Classifier {
   @Override
   public void classify(VCFFileReader reader, DecisionTree decisionTree, DecisionWriter writer) {
     VCFHeader header = reader.getFileHeader();
+    int nrRecord = 0;
     for (VariantContext vcfRecord : reader) {
+      ++nrRecord;
+
       List<Decision> decisions = processRecord(vcfRecord, decisionTree, header);
       writer.write(decisions, vcfRecord);
+
+      if (nrRecord % 25000 == 0) {
+        LOGGER.debug("processed {} records", nrRecord);
+      }
     }
   }
 
