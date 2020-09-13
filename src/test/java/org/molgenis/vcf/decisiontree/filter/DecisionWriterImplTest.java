@@ -42,10 +42,11 @@ class DecisionWriterImplTest {
     // can't mock CommonInfo because it is final
     CommonInfo commonInfo = new CommonInfo(null, 0, null, null);
     when(variantContext.getCommonInfo()).thenReturn(commonInfo);
+    VcfRecord vcfRecord = when(mock(VcfRecord.class).unwrap()).thenReturn(variantContext).getMock();
 
     String clazz = "my_class";
     Decision decision = Decision.builder().clazz(clazz).labels(Set.of()).path(List.of()).build();
-    decisionWriter.write(List.of(decision), variantContext);
+    decisionWriter.write(List.of(decision), vcfRecord);
     verify(vcfWriter).add(variantContext);
     assertAll(
         () -> assertEquals(clazz, commonInfo.getAttribute("VIPC")),
@@ -61,6 +62,7 @@ class DecisionWriterImplTest {
     // can't mock CommonInfo because it is final
     CommonInfo commonInfo = new CommonInfo(null, 0, null, null);
     when(variantContext.getCommonInfo()).thenReturn(commonInfo);
+    VcfRecord vcfRecord = when(mock(VcfRecord.class).unwrap()).thenReturn(variantContext).getMock();
 
     Node node0 = when(mock(Node.class).getId()).thenReturn("node0").getMock();
     Node node1 = when(mock(Node.class).getId()).thenReturn("node1").getMock();
@@ -74,7 +76,7 @@ class DecisionWriterImplTest {
             .labels(new LinkedHashSet<>(List.of(label0, label1)))
             .path(List.of(node0, node1))
             .build();
-    decisionWriter.write(List.of(decision), variantContext);
+    decisionWriter.write(List.of(decision), vcfRecord);
     verify(vcfWriter).add(variantContext);
     assertAll(
         () -> assertEquals(clazz, commonInfo.getAttribute("VIPC")),
@@ -90,10 +92,11 @@ class DecisionWriterImplTest {
     // can't mock CommonInfo because it is final
     CommonInfo commonInfo = new CommonInfo(null, 0, null, null);
     when(variantContext.getCommonInfo()).thenReturn(commonInfo);
+    VcfRecord vcfRecord = when(mock(VcfRecord.class).unwrap()).thenReturn(variantContext).getMock();
 
     String clazz = "my_class";
     Decision decision = Decision.builder().clazz(clazz).labels(Set.of()).path(List.of()).build();
-    decisionWriter.write(List.of(decision), variantContext);
+    decisionWriter.write(List.of(decision), vcfRecord);
     verify(vcfWriter).add(variantContext);
     assertAll(
         () -> assertEquals(clazz, commonInfo.getAttribute("VIPC")),
@@ -109,12 +112,13 @@ class DecisionWriterImplTest {
     // can't mock CommonInfo because it is final
     CommonInfo commonInfo = new CommonInfo(null, 0, null, null);
     when(variantContext.getCommonInfo()).thenReturn(commonInfo);
+    VcfRecord vcfRecord = when(mock(VcfRecord.class).unwrap()).thenReturn(variantContext).getMock();
 
     String clazz0 = "class0";
     Decision decision0 = Decision.builder().clazz(clazz0).labels(Set.of()).path(List.of()).build();
     String clazz1 = "class1";
     Decision decision1 = Decision.builder().clazz(clazz1).labels(Set.of()).path(List.of()).build();
-    decisionWriter.write(List.of(decision0, decision1), variantContext);
+    decisionWriter.write(List.of(decision0, decision1), vcfRecord);
     verify(vcfWriter).add(variantContext);
     assertAll(
         () -> assertEquals("class0,class1", commonInfo.getAttribute("VIPC")),
@@ -130,6 +134,7 @@ class DecisionWriterImplTest {
     // can't mock CommonInfo because it is final
     CommonInfo commonInfo = new CommonInfo(null, 0, null, null);
     when(variantContext.getCommonInfo()).thenReturn(commonInfo);
+    VcfRecord vcfRecord = when(mock(VcfRecord.class).unwrap()).thenReturn(variantContext).getMock();
 
     Node node0 = when(mock(Node.class).getId()).thenReturn("node0").getMock();
     Node node1 = when(mock(Node.class).getId()).thenReturn("node1").getMock();
@@ -146,7 +151,7 @@ class DecisionWriterImplTest {
     String clazz1 = "class1";
     Decision decision1 =
         Decision.builder().clazz(clazz1).labels(Set.of()).path(List.of(node0, node1)).build();
-    decisionWriter.write(List.of(decision0, decision1), variantContext);
+    decisionWriter.write(List.of(decision0, decision1), vcfRecord);
     verify(vcfWriter).add(variantContext);
     assertAll(
         () -> assertEquals("class0,class1", commonInfo.getAttribute("VIPC")),

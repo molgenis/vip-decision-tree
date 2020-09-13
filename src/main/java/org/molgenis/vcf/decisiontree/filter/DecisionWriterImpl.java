@@ -15,9 +15,9 @@ import org.molgenis.vcf.decisiontree.filter.model.Node;
 
 public class DecisionWriterImpl implements DecisionWriter {
 
-  static final String INFO_CLASS_ID = "VIPC";
-  static final String INFO_PATH_ID = "VIPP";
-  static final String INFO_LABELS_ID = "VIPL";
+  public static final String INFO_CLASS_ID = "VIPC";
+  public static final String INFO_PATH_ID = "VIPP";
+  public static final String INFO_LABELS_ID = "VIPL";
 
   private final VariantContextWriter vcfWriter;
   private final boolean writeLabels;
@@ -26,24 +26,26 @@ public class DecisionWriterImpl implements DecisionWriter {
   /**
    * Constructs a DecisionWriter that doesn't store labels and paths.
    */
-  DecisionWriterImpl(VariantContextWriter vcfWriter) {
+  public DecisionWriterImpl(VariantContextWriter vcfWriter) {
     this(vcfWriter, false, false);
   }
 
-  DecisionWriterImpl(VariantContextWriter vcfWriter, boolean writeLabels, boolean writePaths) {
+  public DecisionWriterImpl(
+      VariantContextWriter vcfWriter, boolean writeLabels, boolean writePaths) {
     this.vcfWriter = requireNonNull(vcfWriter);
     this.writeLabels = writeLabels;
     this.writePaths = writePaths;
   }
 
   @Override
-  public void write(List<Decision> decisions, VariantContext vcfRecord) {
-    VariantContext updatedVariantContext = addDecisions(decisions, vcfRecord);
+  public void write(List<Decision> decisions, VcfRecord vcfRecord) {
+    VariantContext variantContext = vcfRecord.unwrap();
+    VariantContext updatedVariantContext = addDecisions(decisions, variantContext);
     vcfWriter.add(updatedVariantContext);
   }
 
-  private VariantContext addDecisions(List<Decision> decisions, VariantContext vcfRecord) {
-    CommonInfo commonInfo = vcfRecord.getCommonInfo();
+  private VariantContext addDecisions(List<Decision> decisions, VariantContext variantContext) {
+    CommonInfo commonInfo = variantContext.getCommonInfo();
 
     addDecisionClass(decisions, commonInfo);
     if (writePaths) {
@@ -53,7 +55,7 @@ public class DecisionWriterImpl implements DecisionWriter {
     if (writeLabels) {
       addDecisionLabels(decisions, commonInfo);
     }
-    return vcfRecord;
+    return variantContext;
   }
 
   private static void addDecisionLabels(List<Decision> decisions, CommonInfo commonInfo) {

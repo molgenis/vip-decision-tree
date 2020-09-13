@@ -1,12 +1,15 @@
-package org.molgenis.vcf.decisiontree.filter;
+package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Objects.requireNonNull;
 
 import org.molgenis.vcf.decisiontree.WriterSettings;
+import org.molgenis.vcf.decisiontree.filter.DecisionTreeExecutor;
+import org.molgenis.vcf.decisiontree.filter.DecisionTreeExecutorImpl;
+import org.molgenis.vcf.decisiontree.filter.NodeEvaluatorService;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DecisionTreeExecutorFactoryImpl implements DecisionTreeExecutorFactory {
+class DecisionTreeExecutorFactoryImpl implements DecisionTreeExecutorFactory {
 
   private final NodeEvaluatorService nodeEvaluatorService;
 

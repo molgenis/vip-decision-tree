@@ -11,43 +11,43 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PATH;
 
 import java.nio.file.Path;
 import org.apache.commons.cli.CommandLine;
-import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
-import org.molgenis.vcf.decisiontree.loader.DecisionTreeLoader;
+import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppCommandLineToSettingsMapper {
+class AppCommandLineToSettingsMapper {
 
   private final String appName;
   private final String appVersion;
-  private final DecisionTreeLoader decisionTreeLoader;
+  private final ConfigDecisionTreeLoader configDecisionTreeLoader;
 
   AppCommandLineToSettingsMapper(
       @Value("${app.name}") String appName,
       @Value("${app.version}") String appVersion,
-      DecisionTreeLoader decisionTreeLoader) {
+      ConfigDecisionTreeLoader configDecisionTreeLoader) {
     this.appName = appName;
     this.appVersion = appVersion;
-    this.decisionTreeLoader = requireNonNull(decisionTreeLoader);
+    this.configDecisionTreeLoader = requireNonNull(configDecisionTreeLoader);
   }
 
   Settings map(CommandLine commandLine, String... args) {
     AppSettings appSettings = createAppSettings(args);
     Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
-    DecisionTree decisionTree = createDecisionTree(commandLine);
+    ConfigDecisionTree configDecisionTree = createDecisionTree(commandLine);
     WriterSettings writerSettings = createWriterSettings(commandLine);
     return Settings.builder()
         .inputVcfPath(inputPath)
-        .decisionTree(decisionTree)
+        .configDecisionTree(configDecisionTree)
         .appSettings(appSettings)
         .writerSettings(writerSettings)
         .build();
   }
 
-  private DecisionTree createDecisionTree(CommandLine commandLine) {
+  private ConfigDecisionTree createDecisionTree(CommandLine commandLine) {
     Path configPath = Path.of(commandLine.getOptionValue(OPT_CONFIG));
-    return decisionTreeLoader.load(configPath);
+    return configDecisionTreeLoader.load(configPath);
   }
 
   private AppSettings createAppSettings(String... args) {
