@@ -3,13 +3,14 @@ package org.molgenis.vcf.decisiontree;
 import java.nio.file.Path;
 import lombok.Builder;
 import lombok.Value;
-import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 
 @Value
 @Builder
 public class Settings {
+
   Path inputVcfPath;
-  DecisionTree decisionTree;
+  ConfigDecisionTree configDecisionTree;
   AppSettings appSettings;
   WriterSettings writerSettings;
 }
