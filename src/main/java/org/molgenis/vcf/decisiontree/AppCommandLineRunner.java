@@ -15,6 +15,8 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.ParseException;
+import org.molgenis.vcf.decisiontree.runner.AppRunner;
+import org.molgenis.vcf.decisiontree.runner.AppRunnerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +24,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppCommandLineRunner implements CommandLineRunner {
+class AppCommandLineRunner implements CommandLineRunner {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AppCommandLineRunner.class);
 

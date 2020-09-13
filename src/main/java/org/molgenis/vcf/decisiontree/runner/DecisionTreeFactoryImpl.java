@@ -1,4 +1,4 @@
-package org.molgenis.vcf.decisiontree.filter;
+package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Collections.emptyMap;
 import static java.util.function.Function.identity;
@@ -34,7 +34,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DecisionTreeFactoryImpl implements DecisionTreeFactory {
+class DecisionTreeFactoryImpl implements DecisionTreeFactory {
 
   private static final String FIELD_SEPARATOR = "/";
 

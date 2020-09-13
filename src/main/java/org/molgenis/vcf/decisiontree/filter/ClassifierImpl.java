@@ -18,7 +18,7 @@ public class ClassifierImpl implements Classifier {
 
   private final DecisionTreeExecutor decisionTreeExecutor;
 
-  ClassifierImpl(DecisionTreeExecutor decisionTreeExecutor) {
+  public ClassifierImpl(DecisionTreeExecutor decisionTreeExecutor) {
     this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
   }
 

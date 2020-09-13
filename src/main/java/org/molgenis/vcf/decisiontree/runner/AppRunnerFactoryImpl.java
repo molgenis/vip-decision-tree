@@ -1,13 +1,11 @@
-package org.molgenis.vcf.decisiontree;
+package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Objects.requireNonNull;
 
 import htsjdk.variant.vcf.VCFFileReader;
+import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.Classifier;
-import org.molgenis.vcf.decisiontree.filter.ClassifierFactory;
-import org.molgenis.vcf.decisiontree.filter.DecisionTreeFactory;
 import org.molgenis.vcf.decisiontree.filter.DecisionWriter;
-import org.molgenis.vcf.decisiontree.filter.DecisionWriterFactory;
 import org.molgenis.vcf.decisiontree.filter.ReaderFactory;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.springframework.stereotype.Component;

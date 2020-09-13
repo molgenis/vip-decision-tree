@@ -1,4 +1,4 @@
-package org.molgenis.vcf.decisiontree.filter;
+package org.molgenis.vcf.decisiontree.runner;
 
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
@@ -12,10 +12,13 @@ import java.io.File;
 import org.molgenis.vcf.decisiontree.AppSettings;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.WriterSettings;
+import org.molgenis.vcf.decisiontree.filter.DecisionWriter;
+import org.molgenis.vcf.decisiontree.filter.DecisionWriterImpl;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DecisionWriterFactoryImpl implements DecisionWriterFactory {
+class DecisionWriterFactoryImpl implements DecisionWriterFactory {
+
   private static final String HEADER_VIP_VERSION = "VIP_treeVersion";
   private static final String HEADER_VIP_ARGS = "VIP_treeCommand";
   private static final String INFO_CLASS_DESC = "VIP decision tree classification";

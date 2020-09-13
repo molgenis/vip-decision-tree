@@ -15,9 +15,9 @@ import org.molgenis.vcf.decisiontree.filter.model.Node;
 
 public class DecisionWriterImpl implements DecisionWriter {
 
-  static final String INFO_CLASS_ID = "VIPC";
-  static final String INFO_PATH_ID = "VIPP";
-  static final String INFO_LABELS_ID = "VIPL";
+  public static final String INFO_CLASS_ID = "VIPC";
+  public static final String INFO_PATH_ID = "VIPP";
+  public static final String INFO_LABELS_ID = "VIPL";
 
   private final VariantContextWriter vcfWriter;
   private final boolean writeLabels;
@@ -26,11 +26,12 @@ public class DecisionWriterImpl implements DecisionWriter {
   /**
    * Constructs a DecisionWriter that doesn't store labels and paths.
    */
-  DecisionWriterImpl(VariantContextWriter vcfWriter) {
+  public DecisionWriterImpl(VariantContextWriter vcfWriter) {
     this(vcfWriter, false, false);
   }
 
-  DecisionWriterImpl(VariantContextWriter vcfWriter, boolean writeLabels, boolean writePaths) {
+  public DecisionWriterImpl(VariantContextWriter vcfWriter, boolean writeLabels,
+      boolean writePaths) {
     this.vcfWriter = requireNonNull(vcfWriter);
     this.writeLabels = writeLabels;
     this.writePaths = writePaths;

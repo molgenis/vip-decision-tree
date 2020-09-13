@@ -1,4 +1,4 @@
-package org.molgenis.vcf.decisiontree;
+package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Objects.requireNonNull;
 

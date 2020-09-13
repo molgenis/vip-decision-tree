@@ -21,12 +21,14 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
   private final boolean storeLabels;
   private final boolean storePaths;
 
-  /** Constructs a DecisionTreeExecutor that doesn't store labels and paths. */
-  DecisionTreeExecutorImpl(NodeEvaluatorService nodeEvaluatorService) {
+  /**
+   * Constructs a DecisionTreeExecutor that doesn't store labels and paths.
+   */
+  public DecisionTreeExecutorImpl(NodeEvaluatorService nodeEvaluatorService) {
     this(nodeEvaluatorService, false, false);
   }
 
-  DecisionTreeExecutorImpl(
+  public DecisionTreeExecutorImpl(
       NodeEvaluatorService nodeEvaluatorService, boolean storeLabels, boolean storePaths) {
     this.nodeEvaluatorService = requireNonNull(nodeEvaluatorService);
     this.storeLabels = storeLabels;
