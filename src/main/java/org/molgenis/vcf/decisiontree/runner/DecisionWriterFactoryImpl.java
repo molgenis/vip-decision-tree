@@ -4,7 +4,6 @@ import static java.lang.String.format;
 
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
-import htsjdk.variant.vcf.VCFFileReader;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLine;
 import htsjdk.variant.vcf.VCFHeaderLineCount;
@@ -19,6 +18,7 @@ import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.WriterSettings;
 import org.molgenis.vcf.decisiontree.filter.DecisionWriter;
 import org.molgenis.vcf.decisiontree.filter.DecisionWriterImpl;
+import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -31,11 +31,11 @@ class DecisionWriterFactoryImpl implements DecisionWriterFactory {
   private static final String INFO_LABELS_DESC = "VIP decision tree labels (pipe separated)";
 
   @Override
-  public DecisionWriter create(VCFFileReader reader, Settings settings) {
+  public DecisionWriter create(VcfMetadata vcfMetadata, Settings settings) {
     WriterSettings writerSettings = settings.getWriterSettings();
 
     VariantContextWriter vcfWriter = createVcfWriter(writerSettings);
-    VCFHeader vcfHeader = createHeader(reader, settings);
+    VCFHeader vcfHeader = createHeader(vcfMetadata, settings);
     vcfWriter.writeHeader(vcfHeader);
     return new DecisionWriterImpl(
         vcfWriter, settings.getWriterSettings().isWriteLabels(), writerSettings.isWritePath());
@@ -61,11 +61,11 @@ class DecisionWriterFactoryImpl implements DecisionWriterFactory {
         .build();
   }
 
-  private static VCFHeader createHeader(VCFFileReader reader, Settings settings) {
+  private static VCFHeader createHeader(VcfMetadata vcfMetadata, Settings settings) {
     AppSettings appSettings = settings.getAppSettings();
     WriterSettings writerSettings = settings.getWriterSettings();
 
-    VCFHeader vcfHeader = new VCFHeader(reader.getFileHeader());
+    VCFHeader vcfHeader = new VCFHeader(vcfMetadata.unwrap());
     vcfHeader.addMetaDataLine(new VCFHeaderLine(HEADER_VIP_VERSION, appSettings.getVersion()));
     vcfHeader.addMetaDataLine(
         new VCFHeaderLine(HEADER_VIP_ARGS, String.join(" ", appSettings.getArgs())));

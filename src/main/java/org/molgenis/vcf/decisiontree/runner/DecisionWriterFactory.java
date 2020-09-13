@@ -1,10 +1,10 @@
 package org.molgenis.vcf.decisiontree.runner;
 
-import htsjdk.variant.vcf.VCFFileReader;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.DecisionWriter;
+import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 
 interface DecisionWriterFactory {
 
-  DecisionWriter create(VCFFileReader reader, Settings settings);
+  DecisionWriter create(VcfMetadata vcfMetadata, Settings settings);
 }

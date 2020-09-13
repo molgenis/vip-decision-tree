@@ -3,10 +3,9 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 
-import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.vcf.VCFHeader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.slf4j.Logger;
@@ -23,35 +22,33 @@ public class ClassifierImpl implements Classifier {
   }
 
   @Override
-  public void classify(
-      Iterable<VariantContext> records,
-      DecisionTree decisionTree,
-      DecisionWriter writer,
-      VCFHeader header) {
-    int nrRecord = 0;
-    for (VariantContext vcfRecord : records) {
-      ++nrRecord;
+  public void classify(VcfReader vcfReader, DecisionTree decisionTree, DecisionWriter writer) {
+    VcfMetadata vcfMetadata = vcfReader.getMetadata();
 
-      List<Decision> decisions = processRecord(vcfRecord, decisionTree, header);
-      writer.write(decisions, vcfRecord);
+    AtomicInteger nrRecord = new AtomicInteger(0);
+    vcfReader.stream()
+        .forEach(
+            vcfRecord -> {
+              List<Decision> decisions = processRecord(vcfRecord, decisionTree, vcfMetadata);
+              writer.write(decisions, vcfRecord);
 
-      if (nrRecord % 25000 == 0) {
-        LOGGER.debug("processed {} records", nrRecord);
-      }
-    }
+              if (nrRecord.incrementAndGet() % 25000 == 0) {
+                LOGGER.debug("processed {} records", nrRecord);
+              }
+            });
   }
 
   private List<Decision> processRecord(
-      VariantContext vcfRecord, DecisionTree decisionTree, VCFHeader header) {
-    int nrAltAlleles = vcfRecord.getNAlleles() - 1;
+      VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata) {
+    int nrAltAlleles = vcfRecord.getNrAltAllelles();
     List<Decision> decisions;
     if (nrAltAlleles == 1) {
-      Decision decision = processVariant(vcfRecord, 1, decisionTree, header);
+      Decision decision = processVariant(vcfRecord, 1, decisionTree, vcfMetadata);
       decisions = singletonList(decision);
     } else {
       decisions = new ArrayList<>(nrAltAlleles);
       for (int i = 0; i < nrAltAlleles; ++i) {
-        Decision decision = processVariant(vcfRecord, i + 1, decisionTree, header);
+        Decision decision = processVariant(vcfRecord, i + 1, decisionTree, vcfMetadata);
         decisions.add(decision);
       }
     }
@@ -59,8 +56,8 @@ public class ClassifierImpl implements Classifier {
   }
 
   private Decision processVariant(
-      VariantContext vcfRecord, int alleleIndex, DecisionTree decisionTree, VCFHeader header) {
-    Variant variant = new Variant(header, vcfRecord, alleleIndex);
+      VcfRecord vcfRecord, int alleleIndex, DecisionTree decisionTree, VcfMetadata vcfMetadata) {
+    Variant variant = new Variant(vcfMetadata, vcfRecord, alleleIndex);
     return decisionTreeExecutor.execute(decisionTree, variant);
   }
 }

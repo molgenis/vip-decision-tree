@@ -30,21 +30,22 @@ public class DecisionWriterImpl implements DecisionWriter {
     this(vcfWriter, false, false);
   }
 
-  public DecisionWriterImpl(VariantContextWriter vcfWriter, boolean writeLabels,
-      boolean writePaths) {
+  public DecisionWriterImpl(
+      VariantContextWriter vcfWriter, boolean writeLabels, boolean writePaths) {
     this.vcfWriter = requireNonNull(vcfWriter);
     this.writeLabels = writeLabels;
     this.writePaths = writePaths;
   }
 
   @Override
-  public void write(List<Decision> decisions, VariantContext vcfRecord) {
-    VariantContext updatedVariantContext = addDecisions(decisions, vcfRecord);
+  public void write(List<Decision> decisions, VcfRecord vcfRecord) {
+    VariantContext variantContext = vcfRecord.unwrap();
+    VariantContext updatedVariantContext = addDecisions(decisions, variantContext);
     vcfWriter.add(updatedVariantContext);
   }
 
-  private VariantContext addDecisions(List<Decision> decisions, VariantContext vcfRecord) {
-    CommonInfo commonInfo = vcfRecord.getCommonInfo();
+  private VariantContext addDecisions(List<Decision> decisions, VariantContext variantContext) {
+    CommonInfo commonInfo = variantContext.getCommonInfo();
 
     addDecisionClass(decisions, commonInfo);
     if (writePaths) {
@@ -54,7 +55,7 @@ public class DecisionWriterImpl implements DecisionWriter {
     if (writeLabels) {
       addDecisionLabels(decisions, commonInfo);
     }
-    return vcfRecord;
+    return variantContext;
   }
 
   private static void addDecisionLabels(List<Decision> decisions, CommonInfo commonInfo) {

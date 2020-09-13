@@ -25,14 +25,14 @@ public class VcfUtils {
   }
 
   public static Object getValue(String field, Variant rfc) {
-    VariantContext vc = rfc.getVcfRecord();
+    VariantContext vc = rfc.getVcfRecord().unwrap();
     if (field.startsWith(INFO_PREFIX)) {
       String infoField = field.replace(INFO_PREFIX, "");
       Object value = getValue(field, vc);
       if (value == null) {
         return null;
       }
-      VCFInfoHeaderLine infoHeader = rfc.getVcfMetadata().getInfoHeaderLine(infoField);
+      VCFInfoHeaderLine infoHeader = rfc.getVcfMetadata().unwrap().getInfoHeaderLine(infoField);
       if (infoHeader.getCountType() == VCFHeaderLineCount.A) {
         if (vc.getAlternateAlleles().size() > 1) {
           if (value instanceof List) {
@@ -95,10 +95,10 @@ public class VcfUtils {
   }
 
   public static String getVariantIdentifier(Variant variant) {
-    return variant.getVcfRecord().getContig()
+    return variant.getVcfRecord().unwrap().getContig()
         + " "
-        + variant.getVcfRecord().getStart()
+        + variant.getVcfRecord().unwrap().getStart()
         + " "
-        + variant.getVcfRecord().getAlternateAllele(variant.getAlleleIndex() - 1);
+        + variant.getVcfRecord().unwrap().getAlternateAllele(variant.getAlleleIndex() - 1);
   }
 }
