@@ -33,6 +33,8 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
     this.decisionTreeFactory = requireNonNull(decisionTreeFactory);
   }
 
+  // Suppress 'Resources should be closed'
+  @SuppressWarnings("java:S2095")
   @Override
   public AppRunner create(Settings settings) {
     VcfReader vcfReader = vcfReaderFactory.create(settings);
