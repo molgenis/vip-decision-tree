@@ -3,13 +3,8 @@ package org.molgenis.vcf.decisiontree;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_DEBUG;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_DEBUG_LONG;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_FORCE;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_FORCE_LONG;
 
 import ch.qos.logback.classic.Level;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import lombok.NonNull;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -72,21 +67,9 @@ class AppCommandLineRunner implements CommandLineRunner {
 
     try {
       Settings settings = createSettings(args);
-
-      @NonNull Path outputReportPath = settings.getWriterSettings().getOutputVcfPath();
-      if (settings.getWriterSettings().isOverwriteOutput()) {
-        Files.deleteIfExists(outputReportPath);
-      } else if (Files.exists(outputReportPath)) {
-        throw new IllegalArgumentException(
-            String.format(
-                "cannot create report '%s' because it already exists, use -%s or --%s to overwrite existing file",
-                outputReportPath, OPT_FORCE, OPT_FORCE_LONG));
-      }
-
       try (AppRunner appRunner = appRunnerFactory.create(settings)) {
         appRunner.run();
       }
-
     } catch (Exception e) {
       LOGGER.error(e.getLocalizedMessage(), e);
       System.exit(STATUS_MISC_ERROR);

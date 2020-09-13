@@ -1,5 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner;
 
+import static java.lang.String.format;
+
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
 import htsjdk.variant.vcf.VCFFileReader;
@@ -8,7 +10,10 @@ import htsjdk.variant.vcf.VCFHeaderLine;
 import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
-import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.molgenis.vcf.decisiontree.AppSettings;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.WriterSettings;
@@ -38,8 +43,22 @@ class DecisionWriterFactoryImpl implements DecisionWriterFactory {
 
   // TODO check whether writing .vcf or .vcf.gz based on file extension works
   private static VariantContextWriter createVcfWriter(WriterSettings settings) {
-    File outputFile = settings.getOutputVcfPath().toFile();
-    return new VariantContextWriterBuilder().clearOptions().setOutputFile(outputFile).build();
+    Path outputVcfPath = settings.getOutputVcfPath();
+    if (settings.isOverwriteOutput()) {
+      try {
+        Files.deleteIfExists(outputVcfPath);
+      } catch (IOException e) {
+        throw new UncheckedIOException(e);
+      }
+    } else if (Files.exists(outputVcfPath)) {
+      throw new IllegalArgumentException(
+          format("cannot create '%s' because it already exists.", outputVcfPath));
+    }
+
+    return new VariantContextWriterBuilder()
+        .clearOptions()
+        .setOutputFile(outputVcfPath.toFile())
+        .build();
   }
 
   private static VCFHeader createHeader(VCFFileReader reader, Settings settings) {
