@@ -34,9 +34,14 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
   @Override
   public AppRunner create(Settings settings) {
     VCFFileReader vcfFileReader = readerFactory.create(settings);
-    Classifier classifier = classifierFactory.create(settings);
-    DecisionTree decisionTree = decisionTreeFactory.map(settings.getConfigDecisionTree());
-    DecisionWriter decisionWriter = decisionWriterFactory.create(vcfFileReader, settings);
-    return new AppRunnerImpl(classifier, vcfFileReader, decisionTree, decisionWriter);
+    try {
+      Classifier classifier = classifierFactory.create(settings);
+      DecisionTree decisionTree = decisionTreeFactory.map(vcfFileReader, settings);
+      DecisionWriter decisionWriter = decisionWriterFactory.create(vcfFileReader, settings);
+      return new AppRunnerImpl(classifier, vcfFileReader, decisionTree, decisionWriter);
+    } catch (Exception e) {
+      vcfFileReader.close();
+      throw e;
+    }
   }
 }

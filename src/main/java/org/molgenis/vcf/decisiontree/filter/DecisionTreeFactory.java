@@ -1,9 +1,10 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import htsjdk.variant.vcf.VCFFileReader;
+import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 
 public interface DecisionTreeFactory {
 
-  DecisionTree map(ConfigDecisionTree configDecisionTree);
+  DecisionTree map(VCFFileReader vcfFileReader, Settings settings);
 }

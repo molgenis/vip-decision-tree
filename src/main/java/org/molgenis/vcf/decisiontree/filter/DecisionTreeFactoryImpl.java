@@ -4,10 +4,12 @@ import static java.util.Collections.emptyMap;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+import htsjdk.variant.vcf.VCFFileReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
@@ -37,7 +39,8 @@ public class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   private static final String FIELD_SEPARATOR = "/";
 
   @Override
-  public DecisionTree map(ConfigDecisionTree configDecisionTree) {
+  public DecisionTree map(VCFFileReader vcfFileReader, Settings settings) {
+    ConfigDecisionTree configDecisionTree = settings.getConfigDecisionTree();
     Map<String, Label> labelMap = mapLabels(configDecisionTree.getLabels());
     Map<String, Node> nodeMap = mapNodes(configDecisionTree.getNodes(), labelMap);
     Node rootNode = nodeMap.get(configDecisionTree.getRootNode());
