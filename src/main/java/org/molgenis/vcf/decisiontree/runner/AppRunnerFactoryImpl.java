@@ -6,24 +6,23 @@ import htsjdk.variant.vcf.VCFFileReader;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.Classifier;
 import org.molgenis.vcf.decisiontree.filter.DecisionWriter;
-import org.molgenis.vcf.decisiontree.filter.ReaderFactory;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.springframework.stereotype.Component;
 
 @Component
 class AppRunnerFactoryImpl implements AppRunnerFactory {
 
-  private final ReaderFactory readerFactory;
+  private final VcfReaderFactory vcfReaderFactory;
   private final ClassifierFactory classifierFactory;
   private final DecisionWriterFactory decisionWriterFactory;
   private final DecisionTreeFactory decisionTreeFactory;
 
   AppRunnerFactoryImpl(
-      ReaderFactory readerFactory,
+      VcfReaderFactory vcfReaderFactory,
       ClassifierFactory classifierFactory,
       DecisionWriterFactory decisionWriterFactory,
       DecisionTreeFactory decisionTreeFactory) {
-    this.readerFactory = requireNonNull(readerFactory);
+    this.vcfReaderFactory = requireNonNull(vcfReaderFactory);
     this.classifierFactory = requireNonNull(classifierFactory);
     this.decisionWriterFactory = requireNonNull(decisionWriterFactory);
     this.decisionTreeFactory = requireNonNull(decisionTreeFactory);
@@ -31,7 +30,7 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
 
   @Override
   public AppRunner create(Settings settings) {
-    VCFFileReader vcfFileReader = readerFactory.create(settings);
+    VCFFileReader vcfFileReader = vcfReaderFactory.create(settings);
     try {
       Classifier classifier = classifierFactory.create(settings);
       DecisionTree decisionTree = decisionTreeFactory.map(vcfFileReader, settings);
