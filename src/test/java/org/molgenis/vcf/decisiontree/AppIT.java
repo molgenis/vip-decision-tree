@@ -37,7 +37,7 @@ class AppIT {
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
 
     Path expectedOutputFile = ResourceUtils.getFile("classpath:example-classified.vcf").toPath();
-    String expectedOutputVcf = Files.readString(expectedOutputFile);
+    String expectedOutputVcf = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
 
     assertEquals(expectedOutputVcf, outputVcf);
   }
@@ -60,8 +60,7 @@ class AppIT {
 
     Path expectedOutputFile = ResourceUtils.getFile("classpath:example-classified_paths-labels.vcf")
         .toPath();
-    String expectedOutputVcf = Files.readString(expectedOutputFile);
-
+    String expectedOutputVcf = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
     assertEquals(expectedOutputVcf, outputVcf);
   }
 }
