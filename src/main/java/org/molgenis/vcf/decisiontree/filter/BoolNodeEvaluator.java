@@ -1,16 +1,12 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import static org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator.IN;
-import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getValue;
-import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getVariantIdentifier;
-
-import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.List;
+import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
+import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
-import org.molgenis.vcf.decisiontree.utils.VcfUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,63 +14,94 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
 
   @Override
   public NodeOutcome evaluate(BoolNode node, Variant variant) {
-    Object value = getValue(node.getQuery().getField(), variant);
-    if (value == null) {
-      NodeOutcome outcomeMissing = node.getOutcomeMissing();
-      if (outcomeMissing != null) {
-        return outcomeMissing;
-      } else {
-        throw new EvaluationException(
-            VcfUtils.getVariantIdentifier(variant)
-                + " "
-                + node.getQuery().getField().stream().collect(Collectors.joining("/"))
-                + ": null value detected in filter '"
-                + "TODO_ADD_ID_TO_NODE"
-                + "'. suggestion: add an 'outcomeMissing' property to the filter definition.");
+    NodeOutcome nodeOutcome;
+
+    BoolQuery query = node.getQuery();
+    Object value = variant.getValue(query.getField());
+    if (value != null) {
+      boolean matches = executeQuery(query, value);
+      nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();
+    } else {
+      nodeOutcome = node.getOutcomeMissing();
+      if (nodeOutcome == null) {
+        throw new EvaluationException(node, variant, "missing 'missingOutcome'");
       }
     }
-    boolean matches = executeQuery(node, variant);
-    return matches ? node.getOutcomeTrue() : node.getOutcomeFalse();
+
+    return nodeOutcome;
   }
 
-  private boolean executeQuery(BoolNode node, Variant rfc) {
-    BoolQuery query = node.getQuery();
-    Object value = getValue(query.getField(), rfc);
-    Operator operator = query.getOperator();
-    try {
-      // FIXME: better validation and conversion of numeric or collection values
-      Double doubleValue;
-      switch (operator) {
-        case EQUALS:
-          return value.equals(query.getValue());
-        case NOT_EQUALS:
-          return !value.equals(query.getValue());
-        case GREATER:
-          doubleValue = Double.parseDouble(value.toString());
-          return doubleValue > Double.parseDouble(query.getValue().toString());
-        case GREATER_OR_EQUAL:
-          doubleValue = Double.parseDouble(value.toString());
-          return doubleValue >= Double.parseDouble(query.getValue().toString());
-        case LESS:
-          doubleValue = Double.parseDouble(value.toString());
-          return doubleValue < Double.parseDouble(query.getValue().toString());
-        case LESS_OR_EQUAL:
-          doubleValue = Double.parseDouble(value.toString());
-          return doubleValue <= Double.parseDouble(query.getValue().toString());
-        case IN:
-        case NOT_IN:
-          Collection<Object> filterValue = (Collection<Object>) query.getValue();
-          return filterValue.contains(value) == (operator == IN);
-        default:
-          throw new IllegalStateException(
-              String.format("Unknown operator: %s", query.getOperator()));
-      }
-    } catch (NumberFormatException e) {
-      // FIXME: proper exception
-      throw new RuntimeException(
-          String.format(
-              "Value '%s' for field '%s' in variant '%s' is not a number",
-              value, node.getQuery().getField(), getVariantIdentifier(rfc)));
+  private boolean executeQuery(BoolQuery boolQuery, Object value) {
+    boolean matches;
+
+    Field field = boolQuery.getField();
+    Operator operator = boolQuery.getOperator();
+    Object queryValue = boolQuery.getValue();
+    switch (operator) {
+      case EQUALS:
+        matches = value.equals(queryValue);
+        break;
+      case NOT_EQUALS:
+        matches = !value.equals(queryValue);
+        break;
+      case LESS:
+        matches = executeLessQuery(field, value, queryValue);
+        break;
+      case LESS_OR_EQUAL:
+        matches = !executeGreaterQuery(field, value, queryValue);
+        break;
+      case GREATER:
+        matches = executeGreaterQuery(field, value, queryValue);
+        break;
+      case GREATER_OR_EQUAL:
+        matches = !executeLessQuery(field, value, queryValue);
+        break;
+      case IN:
+        matches = executeInQuery((List<?>) value, queryValue);
+        break;
+      case NOT_IN:
+        matches = !executeInQuery((List<?>) value, queryValue);
+        break;
+      default:
+        throw new UnexpectedEnumException(operator);
     }
+
+    return matches;
+  }
+
+  @SuppressWarnings("DuplicatedCode")
+  private boolean executeLessQuery(Field field, Object value, Object queryValue) {
+    boolean matches;
+    switch (field.getValueType()) {
+      case INTEGER:
+        matches = ((Integer) value) < ((Integer) queryValue);
+        break;
+      case FLOAT:
+        matches = ((Double) value) < ((Double) queryValue);
+        break;
+      default:
+        throw new UnexpectedEnumException(field.getValueType());
+    }
+    return matches;
+  }
+
+  @SuppressWarnings("DuplicatedCode")
+  private boolean executeGreaterQuery(Field field, Object value, Object queryValue) {
+    boolean matches;
+    switch (field.getValueType()) {
+      case INTEGER:
+        matches = ((Integer) value) > ((Integer) queryValue);
+        break;
+      case FLOAT:
+        matches = ((Double) value) > ((Double) queryValue);
+        break;
+      default:
+        throw new UnexpectedEnumException(field.getValueType());
+    }
+    return matches;
+  }
+
+  private boolean executeInQuery(List<?> values, Object queryValue) {
+    return values.contains(queryValue);
   }
 }

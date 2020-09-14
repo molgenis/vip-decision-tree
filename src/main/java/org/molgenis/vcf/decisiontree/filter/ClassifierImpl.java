@@ -40,7 +40,7 @@ public class ClassifierImpl implements Classifier {
 
   private List<Decision> processRecord(
       VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata) {
-    int nrAltAlleles = vcfRecord.getNrAltAllelles();
+    int nrAltAlleles = vcfRecord.getNrAltAlleles();
     List<Decision> decisions;
     if (nrAltAlleles == 1) {
       Decision decision = processVariant(vcfRecord, 1, decisionTree, vcfMetadata);

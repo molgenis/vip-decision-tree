@@ -41,7 +41,6 @@ class DecisionWriterFactoryImpl implements DecisionWriterFactory {
         vcfWriter, settings.getWriterSettings().isWriteLabels(), writerSettings.isWritePath());
   }
 
-  // TODO check whether writing .vcf or .vcf.gz based on file extension works
   private static VariantContextWriter createVcfWriter(WriterSettings settings) {
     Path outputVcfPath = settings.getOutputVcfPath();
     if (settings.isOverwriteOutput()) {

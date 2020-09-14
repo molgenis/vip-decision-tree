@@ -34,8 +34,8 @@ class ClassifierImplTest {
     VcfMetadata vcfMetadata = mock(VcfMetadata.class);
 
     VcfReader vcfReader = mock(VcfReader.class);
-    VcfRecord record0 = when(mock(VcfRecord.class).getNrAltAllelles()).thenReturn(1).getMock();
-    VcfRecord record1 = when(mock(VcfRecord.class).getNrAltAllelles()).thenReturn(2).getMock();
+    VcfRecord record0 = when(mock(VcfRecord.class).getNrAltAlleles()).thenReturn(1).getMock();
+    VcfRecord record1 = when(mock(VcfRecord.class).getNrAltAlleles()).thenReturn(2).getMock();
     when(vcfReader.stream()).thenReturn(Stream.of(record0, record1));
     when(vcfReader.getMetadata()).thenReturn(vcfMetadata);
 
