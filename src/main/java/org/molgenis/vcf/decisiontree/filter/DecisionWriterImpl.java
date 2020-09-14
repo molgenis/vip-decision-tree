@@ -60,7 +60,9 @@ public class DecisionWriterImpl implements DecisionWriter {
 
   private static void addDecisionLabels(List<Decision> decisions, CommonInfo commonInfo) {
     String infoLabelsValue;
-    if (decisions.size() == 1) {
+    if (decisions.isEmpty()) {
+      infoLabelsValue = VCFConstants.MISSING_VALUE_v4;
+    } else if (decisions.size() == 1) {
       infoLabelsValue = getVcfLabel(decisions.get(0));
     } else {
       infoLabelsValue =
@@ -82,7 +84,9 @@ public class DecisionWriterImpl implements DecisionWriter {
 
   private static void addDecisionsPath(List<Decision> decisions, CommonInfo commonInfo) {
     String infoPathValue;
-    if (decisions.size() == 1) {
+    if (decisions.isEmpty()) {
+      infoPathValue = VCFConstants.MISSING_VALUE_v4;
+    } else if (decisions.size() == 1) {
       infoPathValue = getVcfPath(decisions.get(0));
     } else {
       infoPathValue = decisions.stream().map(DecisionWriterImpl::getVcfPath).collect(joining(","));
@@ -103,7 +107,9 @@ public class DecisionWriterImpl implements DecisionWriter {
 
   private static void addDecisionClass(List<Decision> decisions, CommonInfo commonInfo) {
     String infoClassValue;
-    if (decisions.size() == 1) {
+    if (decisions.isEmpty()) {
+      infoClassValue = VCFConstants.MISSING_VALUE_v4;
+    } else if (decisions.size() == 1) {
       infoClassValue = decisions.get(0).getClazz();
     } else {
       infoClassValue = decisions.stream().map(Decision::getClazz).collect(joining(","));
