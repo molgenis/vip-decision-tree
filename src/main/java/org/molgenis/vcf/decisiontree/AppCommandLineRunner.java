@@ -5,6 +5,8 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_DEBUG;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_DEBUG_LONG;
 
 import ch.qos.logback.classic.Level;
+import java.util.Locale;
+import java.util.Locale.Category;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -47,9 +49,12 @@ class AppCommandLineRunner implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
+    // workaround for https://github.com/samtools/htsjdk/issues/1510
+    Locale.setDefault(Category.FORMAT, Locale.US);
+
     if (args.length == 1
         && (args[0].equals("-" + AppCommandLineOptions.OPT_VERSION)
-            || args[0].equals("--" + AppCommandLineOptions.OPT_VERSION_LONG))) {
+        || args[0].equals("--" + AppCommandLineOptions.OPT_VERSION_LONG))) {
       LOGGER.info("{} {}", appName, appVersion);
       return;
     }
