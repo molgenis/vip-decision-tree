@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
@@ -34,6 +35,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 class DecisionTreeFactoryImpl implements DecisionTreeFactory {
+
+  private final QueryValidator queryValidator;
+
+  DecisionTreeFactoryImpl(QueryValidator queryValidator) {
+    this.queryValidator = requireNonNull(queryValidator);
+  }
 
   @Override
   public DecisionTree map(VcfMetadata vcfMetadata, Settings settings) {
@@ -108,10 +115,10 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .build();
   }
 
-  // TODO validate query: is field/operator/value allowed?
   private BoolQuery toBoolQuery(VcfMetadata vcfMetadata, ConfigBoolQuery configBoolQuery) {
     Operator operator = toOperator(configBoolQuery.getOperator());
     Field field = vcfMetadata.getField(configBoolQuery.getField());
+    queryValidator.validateBooleanNode(configBoolQuery, field);
     return BoolQuery.builder()
         .field(field)
         .operator(operator)
@@ -146,16 +153,22 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       case NOT_IN:
         operator = Operator.NOT_IN;
         break;
+      case CONTAINS:
+        operator = Operator.CONTAINS;
+        break;
+      case NOT_CONTAINS:
+        operator = Operator.NOT_CONTAINS;
+        break;
       default:
         throw new UnexpectedEnumException(configOperator);
     }
     return operator;
   }
 
-  // TODO validate whether node can work with this kind of field
   private CategoricalNode toCategoricalNode(
       VcfMetadata vcfMetadata, String id, ConfigCategoricalNode nodeConfig) {
     Field field = vcfMetadata.getField(nodeConfig.getField());
+    queryValidator.validateCategoricalNode(field);
     return CategoricalNode.builder()
         .id(id)
         .description(nodeConfig.getDescription())
