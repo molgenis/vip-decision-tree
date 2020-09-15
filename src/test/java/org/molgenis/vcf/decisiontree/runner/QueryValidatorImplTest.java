@@ -19,8 +19,7 @@ class QueryValidatorImplTest {
   void validateBooleanNodeFlagPass() {
     Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.FLAG).valueCount(
         ValueCount.builder().type(Type.FIXED).build()).build();
-   queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-        ConfigOperator.EQUALS).value("test").build(), field);
+   validateBooleanNode(field, ConfigOperator.EQUALS);
   }
 
   @Test
@@ -29,16 +28,14 @@ class QueryValidatorImplTest {
         ValueCount.builder().type(Type.FIXED).build()).build();
     assertThrows(
         UnsupportedValueTypeException.class,
-        () -> queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.CONTAINS).value("test").build(), field));
+        () -> validateBooleanNode(field, ConfigOperator.CONTAINS));
   }
 
   @Test
   void validateBooleanNodeFloatPass() {
     Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.INTEGER).valueCount(
         ValueCount.builder().type(Type.FIXED).count(1).build()).build();
-    queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.GREATER).value("test").build(), field);
+    validateBooleanNode(field, ConfigOperator.GREATER);
   }
 
   @Test
@@ -47,8 +44,7 @@ class QueryValidatorImplTest {
         ValueCount.builder().type(Type.FIXED).build()).build();
     assertThrows(
         UnsupportedValueTypeException.class,
-        () -> queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.GREATER).value("test").build(), field));
+        () -> validateBooleanNode(field, ConfigOperator.GREATER));
   }
 
   @Test
@@ -57,8 +53,7 @@ class QueryValidatorImplTest {
         ValueCount.builder().type(Type.FIXED).build()).build();
     assertThrows(
         UnsupportedValueTypeException.class,
-        () -> queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.IN).value("test").build(), field));
+        () -> validateBooleanNode(field, ConfigOperator.IN));
   }
 
   @Test
@@ -67,8 +62,7 @@ class QueryValidatorImplTest {
         ValueCount.builder().type(Type.FIXED).count(1).build()).build();
     assertThrows(
         UnsupportedValueCountException.class,
-        () -> queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.CONTAINS).value("test").build(), field));
+        () -> validateBooleanNode(field, ConfigOperator.CONTAINS));
   }
 
   @Test
@@ -77,16 +71,14 @@ class QueryValidatorImplTest {
         ValueCount.builder().type(Type.FIXED).count(2).build()).build();
     assertThrows(
         UnsupportedValueCountException.class,
-        () -> queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.IN).value("test").build(), field));
+        () -> validateBooleanNode(field, ConfigOperator.IN));
   }
 
   @Test
   void validateBooleanNodeInA() {
     Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.STRING).valueCount(
         ValueCount.builder().type(Type.A).build()).build();
-    queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.IN).value("test").build(), field);
+    validateBooleanNode(field, ConfigOperator.IN);
   }
 
   @Test
@@ -95,8 +87,7 @@ class QueryValidatorImplTest {
         ValueCount.builder().type(Type.G).count(2).build()).build();
     assertThrows(
         UnsupportedValueCountTypeException.class,
-        () -> queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.IN).value("test").build(), field));
+        () -> validateBooleanNode(field, ConfigOperator.IN));
   }
 
   @Test
@@ -105,8 +96,7 @@ class QueryValidatorImplTest {
         ValueCount.builder().type(Type.VARIABLE).count(2).build()).build();
     assertThrows(
         UnsupportedValueCountTypeException.class,
-        () -> queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.IN).value("test").build(), field));
+        () -> validateBooleanNode(field, ConfigOperator.IN));
   }
 
   @Test
@@ -177,5 +167,10 @@ class QueryValidatorImplTest {
     Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.STRING).valueCount(
         ValueCount.builder().type(Type.FIXED).count(1).build()).build();
     queryValidator.validateCategoricalNode(field);
+  }
+
+  private void validateBooleanNode(Field field, ConfigOperator operator) {
+    queryValidator.validateBooleanNode(ConfigBoolQuery.builder().field("test").operator(
+        operator).value("test").build(), field);
   }
 }
