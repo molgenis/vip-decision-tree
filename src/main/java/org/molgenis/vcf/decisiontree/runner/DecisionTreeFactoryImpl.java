@@ -1,12 +1,11 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
@@ -16,6 +15,7 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.Label;
 import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
 import org.molgenis.vcf.decisiontree.filter.model.Node;
@@ -36,13 +36,17 @@ import org.springframework.stereotype.Component;
 @Component
 class DecisionTreeFactoryImpl implements DecisionTreeFactory {
 
-  private static final String FIELD_SEPARATOR = "/";
+  private final QueryValidator queryValidator;
+
+  DecisionTreeFactoryImpl(QueryValidator queryValidator) {
+    this.queryValidator = requireNonNull(queryValidator);
+  }
 
   @Override
   public DecisionTree map(VcfMetadata vcfMetadata, Settings settings) {
     ConfigDecisionTree configDecisionTree = settings.getConfigDecisionTree();
     Map<String, Label> labelMap = mapLabels(configDecisionTree.getLabels());
-    Map<String, Node> nodeMap = mapNodes(configDecisionTree.getNodes(), labelMap);
+    Map<String, Node> nodeMap = mapNodes(vcfMetadata, configDecisionTree.getNodes(), labelMap);
     Node rootNode = nodeMap.get(configDecisionTree.getRootNode());
     return DecisionTree.builder().rootNode(rootNode).build();
   }
@@ -65,11 +69,11 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   }
 
   private Map<String, Node> mapNodes(
-      Map<String, ConfigNode> configNodeMap, Map<String, Label> labelMap) {
+      VcfMetadata vcfMetadata, Map<String, ConfigNode> configNodeMap, Map<String, Label> labelMap) {
     // first pass: create nodes
     Map<String, Node> nodeMap =
         configNodeMap.entrySet().stream()
-            .map(entry -> this.toNode(entry.getKey(), entry.getValue()))
+            .map(entry -> this.toNode(vcfMetadata, entry.getKey(), entry.getValue()))
             .collect(toMap(Node::getId, identity()));
 
     // second pass: update nodes
@@ -83,14 +87,14 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     return nodeMap;
   }
 
-  private Node toNode(String id, ConfigNode configNode) {
+  private Node toNode(VcfMetadata vcfMetadata, String id, ConfigNode configNode) {
     Node node;
     switch (configNode.getType()) {
       case BOOL:
-        node = toBoolNode(id, (ConfigBoolNode) configNode);
+        node = toBoolNode(vcfMetadata, id, (ConfigBoolNode) configNode);
         break;
       case CATEGORICAL:
-        node = toCategoricalNode(id, (ConfigCategoricalNode) configNode);
+        node = toCategoricalNode(vcfMetadata, id, (ConfigCategoricalNode) configNode);
         break;
       case LEAF:
         node = toLeafNode(id, (ConfigLeafNode) configNode);
@@ -102,8 +106,8 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     return node;
   }
 
-  private BoolNode toBoolNode(String id, ConfigBoolNode nodeConfig) {
-    BoolQuery boolQuery = toBoolQuery(nodeConfig.getQuery());
+  private BoolNode toBoolNode(VcfMetadata vcfMetadata, String id, ConfigBoolNode nodeConfig) {
+    BoolQuery boolQuery = toBoolQuery(vcfMetadata, nodeConfig.getQuery());
     return BoolNode.builder()
         .id(id)
         .description(nodeConfig.getDescription())
@@ -111,9 +115,10 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .build();
   }
 
-  private BoolQuery toBoolQuery(ConfigBoolQuery configBoolQuery) {
+  private BoolQuery toBoolQuery(VcfMetadata vcfMetadata, ConfigBoolQuery configBoolQuery) {
     Operator operator = toOperator(configBoolQuery.getOperator());
-    List<String> field = Arrays.asList(configBoolQuery.getField().split(FIELD_SEPARATOR));
+    Field field = vcfMetadata.getField(configBoolQuery.getField());
+    queryValidator.validateBooleanNode(configBoolQuery, field);
     return BoolQuery.builder()
         .field(field)
         .operator(operator)
@@ -148,14 +153,22 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       case NOT_IN:
         operator = Operator.NOT_IN;
         break;
+      case CONTAINS:
+        operator = Operator.CONTAINS;
+        break;
+      case NOT_CONTAINS:
+        operator = Operator.NOT_CONTAINS;
+        break;
       default:
         throw new UnexpectedEnumException(configOperator);
     }
     return operator;
   }
 
-  private CategoricalNode toCategoricalNode(String id, ConfigCategoricalNode nodeConfig) {
-    List<String> field = Arrays.asList(nodeConfig.getField().split(FIELD_SEPARATOR));
+  private CategoricalNode toCategoricalNode(
+      VcfMetadata vcfMetadata, String id, ConfigCategoricalNode nodeConfig) {
+    Field field = vcfMetadata.getField(nodeConfig.getField());
+    queryValidator.validateCategoricalNode(field);
     return CategoricalNode.builder()
         .id(id)
         .description(nodeConfig.getDescription())

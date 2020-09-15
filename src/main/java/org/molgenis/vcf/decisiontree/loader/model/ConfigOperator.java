@@ -18,5 +18,9 @@ public enum ConfigOperator {
   @JsonProperty("in")
   IN,
   @JsonProperty("!in")
-  NOT_IN
+  NOT_IN,
+  @JsonProperty("contains")
+  CONTAINS,
+  @JsonProperty("!contains")
+  NOT_CONTAINS
 }

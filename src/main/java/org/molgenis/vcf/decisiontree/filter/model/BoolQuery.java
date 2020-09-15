@@ -1,6 +1,5 @@
 package org.molgenis.vcf.decisiontree.filter.model;
 
-import java.util.List;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
@@ -16,10 +15,12 @@ public class BoolQuery {
     GREATER,
     GREATER_OR_EQUAL,
     IN,
-    NOT_IN
+    NOT_IN,
+    CONTAINS,
+    NOT_CONTAINS
   }
 
-  @NonNull List<String> field;
+  @NonNull Field field;
   @NonNull Operator operator;
   @NonNull Object value;
 }
