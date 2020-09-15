@@ -186,7 +186,59 @@ class BoolNodeEvaluatorTest {
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.IN;
-    String queryValue = "str1";
+    List<String> queryValue = List.of("str0", "str1", "str2");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn("str0");
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateNotInFalseString() {
+    Field field = mock(Field.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.NOT_IN;
+    List<String> queryValue = List.of("str0", "str1", "str2");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn("str0");
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsTrueString() {
+    Field field = mock(Field.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS;
+    String queryValue = "str0";
     BoolQuery boolQuery =
         BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
     NodeOutcome outcomeTrue = mock(NodeOutcome.class);
@@ -207,11 +259,11 @@ class BoolNodeEvaluatorTest {
   }
 
   @Test
-  void evaluateNotInFalseString() {
+  void evaluateNotContainsFalseString() {
     Field field = mock(Field.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
-    Operator operator = Operator.NOT_IN;
+    Operator operator = Operator.NOT_CONTAINS;
     String queryValue = "str1";
     BoolQuery boolQuery =
         BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
