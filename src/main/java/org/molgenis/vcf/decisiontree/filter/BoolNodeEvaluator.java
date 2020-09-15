@@ -57,10 +57,16 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
         matches = !executeLessQuery(field, value, queryValue);
         break;
       case IN:
-        matches = executeInQuery((List<?>) value, queryValue);
+        matches = executeInQuery(value, (List<?>) queryValue);
         break;
       case NOT_IN:
-        matches = !executeInQuery((List<?>) value, queryValue);
+        matches = !executeInQuery(value, (List<?>) queryValue);
+        break;
+      case CONTAINS:
+        matches = executeContainsQuery((List<?>) value, queryValue);
+        break;
+      case NOT_CONTAINS:
+        matches = !executeContainsQuery((List<?>) value, queryValue);
         break;
       default:
         throw new UnexpectedEnumException(operator);
@@ -101,7 +107,11 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
     return matches;
   }
 
-  private boolean executeInQuery(List<?> values, Object queryValue) {
+  private boolean executeContainsQuery(List<?> values, Object queryValue) {
     return values.contains(queryValue);
+  }
+
+  private boolean executeInQuery(Object value, List<?> queryValues) {
+    return queryValues.contains(value);
   }
 }

@@ -15,7 +15,9 @@ public class BoolQuery {
     GREATER,
     GREATER_OR_EQUAL,
     IN,
-    NOT_IN
+    NOT_IN,
+    CONTAINS,
+    NOT_CONTAINS
   }
 
   @NonNull Field field;
