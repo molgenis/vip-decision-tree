@@ -2,10 +2,14 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 
 import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.vcf.VCFConstants;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -18,6 +22,8 @@ import org.molgenis.vcf.decisiontree.utils.VcfUtils;
  * {@link VariantContext} wrapper that works with nested data (e.g. CSQ INFO fields)..
  */
 public class VcfRecord {
+
+  private static final List<String> PASS_FILTER = singletonList(VCFConstants.PASSES_FILTERS_v4);
 
   private final VariantContext variantContext;
 
@@ -76,10 +82,27 @@ public class VcfRecord {
         value = variantContext.hasLog10PError() ? variantContext.getPhredScaledQual() : null;
         break;
       case "FILTER":
-        value = variantContext.getFilters();
+        value = getCommonFilterValue();
         break;
       default:
         throw new UnknownFieldException(field.getId(), FieldType.COMMON);
+    }
+    return value;
+  }
+
+  private Object getCommonFilterValue() {
+    Object value;
+    Set<String> filters = variantContext.getFiltersMaybeNull();
+    if (filters == null) {
+      value = emptyList();
+    } else if (filters.isEmpty()) {
+      value = PASS_FILTER;
+    } else {
+      if (filters.size() == 1) {
+        value = singletonList(filters.iterator().next());
+      } else {
+        value = new ArrayList<>(filters);
+      }
     }
     return value;
   }

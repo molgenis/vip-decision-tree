@@ -3,6 +3,7 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.VariantContext;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -144,18 +146,26 @@ class VcfRecordTest {
     Set<String> filters = new LinkedHashSet<>();
     filters.add("filter0");
     filters.add("filter1");
-    when(variantContext.getFilters()).thenReturn(filters);
+    when(variantContext.getFiltersMaybeNull()).thenReturn(filters);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("FILTER");
-    assertEquals(filters, vcfRecord.getValue(field, 1));
+    assertEquals(new ArrayList<>(filters), vcfRecord.getValue(field, 1));
   }
 
   @Test
   void getValueCommonFiltersMissing() {
-    when(variantContext.getFilters()).thenReturn(emptySet());
+    when(variantContext.getFiltersMaybeNull()).thenReturn(null);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("FILTER");
-    assertEquals(emptySet(), vcfRecord.getValue(field, 1));
+    assertEquals(emptyList(), vcfRecord.getValue(field, 1));
+  }
+
+  @Test
+  void getValueCommonFiltersPass() {
+    when(variantContext.getFiltersMaybeNull()).thenReturn(emptySet());
+    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    when(field.getId()).thenReturn("FILTER");
+    assertEquals(singletonList("PASS"), vcfRecord.getValue(field, 1));
   }
 
   @Test
