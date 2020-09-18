@@ -141,7 +141,13 @@ public class VcfUtils {
   public static List<String> getInfoAsStringList(VariantContext variantContext, Field field) {
     List<String> strValues;
 
-    Object value = variantContext.getAttribute(field.getId());
+    return getInfoAsStringList(variantContext, field.getId());
+  }
+
+  public static List<String> getInfoAsStringList(VariantContext variantContext, String field) {
+    List<String> strValues;
+
+    Object value = variantContext.getAttribute(field);
     if (value == null) {
       strValues = List.of();
     } else if (value instanceof List<?>) {

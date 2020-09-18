@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_CONFIG;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_FORCE;
@@ -10,9 +11,13 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PATH;
 
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Map;
 import org.apache.commons.cli.CommandLine;
-import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
+import org.molgenis.vcf.decisiontree.loader.ConfigLoader;
+import org.molgenis.vcf.decisiontree.loader.model.Config;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigNestedMetadata;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,33 +26,37 @@ class AppCommandLineToSettingsMapper {
 
   private final String appName;
   private final String appVersion;
-  private final ConfigDecisionTreeLoader configDecisionTreeLoader;
+  private final ConfigLoader configLoader;
 
   AppCommandLineToSettingsMapper(
       @Value("${app.name}") String appName,
       @Value("${app.version}") String appVersion,
-      ConfigDecisionTreeLoader configDecisionTreeLoader) {
+      ConfigLoader configLoader) {
     this.appName = appName;
     this.appVersion = appVersion;
-    this.configDecisionTreeLoader = requireNonNull(configDecisionTreeLoader);
+    this.configLoader = requireNonNull(configLoader);
   }
 
   Settings map(CommandLine commandLine, String... args) {
     AppSettings appSettings = createAppSettings(args);
     Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
-    ConfigDecisionTree configDecisionTree = createDecisionTree(commandLine);
+    Config config = loadConfig(commandLine);
+    ConfigDecisionTree configDecisionTree = config.getDecisionTree();
     WriterSettings writerSettings = createWriterSettings(commandLine);
+    Map<String, ConfigNestedMetadata> nestedMetadata = config.getNestedMetadata() != null? config.getNestedMetadata(): Collections
+        .emptyMap();
     return Settings.builder()
         .inputVcfPath(inputPath)
         .configDecisionTree(configDecisionTree)
+        .configNestedMetadata(nestedMetadata)
         .appSettings(appSettings)
         .writerSettings(writerSettings)
         .build();
   }
 
-  private ConfigDecisionTree createDecisionTree(CommandLine commandLine) {
+  private Config loadConfig(CommandLine commandLine) {
     Path configPath = Path.of(commandLine.getOptionValue(OPT_CONFIG));
-    return configDecisionTreeLoader.load(configPath);
+    return configLoader.load(configPath);
   }
 
   private AppSettings createAppSettings(String... args) {

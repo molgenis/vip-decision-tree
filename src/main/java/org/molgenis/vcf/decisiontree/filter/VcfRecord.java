@@ -5,13 +5,18 @@ import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 
 import htsjdk.variant.variantcontext.VariantContext;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigNestedField;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigNestedMetadata;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigSelector;
 import org.molgenis.vcf.decisiontree.utils.VcfUtils;
 
 /**
@@ -20,9 +25,13 @@ import org.molgenis.vcf.decisiontree.utils.VcfUtils;
 public class VcfRecord {
 
   private final VariantContext variantContext;
+  private final Map<String, ConfigNestedMetadata> nestedMetadata;
 
-  public VcfRecord(VariantContext variantContext) {
+
+  public VcfRecord(VariantContext variantContext,
+      Map<String, ConfigNestedMetadata> nestedMetadata) {
     this.variantContext = requireNonNull(variantContext);
+    this.nestedMetadata = nestedMetadata;
   }
 
   public int getNrAltAlleles() {
@@ -44,14 +53,57 @@ public class VcfRecord {
         value = getInfoValue(field, alleleIndex);
         break;
       case INFO_NESTED:
-        throw new UnsupportedOperationException(
-            "INFO_NESTED values are not yet supported."); // TODO
+        String[] fieldTokens = field.getId().split("/");
+        List<String> listValue = VcfUtils.getInfoAsStringList(variantContext, fieldTokens[0]);
+        ConfigNestedMetadata meta = nestedMetadata.get(fieldTokens[0]);
+        value = null;
+        for (String singleValue : listValue) {
+            ConfigNestedField subFieldMeta = meta
+                .getFields().get(fieldTokens[1]);
+          if (selectorsPass(meta,singleValue, alleleIndex)) {
+            int index = subFieldMeta.getIndex();
+            //FIXME pipe separator from config
+            String singleSubValue = singleValue.split("\\|")[index];
+            switch (subFieldMeta.getNumber()) {
+              case A:
+              case R:
+                throw new UnsupportedOperationException(
+                    subFieldMeta.getNumber() + "within a nested value???");//FIXME
+              case VARIABLE:
+                value = Arrays.asList(singleSubValue.split(subFieldMeta.getSeparator()));
+                break;
+              case FIXED:
+               value = subFieldMeta.getCount() == 1 ? singleValue
+                    : Arrays.asList(singleSubValue.split(subFieldMeta.getSeparator()));
+                break;
+              default:
+                throw new UnexpectedEnumException(subFieldMeta.getNumber());
+            }
+          }
+        }
+        break;
       case FORMAT:
         throw new UnsupportedOperationException("FORMAT values are not yet supported."); // TODO
       default:
         throw new UnexpectedEnumException(fieldType);
     }
     return value;
+  }
+
+  private boolean selectorsPass(ConfigNestedMetadata meta, String nestedValueString, int alleleIndex) {
+    for(ConfigSelector selector : meta.getUnique()){
+      ConfigNestedField field = meta.getFields().get(selector.getField());
+      Object value = selector.getValue();
+      if(value.equals("SELECTED_ALLELE")){
+        value = variantContext.getAlternateAllele(alleleIndex-1).getBaseString();
+      }
+      //FIXME: use separator, but cope with pipes
+      String nestedValue = nestedValueString.split("\\|")[field.getIndex()];
+      if(!nestedValue.equals(value)){
+        return false;
+      }
+    }
+    return true;
   }
 
   private Object getCommonValue(Field field, int alleleIndex) {

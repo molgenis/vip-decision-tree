@@ -11,6 +11,7 @@ import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -18,6 +19,8 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.ValueCountBuilder;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigNestedField;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigNestedMetadata;
 
 /**
  * {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields).
@@ -27,9 +30,12 @@ public class VcfMetadata {
   private static final String FIELD_TOKEN_SEPARATOR = "/";
 
   private final VCFHeader vcfHeader;
+  private final Map<String, ConfigNestedMetadata> nestedMetadata;
 
-  public VcfMetadata(VCFHeader vcfHeader) {
+  public VcfMetadata(VCFHeader vcfHeader,
+      Map<String, ConfigNestedMetadata> nestedMetadata) {
     this.vcfHeader = requireNonNull(vcfHeader);
+    this.nestedMetadata = nestedMetadata;
   }
 
   public Field getField(String fieldId) {
@@ -46,8 +52,16 @@ public class VcfMetadata {
         field = toCompoundField(fieldTokens, fieldType);
         break;
       case INFO_NESTED:
-        throw new UnsupportedOperationException(
-            "INFO_NESTED values are not yet supported."); // TODO
+        //FIXME
+        String fieldName = fieldTokens.get(1);
+        String subFieldName = fieldTokens.get(2);
+        ConfigNestedField nestedField = nestedMetadata.get(fieldName).getFields().get(subFieldName);
+        return Field.builder()
+            .id(fieldName + "/" +subFieldName)
+            .fieldType(fieldType)
+            .valueType(nestedField.getType())
+            .valueCount(ValueCount.builder().type(nestedField.getNumber()).count(nestedField.getCount()).build())
+            .build();
       default:
         throw new UnexpectedEnumException(fieldType);
     }

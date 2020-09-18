@@ -14,19 +14,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 
 @ExtendWith(MockitoExtension.class)
-class ConfigDecisionTreeLoaderImplTest {
-  private ConfigDecisionTreeLoaderImpl configDecisionTreeLoader;
+class ConfigLoaderImplTest {
+  private ConfigLoaderImpl configDecisionTreeLoader;
   @Mock private ConfigDecisionTreeValidator configDecisionTreeValidator;
 
   @BeforeEach
   void setUp() {
-    configDecisionTreeLoader = new ConfigDecisionTreeLoaderImpl(configDecisionTreeValidator);
+    configDecisionTreeLoader = new ConfigLoaderImpl(configDecisionTreeValidator);
   }
 
   @Test
   void load() {
     Path treePath = Paths.get("src", "test", "resources", "tree_all_types.json");
-    ConfigDecisionTree configDecisionTree = configDecisionTreeLoader.load(treePath);
+    ConfigDecisionTree configDecisionTree = null;//FIXME = configDecisionTreeLoader.load(treePath);
 
     verify(configDecisionTreeValidator).validate(configDecisionTree);
     Assertions.assertAll(

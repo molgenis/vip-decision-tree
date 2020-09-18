@@ -30,7 +30,7 @@ class VcfMetadataTest {
 
   @BeforeEach
   void setUp() {
-    vcfMetadata = new VcfMetadata(vcfHeader);
+    vcfMetadata = new VcfMetadata(vcfHeader, null);
   }
 
   @Test

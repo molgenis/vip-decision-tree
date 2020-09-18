@@ -7,34 +7,33 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
+import org.molgenis.vcf.decisiontree.loader.model.Config;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ConfigDecisionTreeLoaderImpl implements ConfigDecisionTreeLoader {
+public class ConfigLoaderImpl implements ConfigLoader {
   private final ConfigDecisionTreeValidator configDecisionTreeValidator;
 
-  ConfigDecisionTreeLoaderImpl(ConfigDecisionTreeValidator configDecisionTreeValidator) {
+  ConfigLoaderImpl(ConfigDecisionTreeValidator configDecisionTreeValidator) {
     this.configDecisionTreeValidator = requireNonNull(configDecisionTreeValidator);
   }
 
-  public ConfigDecisionTree load(Path decisionTreeConfigPath) {
+  public Config load(Path decisionTreeConfigPath) {
     ObjectMapper mapper = new ObjectMapper();
     SimpleModule module = new SimpleModule();
     module.addDeserializer(ConfigNode.class, new ConfigNodeDeserializer());
     mapper.registerModule(module);
 
-    ConfigDecisionTree configDecisionTree;
+    Config config;
     try {
-      configDecisionTree =
-          mapper.readValue(decisionTreeConfigPath.toFile(), ConfigDecisionTree.class);
+      config =
+          mapper.readValue(decisionTreeConfigPath.toFile(), Config.class);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+    configDecisionTreeValidator.validate(config.getDecisionTree());
 
-    configDecisionTreeValidator.validate(configDecisionTree);
-
-    return configDecisionTree;
+    return config;
   }
 }

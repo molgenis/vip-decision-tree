@@ -2,6 +2,7 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -35,7 +36,7 @@ class VcfRecordTest {
 
   @BeforeEach
   void setUp() {
-    vcfRecord = new VcfRecord(variantContext);
+    vcfRecord = new VcfRecord(variantContext, emptyMap());
   }
 
   @Test

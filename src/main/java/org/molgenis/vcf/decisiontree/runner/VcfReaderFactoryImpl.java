@@ -12,6 +12,6 @@ class VcfReaderFactoryImpl implements VcfReaderFactory {
   @Override
   public VcfReader create(Settings settings) {
     Path inputVcfPath = settings.getInputVcfPath();
-    return new VcfReader(new VCFFileReader(inputVcfPath.toFile(), false));
+    return new VcfReader(new VCFFileReader(inputVcfPath.toFile(), false), settings.getConfigNestedMetadata());
   }
 }
