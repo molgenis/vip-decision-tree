@@ -66,7 +66,7 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
     if (nestedFields.containsKey(ALLELE)) {
       selector.put(nestedFields.get(ALLELE), VcfRecord.SELECTED_ALLELE);
     } else {
-      throw new MissingRequiredNestedValueException("VEP", "Allele");
+      throw new MissingRequiredNestedValueException("VEP", ALLELE);
     }
     return selector;
   }

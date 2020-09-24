@@ -63,7 +63,7 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
     if (nestedFields.containsKey(ALLELE)) {
       selector.put(nestedFields.get(ALLELE), VcfRecord.SELECTED_ALLELE);
     } else {
-      throw new MissingRequiredNestedValueException("SnpEff", "Allele");
+      throw new MissingRequiredNestedValueException("SnpEff", ALLELE);
     }
     return selector;
   }
