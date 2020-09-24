@@ -6,8 +6,12 @@ import static java.util.Collections.singletonList;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.springframework.lang.Nullable;
 
 public class VcfUtils {
@@ -140,8 +144,16 @@ public class VcfUtils {
 
   public static List<String> getInfoAsStringList(VariantContext variantContext, Field field) {
     List<String> strValues;
+    String id = field.getId();
 
-    Object value = variantContext.getAttribute(field.getId());
+    strValues = getInfoAsStringList(variantContext, id);
+
+    return strValues;
+  }
+
+  public static List<String> getInfoAsStringList(VariantContext variantContext, String id) {
+    List<String> strValues;
+    Object value = variantContext.getAttribute(id);
     if (value == null) {
       strValues = List.of();
     } else if (value instanceof List<?>) {
@@ -191,9 +203,13 @@ public class VcfUtils {
   }
 
   public static boolean getInfoAsBoolean(VariantContext variantContext, Field field) {
+    Object objValue = variantContext.getAttribute(field.getId());
+    return getInfoValueAsBoolean(objValue);
+  }
+
+  private static boolean getInfoValueAsBoolean(Object objValue) {
     boolean bool;
 
-    Object objValue = variantContext.getAttribute(field.getId());
     if (objValue == null) {
       bool = false;
     } else if (objValue instanceof Boolean) {
@@ -204,4 +220,38 @@ public class VcfUtils {
 
     return bool;
   }
+
+  public static Object getTypedInfoValue(Field field, String stringValue, String separator) {
+    Object value;
+    if(separator == null){
+      value = getTypedInfoValue(field, stringValue);
+    }else{
+      List<String> values = Arrays.asList(stringValue.split(separator));
+      value = values.stream().map(singleValue -> getTypedInfoValue(field, singleValue)).collect(Collectors.toList());
+    }
+    return value;
+  }
+
+    public static Object getTypedInfoValue(Field field, String stringValue) {
+      Object typedValue;
+      ValueType valueType = field.getValueType();
+      switch (valueType) {
+        case INTEGER:
+          typedValue = VcfUtils.getInfoValueAsInteger(stringValue);
+          break;
+        case FLAG:
+          typedValue = VcfUtils.getInfoValueAsBoolean(stringValue);
+          break;
+        case FLOAT:
+          typedValue = VcfUtils.getInfoValueAsDouble(stringValue);
+          break;
+        case CHARACTER:
+        case STRING:
+          typedValue = VcfUtils.getInfoValueAsString(stringValue);
+          break;
+        default:
+          throw new UnexpectedEnumException(valueType);
+      }
+      return typedValue;
+    }
 }

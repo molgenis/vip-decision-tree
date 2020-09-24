@@ -10,16 +10,25 @@ import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
+import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
 
 @ExtendWith(MockitoExtension.class)
 class VcfMetadataTest {
@@ -30,10 +39,15 @@ class VcfMetadataTest {
 
   @BeforeEach
   void setUp() {
-    vcfMetadata = new VcfMetadata(vcfHeader);
+    Map<String, NestedField> vepNestedMetadata = new HashMap<>();
+    vepNestedMetadata.put("Allele", createNestedField("Allele"));
+    vepNestedMetadata.put("PICK", createNestedField("PICK"));
+    vepNestedMetadata.put("consequence", createNestedField("consequence"));
+    NestedInfoHeaderLine nestedInfoHeaderLine = NestedInfoHeaderLine.builder().nestedFields(vepNestedMetadata).build();
+    vcfMetadata = new VcfMetadata(vcfHeader, VcfNestedMetadata.builder().nestedLines(Collections.singletonMap("VEP", nestedInfoHeaderLine)).build());
   }
 
-  @Test
+@Test
   void getFieldCommonChrom() {
     String fieldId = "#CHROM";
     assertEquals(
@@ -59,7 +73,8 @@ class VcfMetadataTest {
         vcfMetadata.getField(fieldId));
   }
 
-  @Test
+  @ParameterizedTest
+  @ValueSource(strings = {"ID", "ALT", "FILTER"})
   void getFieldCommonId() {
     String fieldId = "ID";
     assertEquals(
@@ -81,32 +96,6 @@ class VcfMetadataTest {
             .fieldType(FieldType.COMMON)
             .valueType(ValueType.STRING)
             .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-            .build(),
-        vcfMetadata.getField(fieldId));
-  }
-
-  @Test
-  void getFieldCommonAlt() {
-    String fieldId = "ALT";
-    assertEquals(
-        Field.builder()
-            .id(fieldId)
-            .fieldType(FieldType.COMMON)
-            .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).nullable(true).build())
-            .build(),
-        vcfMetadata.getField(fieldId));
-  }
-
-  @Test
-  void getFieldCommonFilter() {
-    String fieldId = "FILTER";
-    assertEquals(
-        Field.builder()
-            .id(fieldId)
-            .fieldType(FieldType.COMMON)
-            .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).nullable(true).build())
             .build(),
         vcfMetadata.getField(fieldId));
   }
@@ -255,6 +244,23 @@ class VcfMetadataTest {
   }
 
   @Test
+  void getNestedFieldInfoUnknown() {
+    assertThrows(UnknownFieldException.class, () -> vcfMetadata.getField("INFO/VEP/unknown"));
+  }
+
+  @Test
+  void getNestedFieldInfoUnknownParent() {
+    assertThrows(UnknownFieldException.class, () -> vcfMetadata.getField("INFO/VOP/consequence"));
+  }
+
+  @Test
+  void getNestedFieldInfoString() {
+    String fieldId = "INFO/VEP/consequence";
+    assertEquals(createNestedField("consequence"),
+        vcfMetadata.getField(fieldId));
+  }
+
+  @Test
   void getFieldFormatUnknown() {
     assertThrows(UnknownFieldException.class, () -> vcfMetadata.getField("FORMAT/unknown"));
   }
@@ -262,5 +268,11 @@ class VcfMetadataTest {
   @Test
   void unwrap() {
     assertEquals(vcfHeader, vcfMetadata.unwrap());
+  }
+
+  private NestedField createNestedField(String field) {
+    ValueCount valueCount = ValueCount.builder().type(Type.VARIABLE).build();
+    Field parent = Field.builder().id("VEP").fieldType(FieldType.INFO).valueType(ValueType.STRING).valueCount(valueCount).separator('|').build();
+    return NestedField.nestedBuilder().id(field).parent(parent).fieldType(FieldType.INFO_NESTED).valueType(ValueType.STRING).valueCount(valueCount).build();
   }
 }
