@@ -7,6 +7,7 @@
 ##INFO=<ID=CAP,Number=A,Type=Float,Description="Capice score">
 ##INFO=<ID=GNOMAD,Number=A,Type=Float,Description="GNOMAD frequency">
 ##INFO=<ID=VKGL,Number=A,Type=String,Description="VKGL classification">
+##INFO=<ID=ANN,Number=.,Type=String,Description="Functional annotations: 'Allele | Annotation | Annotation_Impact | Gene_Name | Gene_ID | Feature_Type | Feature_ID | Transcript_BioType | Rank | HGVS.c | HGVS.p | cDNA.pos / cDNA.length | CDS.pos / CDS.length | AA.pos / AA.length | Distance | ERRORS / WARNINGS / INFO' ">
 ##FILTER=<ID=q10,Description="Quality below 10">
 ##FILTER=<ID=s50,Description="Less than 50% of samples have data">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">

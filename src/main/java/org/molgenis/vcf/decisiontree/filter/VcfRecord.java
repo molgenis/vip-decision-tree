@@ -4,15 +4,21 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedInfoValue;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
+import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -24,6 +30,7 @@ import org.molgenis.vcf.decisiontree.utils.VcfUtils;
 public class VcfRecord {
 
   private static final List<String> PASS_FILTER = singletonList(VCFConstants.PASSES_FILTERS_v4);
+  public static final String SELECTED_ALLELE = "SELECTED_ALLELE";
 
   private final VariantContext variantContext;
 
@@ -50,14 +57,56 @@ public class VcfRecord {
         value = getInfoValue(field, alleleIndex);
         break;
       case INFO_NESTED:
-        throw new UnsupportedOperationException(
-            "INFO_NESTED values are not yet supported."); // TODO
+        value = getNestedValue(field, alleleIndex);
+        break;
       case FORMAT:
         throw new UnsupportedOperationException("FORMAT values are not yet supported."); // TODO
       default:
         throw new UnexpectedEnumException(fieldType);
     }
     return value;
+  }
+
+  private Object getNestedValue(Field field, int alleleIndex) {
+    Object value = null;
+    NestedField nestedField = (NestedField) field;
+    String separator = Pattern.quote(nestedField.getParent().getSeparator().toString());
+    int index = nestedField.getIndex();
+    String infoId = nestedField.getParent().getId();
+    List<String> infoValues = VcfUtils.getInfoAsStringList(variantContext, infoId);
+    if (!infoValues.isEmpty()) {
+      List<String> filteredInfo = infoValues.stream()
+          .filter(infoValue -> matchedSelector(infoValue, nestedField, alleleIndex)).collect(
+              Collectors.toList());
+      if (!filteredInfo.isEmpty()) {
+        String singleValue = filteredInfo.get(0);
+        String[] split = singleValue.split(separator);
+        String stringValue = split[index];
+        if (!stringValue.isEmpty()) {
+          value = getTypedInfoValue(field, stringValue);
+        }
+      }
+    }
+    return value;
+  }
+
+  private boolean matchedSelector(String infoValue, NestedField nestedField, int alleleIndex) {
+    String separator = Pattern.quote(nestedField.getParent().getSeparator().toString());
+    Map<NestedField, Object> selectors = nestedField.getSelectors();
+    String[] split = infoValue.split(separator);
+    if (selectors != null) {
+      for (Entry<NestedField, Object> selector : selectors.entrySet()) {
+        Object value = selector.getValue();
+        if (value.equals(SELECTED_ALLELE)) {
+          value = variantContext.getAlternateAllele(alleleIndex - 1).getBaseString();
+        }
+        if (!getTypedInfoValue(selector.getKey(), split[selector.getKey().getIndex()])
+            .equals(value)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   private Object getCommonValue(Field field, int alleleIndex) {

@@ -3,6 +3,7 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.COMMON;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.FORMAT;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_NESTED;
 
 import htsjdk.variant.vcf.VCFCompoundHeaderLine;
@@ -11,9 +12,11 @@ import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
+import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.ValueCountBuilder;
@@ -27,9 +30,11 @@ public class VcfMetadata {
   private static final String FIELD_TOKEN_SEPARATOR = "/";
 
   private final VCFHeader vcfHeader;
+  private final Map<String, Map<String, NestedField>> nestedMetadata;
 
-  public VcfMetadata(VCFHeader vcfHeader) {
+  public VcfMetadata(VCFHeader vcfHeader, Map<String, Map<String,NestedField>> nestedMetadata) {
     this.vcfHeader = requireNonNull(vcfHeader);
+    this.nestedMetadata = requireNonNull(nestedMetadata);
   }
 
   public Field getField(String fieldId) {
@@ -46,13 +51,31 @@ public class VcfMetadata {
         field = toCompoundField(fieldTokens, fieldType);
         break;
       case INFO_NESTED:
-        throw new UnsupportedOperationException(
-            "INFO_NESTED values are not yet supported."); // TODO
+        field = toNestedField(fieldTokens, fieldType);
+        break;
       default:
         throw new UnexpectedEnumException(fieldType);
     }
 
     return field;
+  }
+
+  private Field toNestedField(List<String> fieldTokens, FieldType fieldType) {
+    if (fieldTokens.size() != 3) {
+      throw new InvalidNumberOfTokensException(fieldTokens, fieldType, 2);
+    }
+    String field = fieldTokens.get(1);
+    String nestedField = fieldTokens.get(2);
+
+    Map<String, NestedField> nestedFieldMetadata = nestedMetadata.get(field);
+    if(nestedFieldMetadata == null){
+      throw new UnknownFieldException(field, INFO);
+    }
+    if(nestedFieldMetadata.containsKey(nestedField)){
+      return nestedFieldMetadata.get(nestedField);
+    }else{
+      throw new UnknownFieldException(nestedField, INFO_NESTED);
+    }
   }
 
   private static FieldType toFieldType(List<String> fields) {
@@ -70,7 +93,7 @@ public class VcfMetadata {
         fieldType = COMMON;
         break;
       case "INFO":
-        fieldType = fields.size() > 2 ? INFO_NESTED : FieldType.INFO;
+        fieldType = fields.size() > 2 ? INFO_NESTED : INFO;
         break;
       case "FORMAT":
         fieldType = FORMAT;

@@ -7,7 +7,9 @@ import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
 import java.util.List;
+import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.springframework.lang.Nullable;
 
 public class VcfUtils {
@@ -140,8 +142,16 @@ public class VcfUtils {
 
   public static List<String> getInfoAsStringList(VariantContext variantContext, Field field) {
     List<String> strValues;
+    String id = field.getId();
 
-    Object value = variantContext.getAttribute(field.getId());
+    strValues = getInfoAsStringList(variantContext, id);
+
+    return strValues;
+  }
+
+  public static List<String> getInfoAsStringList(VariantContext variantContext, String id) {
+    List<String> strValues;
+    Object value = variantContext.getAttribute(id);
     if (value == null) {
       strValues = List.of();
     } else if (value instanceof List<?>) {
@@ -191,17 +201,46 @@ public class VcfUtils {
   }
 
   public static boolean getInfoAsBoolean(VariantContext variantContext, Field field) {
+    Object objValue = variantContext.getAttribute(field.getId());
+    return getInfoValueAsBoolean(objValue);
+  }
+
+  private static boolean getInfoValueAsBoolean(Object objValue) {
     boolean bool;
 
-    Object objValue = variantContext.getAttribute(field.getId());
     if (objValue == null) {
       bool = false;
     } else if (objValue instanceof Boolean) {
       bool = (Boolean) objValue;
+    } else if (objValue instanceof String) {
+      bool = objValue.equals("true")||objValue.equals("1");
     } else {
       throw new TypeConversionException(objValue, Boolean.class);
     }
 
     return bool;
   }
+
+    public static Object getTypedInfoValue(Field field, Object stringValue) {
+      Object typedValue;
+      ValueType valueType = field.getValueType();
+      switch (valueType) {
+        case INTEGER:
+          typedValue = VcfUtils.getInfoValueAsInteger(stringValue);
+          break;
+        case FLAG:
+          typedValue = VcfUtils.getInfoValueAsBoolean(stringValue);
+          break;
+        case FLOAT:
+          typedValue = VcfUtils.getInfoValueAsDouble(stringValue);
+          break;
+        case CHARACTER:
+        case STRING:
+          typedValue = VcfUtils.getInfoValueAsString(stringValue);
+          break;
+        default:
+          throw new UnexpectedEnumException(valueType);
+      }
+      return typedValue;
+    }
 }

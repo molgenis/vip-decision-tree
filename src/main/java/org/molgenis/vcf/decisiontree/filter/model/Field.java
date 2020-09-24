@@ -1,5 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
@@ -8,6 +9,7 @@ import lombok.experimental.NonFinal;
 @Value
 @Builder
 @NonFinal
+@AllArgsConstructor
 public class Field {
 
   @NonNull String id;
