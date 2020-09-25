@@ -82,7 +82,7 @@ public class VcfRecord {
               Collectors.toList());
       if (!filteredInfo.isEmpty()) {
         String singleValue = filteredInfo.get(0);
-        String[] split = singleValue.split(separator);
+        String[] split = singleValue.split(separator,-1);
         String stringValue = split[index];
         if (!stringValue.isEmpty()) {
           value = getTypedInfoValue(field, stringValue);
