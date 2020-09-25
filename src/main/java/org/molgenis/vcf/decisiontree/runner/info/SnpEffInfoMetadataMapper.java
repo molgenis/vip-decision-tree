@@ -8,10 +8,8 @@ import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.molgenis.vcf.decisiontree.filter.VcfRecord;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
@@ -26,7 +24,6 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
   private static final String INFO_ID = "ANN";
   private static final Pattern INFO_DESCRIPTION_PATTERN =
       Pattern.compile("Functional annotations: '(.*?)'");
-  private static final String ALLELE = "Allele";
 
   private final SnpEffInfoSelector selector;
 

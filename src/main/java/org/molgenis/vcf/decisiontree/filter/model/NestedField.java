@@ -2,10 +2,7 @@ package org.molgenis.vcf.decisiontree.filter.model;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Map;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.Value;
