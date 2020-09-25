@@ -1,13 +1,10 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
 
-import htsjdk.variant.vcf.VCFHeaderLineCount;
-import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,10 +27,12 @@ class VepInfoMetadataMapperTest {
   @Mock
   VCFInfoHeaderLine headerLine;
   private Field vepField;
+  private VepInfoSelector selector;
 
   @BeforeEach
   void setUp() {
-    vepInfoMetadataMapper = new VepInfoMetadataMapper();
+    selector = new VepInfoSelector();
+    vepInfoMetadataMapper = new VepInfoMetadataMapper(selector);
 
     vepField = Field.builder()
         .id("CSQ")
@@ -89,13 +88,14 @@ class VepInfoMetadataMapperTest {
   private NestedField getFixedFlagField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
         .fieldType(FieldType.INFO_NESTED)
+        .nestedInfoSelector(selector)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
         .valueType(ValueType.FLAG).build();
   }
 
   private NestedField getVariableFlagField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED)
+        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
         .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
         .valueType(ValueType.FLAG)
         .separator('&').build();
@@ -103,7 +103,7 @@ class VepInfoMetadataMapperTest {
 
   private NestedField getVariableIntegerField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED)
+        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
         .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
         .valueType(ValueType.INTEGER)
         .separator('&').build();
@@ -111,21 +111,21 @@ class VepInfoMetadataMapperTest {
 
   private NestedField getFixedIntegerField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED)
+        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
         .valueType(ValueType.INTEGER).build();
   }
 
   private NestedField getFixedFloatField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED)
+        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
         .valueType(ValueType.FLOAT).build();
   }
 
   private NestedField getFixedStringField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED)
+        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
         .valueType(ValueType.STRING).build();
   }

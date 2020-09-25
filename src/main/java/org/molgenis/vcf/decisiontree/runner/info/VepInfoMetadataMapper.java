@@ -8,8 +8,6 @@ import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import org.molgenis.vcf.decisiontree.filter.VcfRecord;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
@@ -24,8 +22,12 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
 
   private static final String INFO_DESCRIPTION_PREFIX =
       "Consequence annotations from Ensembl VEP. Format: ";
-  private static final String ALLELE = "Allele";
-  private static final String PICK = "PICK";
+
+  private final VepInfoSelector selector;
+
+  public VepInfoMetadataMapper(VepInfoSelector selector) {
+    this.selector = selector;
+  }
 
   @Override
   public boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -49,26 +51,7 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
       nestedFields.put(id, mapNestedMetadataToField(id, index, vepField));
       index++;
     }
-    Map<NestedField, Object> selectors = getSelectors(nestedFields);
-    for (Entry<String, NestedField> nestedFieldEntry : nestedFields.entrySet()) {
-      NestedField nestedField = nestedFieldEntry.getValue();
-      nestedField.setSelectors(selectors);
-      nestedFields.put(nestedFieldEntry.getKey(), nestedField);
-    }
     return nestedFields;
-  }
-
-  private Map<NestedField, Object> getSelectors(Map<String, NestedField> nestedFields) {
-    Map<NestedField, Object> selector = new HashMap<>();
-    if (nestedFields.containsKey(PICK)) {
-      selector.put(nestedFields.get(PICK), true);
-    }
-    if (nestedFields.containsKey(ALLELE)) {
-      selector.put(nestedFields.get(ALLELE), VcfRecord.SELECTED_ALLELE);
-    } else {
-      throw new MissingRequiredNestedValueException("VEP", ALLELE);
-    }
-    return selector;
   }
 
   protected List<String> getNestedInfoIds(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -79,9 +62,9 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
 
   protected NestedField mapNestedMetadataToField(String id, int index, Field vepField) {
     NestedFieldBuilder fieldBuilder = NestedField.nestedBuilder().id(id).index(index)
-        .parent(vepField).fieldType(FieldType.INFO_NESTED);
+        .parent(vepField).fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector);
     switch (id) {
-      case PICK:
+      case "PICK":
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.FLAG);

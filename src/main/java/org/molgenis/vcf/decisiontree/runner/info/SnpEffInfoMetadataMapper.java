@@ -28,6 +28,13 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
       Pattern.compile("Functional annotations: '(.*?)'");
   private static final String ALLELE = "Allele";
 
+  private final SnpEffInfoSelector selector;
+
+  public SnpEffInfoMetadataMapper(
+      SnpEffInfoSelector selector) {
+    this.selector = selector;
+  }
+
   @Override
   public boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
     return vcfInfoHeaderLine.getID().equals(INFO_ID)
@@ -49,23 +56,7 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
       nestedFields.put(id, mapNestedMetadataToField(id, index, annField));
       index++;
     }
-    Map<NestedField, Object> selectors = getSelectors(nestedFields);
-    for (Entry<String, NestedField> nestedFieldEntry : nestedFields.entrySet()) {
-      NestedField nestedField = nestedFieldEntry.getValue();
-      nestedField.setSelectors(selectors);
-      nestedFields.put(nestedFieldEntry.getKey(), nestedField);
-    }
     return nestedFields;
-  }
-
-  private Map<NestedField, Object> getSelectors(Map<String, NestedField> nestedFields) {
-    Map<NestedField, Object> selector = new HashMap<>();
-    if (nestedFields.containsKey(ALLELE)) {
-      selector.put(nestedFields.get(ALLELE), VcfRecord.SELECTED_ALLELE);
-    } else {
-      throw new MissingRequiredNestedValueException("SnpEff", ALLELE);
-    }
-    return selector;
   }
 
   protected List<String> getNestedInfoIds(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -79,7 +70,7 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
 
   protected NestedField mapNestedMetadataToField(String id, int index, Field annField) {
     NestedFieldBuilder fieldBuilder = NestedField.nestedBuilder().id(id).index(index)
-        .parent(annField).fieldType(FieldType.INFO_NESTED);
+        .parent(annField).fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector);
     switch (id) {
       case "cDNA.pos/cDNA.length":
       case "CDS.pos/CDS.length":

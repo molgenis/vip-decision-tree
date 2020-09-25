@@ -10,15 +10,15 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import org.molgenis.vcf.decisiontree.runner.info.NestedInfoSelector;
 
-@Getter
-@EqualsAndHashCode
+@Value
 @NonFinal
 public class NestedField extends Field {
 
   @NonNull final int index;
   @NonNull final Field parent;
-  @Setter Map<NestedField, Object> selectors;
+  @Setter NestedInfoSelector nestedInfoSelector;
 
   // Suppress 'Methods should not have too many parameters'
   @SuppressWarnings("java:S107")
@@ -29,7 +29,7 @@ public class NestedField extends Field {
       ValueCount valueCount,
       Integer count,
       Character separator, int index,
-      Map<NestedField, Object> selectors,
+      NestedInfoSelector nestedInfoSelector,
       Field parent) {
     super(id,
         fieldType,
@@ -38,7 +38,7 @@ public class NestedField extends Field {
         count,
         separator);
     this.index = requireNonNull(index);
-    this.selectors = selectors;
+    this.nestedInfoSelector = nestedInfoSelector;
     this.parent = requireNonNull(parent);
   }
 }

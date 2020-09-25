@@ -33,7 +33,7 @@ public class VcfReader implements AutoCloseable {
   }
 
   public Stream<VcfRecord> stream() {
-    return StreamSupport.stream(vcfFileReader.spliterator(), false).map(VcfRecord::new);
+    return StreamSupport.stream(vcfFileReader.spliterator(), false).map(vc -> new VcfRecord(vc, getMetadata()));
   }
 
   public VcfMetadata getMetadata() {

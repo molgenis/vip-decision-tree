@@ -30,6 +30,7 @@ public class VcfMetadata {
   private static final String FIELD_TOKEN_SEPARATOR = "/";
 
   private final VCFHeader vcfHeader;
+
   private final Map<String, Map<String, NestedField>> nestedMetadata;
 
   public VcfMetadata(VCFHeader vcfHeader, Map<String, Map<String,NestedField>> nestedMetadata) {
@@ -226,5 +227,9 @@ public class VcfMetadata {
 
   public VCFHeader unwrap() {
     return vcfHeader;
+  }
+
+  public Map<String, Map<String, NestedField>> getNestedMetadata() {
+    return nestedMetadata;
   }
 }

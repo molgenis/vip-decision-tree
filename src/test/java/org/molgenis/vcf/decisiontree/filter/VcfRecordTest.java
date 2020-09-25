@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.VariantContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,10 +35,11 @@ class VcfRecordTest {
   @Mock
   private VariantContext variantContext;
   private VcfRecord vcfRecord;
+  private VcfMetadata vcfMetadata;
 
   @BeforeEach
   void setUp() {
-    vcfRecord = new VcfRecord(variantContext);
+    vcfRecord = new VcfRecord(variantContext, vcfMetadata);
   }
 
   @Test

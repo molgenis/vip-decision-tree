@@ -20,7 +20,6 @@ import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,10 +29,12 @@ class SnpEffInfoMetadataMapperTest {
   @Mock
   VCFInfoHeaderLine headerLine;
   private Field snpEffField;
+  private SnpEffInfoSelector selector;
 
   @BeforeEach
   void setUp() {
-    snpEffInfoMetadataMapper = new SnpEffInfoMetadataMapper();
+    selector = new SnpEffInfoSelector();
+    snpEffInfoMetadataMapper = new SnpEffInfoMetadataMapper(selector);
 
     snpEffField = Field.builder()
         .id("ANN")
@@ -94,6 +95,7 @@ class SnpEffInfoMetadataMapperTest {
         .fieldType(FieldType.INFO_NESTED)
         .valueCount(ValueCount.builder().type(FIXED).count(3).build())
         .separator('/')
+        .nestedInfoSelector(selector)
         .valueType(ValueType.STRING).build();
   }
 
@@ -102,6 +104,7 @@ class SnpEffInfoMetadataMapperTest {
         .fieldType(FieldType.INFO_NESTED)
         .valueCount(ValueCount.builder().type(FIXED).count(2).build())
         .separator('/')
+        .nestedInfoSelector(selector)
         .valueType(ValueType.INTEGER).build();
   }
 
@@ -109,6 +112,7 @@ class SnpEffInfoMetadataMapperTest {
     return NestedField.nestedBuilder().id(id).index(index).parent(snpEffField)
         .fieldType(FieldType.INFO_NESTED)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
+        .nestedInfoSelector(selector)
         .valueType(ValueType.INTEGER).build();
   }
 
@@ -116,6 +120,7 @@ class SnpEffInfoMetadataMapperTest {
     return NestedField.nestedBuilder().id(id).index(index).parent(snpEffField)
         .fieldType(FieldType.INFO_NESTED)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
+        .nestedInfoSelector(selector)
         .valueType(ValueType.STRING).build();
   }
 }
