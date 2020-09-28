@@ -68,6 +68,6 @@ class DecisionTreeFactoryImplTest{
     Settings settings = Settings.builder().configDecisionTree(decisionTree).build();
     DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
 
-    assertEquals(((BoolNode)decisionTree.getRootNode()).getQuery().getValue(),Arrays.asList("unit","test","value"));
+    assertEquals(Arrays.asList("unit","test","value"), ((BoolNode)decisionTree.getRootNode()).getQuery().getValue());
   }
 }
