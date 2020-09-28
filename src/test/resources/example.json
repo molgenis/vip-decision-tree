@@ -1,5 +1,5 @@
 {
-  "rootNode": "capice",
+  "rootNode": "genPanel",
   "nodes": {
     "capice": {
       "type": "BOOL",
@@ -30,14 +30,14 @@
         "value": 0.01
       },
       "outcomeTrue": {
-        "nextNode": "done_include"
+        "nextNode": "capice"
       },
       "outcomeFalse": {
-        "nextNode": "done_include",
+        "nextNode": "done_exclude",
         "label": "GNOMAD_F"
       },
       "outcomeMissing": {
-        "nextNode": "snpEff"
+        "nextNode": "capice"
       }
     },
     "snpEff": {
@@ -62,7 +62,7 @@
       "field": "INFO/VKGL",
       "outcomeMap": {
         "LP": {
-          "nextNode": "done_exclude"
+          "nextNode": "genPanel"
         },
         "LB": {
           "nextNode": "done_exclude",
@@ -81,6 +81,24 @@
         "nextNode": "done_exclude"
       }
     },
+    "genPanel": {
+      "type": "BOOL",
+      "query": {
+        "field": "INFO/CSQ/SYMBOL",
+        "operator": "in",
+        "value": "file:panel"
+      },
+      "outcomeTrue": {
+        "nextNode": "done_include"
+      },
+      "outcomeFalse": {
+        "nextNode": "done_include",
+        "label": "GNOMAD_F"
+      },
+      "outcomeMissing": {
+        "nextNode": "snpEff"
+      }
+    },
     "done_include": {
       "type": "LEAF",
       "class": "in"
@@ -96,6 +114,11 @@
     },
     "CAP_F": {
       "description": "Capice filter false"
+    }
+  },
+  "files": {
+    "panel": {
+      "path": "./src/test/resources/example.txt"
     }
   }
 }
