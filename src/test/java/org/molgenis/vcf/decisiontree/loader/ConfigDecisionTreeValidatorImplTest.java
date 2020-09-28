@@ -5,11 +5,16 @@ import static java.util.Collections.singletonMap;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
+import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.EQUALS;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
 
+import java.nio.file.Path;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
@@ -41,6 +46,27 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigDecisionTree configDecisionTree =
         ConfigDecisionTree.builder()
             .rootNode("node")
+            .nodes(Map.of("node", configBoolNode, "exit", configLeafNode))
+            .build();
+    assertDoesNotThrow(() -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+  @Test
+  void validateBoolNodeFileValue() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery =
+        ConfigBoolQuery.builder().field("field").operator(IN).value(FILE_PREFIX+"testFile").build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolNode configBoolNode =
+        ConfigBoolNode.builder()
+            .query(configBoolQuery)
+            .outcomeTrue(configNodeOutcome)
+            .outcomeFalse(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .files(Map.of("testFile", Path.of("testFile")))
             .nodes(Map.of("node", configBoolNode, "exit", configLeafNode))
             .build();
     assertDoesNotThrow(() -> configDecisionTreeValidator.validate(configDecisionTree));
@@ -109,6 +135,27 @@ class ConfigDecisionTreeValidatorImplTest {
         ConfigDecisionTreeValidationException.class,
         () -> configDecisionTreeValidator.validate(configDecisionTree));
   }
+  @Test
+  void validateBoolNodeUnknownFileValue() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery =
+        ConfigBoolQuery.builder().field("field").operator(IN).value(FILE_PREFIX+"testFile").build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolNode configBoolNode =
+        ConfigBoolNode.builder()
+            .query(configBoolQuery)
+            .outcomeTrue(configNodeOutcome)
+            .outcomeFalse(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .files(Map.of("otherTestFile", Path.of("otherTestFile")))
+            .nodes(Map.of("node", configBoolNode, "exit", configLeafNode))
+            .build();
+    assertThrows(ConfigDecisionTreeValidationException.class,() -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
 
   @Test
   void validateCategoricalNodeOutcomeMapUnknown() {

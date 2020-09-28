@@ -4,8 +4,10 @@ import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
+import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -40,7 +42,6 @@ import org.springframework.stereotype.Component;
 @Component
 class DecisionTreeFactoryImpl implements DecisionTreeFactory {
 
-  public static final String FILE_PREFIX = "file=";
   private final QueryValidator queryValidator;
 
   DecisionTreeFactoryImpl(QueryValidator queryValidator) {
@@ -51,9 +52,30 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   public DecisionTree map(VcfMetadata vcfMetadata, Settings settings) {
     ConfigDecisionTree configDecisionTree = settings.getConfigDecisionTree();
     Map<String, Label> labelMap = mapLabels(configDecisionTree.getLabels());
-    Map<String, Node> nodeMap = mapNodes(vcfMetadata, configDecisionTree.getNodes(), labelMap);
+    Map<String, List<String>> filesMap = mapFiles(configDecisionTree.getFiles());
+    Map<String, Node> nodeMap = mapNodes(vcfMetadata, configDecisionTree.getNodes(), labelMap, filesMap);
     Node rootNode = nodeMap.get(configDecisionTree.getRootNode());
     return DecisionTree.builder().rootNode(rootNode).build();
+  }
+
+  private Map<String, List<String>> mapFiles(Map<String, Path> files) {
+    Map<String, List<String>> filesMap;
+    if (files == null) {
+      filesMap = emptyMap();
+    } else {
+      filesMap = new HashMap<>();
+          files.entrySet().stream()
+              .forEach(entry -> filesMap.put(entry.getKey(), this.mapFile(entry.getValue())));
+    }
+    return filesMap;
+  }
+
+  private List<String> mapFile(Path value) {
+    try {
+      return Files.readAllLines(value);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
   }
 
   private Map<String, Label> mapLabels(@Nullable Map<String, ConfigLabel> configLabels) {
@@ -74,11 +96,11 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   }
 
   private Map<String, Node> mapNodes(
-      VcfMetadata vcfMetadata, Map<String, ConfigNode> configNodeMap, Map<String, Label> labelMap) {
+      VcfMetadata vcfMetadata, Map<String, ConfigNode> configNodeMap, Map<String, Label> labelMap, Map<String, List<String>> files) {
     // first pass: create nodes
     Map<String, Node> nodeMap =
         configNodeMap.entrySet().stream()
-            .map(entry -> this.toNode(vcfMetadata, entry.getKey(), entry.getValue()))
+            .map(entry -> this.toNode(vcfMetadata, entry.getKey(), entry.getValue(), files))
             .collect(toMap(Node::getId, identity()));
 
     // second pass: update nodes
@@ -92,11 +114,11 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     return nodeMap;
   }
 
-  private Node toNode(VcfMetadata vcfMetadata, String id, ConfigNode configNode) {
+  private Node toNode(VcfMetadata vcfMetadata, String id, ConfigNode configNode, Map<String, List<String>> files) {
     Node node;
     switch (configNode.getType()) {
       case BOOL:
-        node = toBoolNode(vcfMetadata, id, (ConfigBoolNode) configNode);
+        node = toBoolNode(vcfMetadata, id, (ConfigBoolNode) configNode, files);
         break;
       case CATEGORICAL:
         node = toCategoricalNode(vcfMetadata, id, (ConfigCategoricalNode) configNode);
@@ -111,8 +133,8 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     return node;
   }
 
-  private BoolNode toBoolNode(VcfMetadata vcfMetadata, String id, ConfigBoolNode nodeConfig) {
-    BoolQuery boolQuery = toBoolQuery(vcfMetadata, nodeConfig.getQuery());
+  private BoolNode toBoolNode(VcfMetadata vcfMetadata, String id, ConfigBoolNode nodeConfig, Map<String, List<String>> files) {
+    BoolQuery boolQuery = toBoolQuery(vcfMetadata, nodeConfig.getQuery(), files);
     return BoolNode.builder()
         .id(id)
         .description(nodeConfig.getDescription())
@@ -120,29 +142,19 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .build();
   }
 
-  private BoolQuery toBoolQuery(VcfMetadata vcfMetadata, ConfigBoolQuery configBoolQuery) {
+  private BoolQuery toBoolQuery(VcfMetadata vcfMetadata, ConfigBoolQuery configBoolQuery, Map<String, List<String>> files) {
     Operator operator = toOperator(configBoolQuery.getOperator());
     Field field = vcfMetadata.getField(configBoolQuery.getField());
     queryValidator.validateBooleanNode(configBoolQuery, field);
     Object value = configBoolQuery.getValue();
     if(value instanceof String && value.toString().startsWith(FILE_PREFIX)){
-      String path = value.toString().substring(FILE_PREFIX.length());
-      value = mapFile(path);
+      value = files.get(((String) value).substring(FILE_PREFIX.length()));
     }
     return BoolQuery.builder()
         .field(field)
         .operator(operator)
         .value(value)
         .build();
-  }
-
-  private List<String> mapFile(String pathString) {
-    try {
-      Path path = Path.of(pathString);
-      return Files.readAllLines(path);
-    } catch (IOException e) {
-      throw new RuntimeException("FIXME");//FIXME
-    }
   }
 
   private Operator toOperator(ConfigOperator configOperator) {
