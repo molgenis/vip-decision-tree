@@ -5,7 +5,11 @@ import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
@@ -36,6 +40,7 @@ import org.springframework.stereotype.Component;
 @Component
 class DecisionTreeFactoryImpl implements DecisionTreeFactory {
 
+  public static final String FILE_PREFIX = "file=";
   private final QueryValidator queryValidator;
 
   DecisionTreeFactoryImpl(QueryValidator queryValidator) {
@@ -119,11 +124,25 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     Operator operator = toOperator(configBoolQuery.getOperator());
     Field field = vcfMetadata.getField(configBoolQuery.getField());
     queryValidator.validateBooleanNode(configBoolQuery, field);
+    Object value = configBoolQuery.getValue();
+    if(value instanceof String && value.toString().startsWith(FILE_PREFIX)){
+      String path = value.toString().substring(FILE_PREFIX.length());
+      value = mapFile(path);
+    }
     return BoolQuery.builder()
         .field(field)
         .operator(operator)
-        .value(configBoolQuery.getValue())
+        .value(value)
         .build();
+  }
+
+  private List<String> mapFile(String pathString) {
+    try {
+      Path path = Path.of(pathString);
+      return Files.readAllLines(path);
+    } catch (IOException e) {
+      throw new RuntimeException("FIXME");//FIXME
+    }
   }
 
   private Operator toOperator(ConfigOperator configOperator) {
