@@ -1,5 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
+import static java.util.Objects.requireNonNull;
+
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
@@ -9,13 +11,13 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.springframework.stereotype.Component;
 
 @Component
-public class NestedMetadataServiceImpl implements NestedMetadataService {
+public class VcfNestedMetadataParserImpl implements VcfNestedMetadataParser {
 
   private final List<NestedMetadataMapper> mappers;
 
-  public NestedMetadataServiceImpl(
+  public VcfNestedMetadataParserImpl(
       List<NestedMetadataMapper> mappers) {
-    this.mappers = mappers;
+    this.mappers = requireNonNull(mappers);
   }
 
   @Override

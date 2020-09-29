@@ -4,6 +4,6 @@ import htsjdk.variant.vcf.VCFHeader;
 import java.util.Map;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 
-public interface NestedMetadataService {
+public interface VcfNestedMetadataParser {
   Map<String, Map<String, NestedField>> map(VCFHeader header);
 }

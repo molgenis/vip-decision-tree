@@ -2,7 +2,6 @@ package org.molgenis.vcf.decisiontree.runner.info;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -18,13 +17,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class NestedMetadataServiceImplTest {
+class VcfNestedMetadataParserImplTest {
 
   @Mock NestedMetadataMapper mapper;
   @Mock VCFHeader vcfHeader;
   @Mock VCFInfoHeaderLine headerLine;
 
-  private NestedMetadataServiceImpl nestedMetadataServiceImpl;
+  private VcfNestedMetadataParserImpl nestedMetadataServiceImpl;
 
   @BeforeEach
   void setUp() {
@@ -32,7 +31,7 @@ class NestedMetadataServiceImplTest {
     List<NestedMetadataMapper> mappers = new ArrayList<>();
     mappers.add(mapper);
     nestedMetadataServiceImpl =
-        new NestedMetadataServiceImpl(mappers);
+        new VcfNestedMetadataParserImpl(mappers);
   }
 
   @Test

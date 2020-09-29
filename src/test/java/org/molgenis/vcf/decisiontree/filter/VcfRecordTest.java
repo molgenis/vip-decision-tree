@@ -34,8 +34,9 @@ class VcfRecordTest {
 
   @Mock
   private VariantContext variantContext;
-  private VcfRecord vcfRecord;
+  @Mock
   private VcfMetadata vcfMetadata;
+  private VcfRecord vcfRecord;
 
   @BeforeEach
   void setUp() {

@@ -36,7 +36,7 @@ public class VcfRecord {
   public VcfRecord(VariantContext variantContext,
       VcfMetadata metadata) {
     this.variantContext = requireNonNull(variantContext);
-    this.metadata = metadata;
+    this.metadata = requireNonNull(metadata);
   }
 
   public int getNrAltAlleles() {

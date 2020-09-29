@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
 
@@ -26,7 +27,7 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
   private final VepInfoSelector selector;
 
   public VepInfoMetadataMapper(VepInfoSelector selector) {
-    this.selector = selector;
+    this.selector = requireNonNull(selector);
   }
 
   @Override

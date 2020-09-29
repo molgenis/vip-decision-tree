@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.decisiontree.runner.info.NestedMetadataService;
+import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadataParser;
 
 /**
  * {@link VCFFileReader} wrapper that works with nested metadata and data (e.g. CSQ INFO fields).
@@ -15,19 +15,19 @@ import org.molgenis.vcf.decisiontree.runner.info.NestedMetadataService;
 public class VcfReader implements AutoCloseable {
 
   private final VCFFileReader vcfFileReader;
-  private final NestedMetadataService nestedMetadataService;
+  private final VcfNestedMetadataParser vcfNestedMetadataParser;
   private Map<String, Map<String, NestedField>> nestedMetadata;
   private boolean inited = false;
 
   public VcfReader(VCFFileReader vcfFileReader,
-      NestedMetadataService nestedMetadataService) {
+      VcfNestedMetadataParser vcfNestedMetadataParser) {
     this.vcfFileReader = requireNonNull(vcfFileReader);
-    this.nestedMetadataService = requireNonNull(nestedMetadataService);
+    this.vcfNestedMetadataParser = requireNonNull(vcfNestedMetadataParser);
   }
 
   private void initNestedMeta(){
     if(!inited){
-      nestedMetadata = nestedMetadataService.map(vcfFileReader.getFileHeader());
+      nestedMetadata = vcfNestedMetadataParser.map(vcfFileReader.getFileHeader());
       inited = true;
     }
   }

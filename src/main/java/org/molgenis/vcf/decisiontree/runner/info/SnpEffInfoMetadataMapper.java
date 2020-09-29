@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
 import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
 
@@ -8,6 +9,7 @@ import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -29,7 +31,7 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
 
   public SnpEffInfoMetadataMapper(
       SnpEffInfoSelector selector) {
-    this.selector = selector;
+    this.selector = requireNonNull(selector);
   }
 
   @Override
@@ -58,9 +60,11 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
 
   protected List<String> getNestedInfoIds(VCFInfoHeaderLine vcfInfoHeaderLine) {
     String description = vcfInfoHeaderLine.getDescription();
-    int end = description.trim().length() - 1;//remove trailing space and quote
-    String[] infoIds = description.trim().substring("Functional annotations: '".length(), end)
-        .split("\\|", -1);
+    Matcher matcher = INFO_DESCRIPTION_PATTERN.matcher(description);
+    if(!matcher.find()){
+      throw new InvalidHeaderLineException(vcfInfoHeaderLine.getID());
+    }
+    String[] infoIds = matcher.group(1).split("\\|", -1);
     return asList(infoIds).stream().map(id -> id.replaceAll("\\s+", ""))
         .collect(Collectors.toList());
   }
