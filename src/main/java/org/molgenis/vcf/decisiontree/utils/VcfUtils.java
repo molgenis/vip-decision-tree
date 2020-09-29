@@ -214,8 +214,6 @@ public class VcfUtils {
       bool = false;
     } else if (objValue instanceof Boolean) {
       bool = (Boolean) objValue;
-    } else if (objValue instanceof String) {
-      bool = objValue.equals("true")||objValue.equals("1");
     } else {
       throw new TypeConversionException(objValue, Boolean.class);
     }

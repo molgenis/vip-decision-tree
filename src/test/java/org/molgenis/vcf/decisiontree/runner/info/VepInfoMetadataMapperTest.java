@@ -69,28 +69,11 @@ class VepInfoMetadataMapperTest {
     Map<String, NestedField> expectedMap = new HashMap<>();
     expectedMap.put("Allele", getFixedStringField("Allele", 0));
     expectedMap.put("cDNA_position", getFixedIntegerField("cDNA_position", 1));
-    expectedMap.put("FLAGS", getVariableFlagField("FLAGS", 2));
-    expectedMap.put("PICK", getFixedFlagField("PICK", 3));
+    expectedMap.put("FLAGS", getVariableIntegerField("FLAGS", 2));
+    expectedMap.put("PICK", getFixedIntegerField("PICK", 3));
     expectedMap.put("gnomAD_AF", getFixedFloatField("gnomAD_AF", 4));
     expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 5));
     assertEquals(NestedInfoHeaderLine.builder().nestedFields(expectedMap).build(), actual);
-  }
-
-
-  private NestedField getFixedFlagField(String id, int index) {
-    return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED)
-        .nestedInfoSelector(selector)
-        .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-        .valueType(ValueType.FLAG).build();
-  }
-
-  private NestedField getVariableFlagField(String id, int index) {
-    return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
-        .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
-        .valueType(ValueType.FLAG)
-        .separator('&').build();
   }
 
   private NestedField getVariableIntegerField(String id, int index) {

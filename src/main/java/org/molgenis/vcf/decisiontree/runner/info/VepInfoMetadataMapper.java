@@ -68,7 +68,7 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
       case "PICK":
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-            .valueType(ValueType.FLAG);
+            .valueType(ValueType.INTEGER);
         break;
       case "Consequence":
       case "Existing_variation":
@@ -80,11 +80,6 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
             .separator('&');
         break;
       case "PHENO":
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
-            .valueType(ValueType.FLAG)
-            .separator('&');
-        break;
       case "PUBMED":
       case "SOMATIC":
         fieldBuilder
