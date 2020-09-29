@@ -16,6 +16,9 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -44,7 +47,7 @@ class VcfMetadataTest {
     vcfMetadata = new VcfMetadata(vcfHeader, VcfNestedMetadata.builder().nestedLines(Collections.singletonMap("VEP", nestedInfoHeaderLine)).build());
   }
 
-  @Test
+@Test
   void getFieldCommonChrom() {
     String fieldId = "#CHROM";
     assertEquals(
@@ -70,7 +73,8 @@ class VcfMetadataTest {
         vcfMetadata.getField(fieldId));
   }
 
-  @Test
+  @ParameterizedTest
+  @ValueSource(strings = {"ID", "ALT", "FILTER"})
   void getFieldCommonId() {
     String fieldId = "ID";
     assertEquals(
@@ -92,32 +96,6 @@ class VcfMetadataTest {
             .fieldType(FieldType.COMMON)
             .valueType(ValueType.STRING)
             .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-            .build(),
-        vcfMetadata.getField(fieldId));
-  }
-
-  @Test
-  void getFieldCommonAlt() {
-    String fieldId = "ALT";
-    assertEquals(
-        Field.builder()
-            .id(fieldId)
-            .fieldType(FieldType.COMMON)
-            .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).nullable(true).build())
-            .build(),
-        vcfMetadata.getField(fieldId));
-  }
-
-  @Test
-  void getFieldCommonFilter() {
-    String fieldId = "FILTER";
-    assertEquals(
-        Field.builder()
-            .id(fieldId)
-            .fieldType(FieldType.COMMON)
-            .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).nullable(true).build())
             .build(),
         vcfMetadata.getField(fieldId));
   }
