@@ -10,6 +10,7 @@ import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,8 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
 
 @ExtendWith(MockitoExtension.class)
 class VcfMetadataTest {
@@ -33,13 +36,12 @@ class VcfMetadataTest {
 
   @BeforeEach
   void setUp() {
-    Map<String, Map<String, NestedField>> nestedMetadata = new HashMap<>();
     Map<String, NestedField> vepNestedMetadata = new HashMap<>();
     vepNestedMetadata.put("Allele", createNestedField("Allele"));
     vepNestedMetadata.put("PICK", createNestedField("PICK"));
     vepNestedMetadata.put("consequence", createNestedField("consequence"));
-    nestedMetadata.put("VEP",vepNestedMetadata);
-    vcfMetadata = new VcfMetadata(vcfHeader, nestedMetadata);
+    NestedInfoHeaderLine nestedInfoHeaderLine = NestedInfoHeaderLine.builder().nestedFields(vepNestedMetadata).build();
+    vcfMetadata = new VcfMetadata(vcfHeader, VcfNestedMetadata.builder().nestedLines(Collections.singletonMap("VEP", nestedInfoHeaderLine)).build());
   }
 
   @Test

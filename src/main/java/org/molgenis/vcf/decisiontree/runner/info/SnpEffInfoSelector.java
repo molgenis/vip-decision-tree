@@ -12,8 +12,8 @@ public class SnpEffInfoSelector implements NestedInfoSelector {
 
   @Override
   public boolean isMatch(String infoValue, VariantContext vc, int alleleIndex,
-      Map<String, NestedField> nestedFields) {
-    NestedField vepAllele = nestedFields.get(ALLELE);
+      NestedInfoHeaderLine nestedInfoHeaderLine) {
+    NestedField vepAllele = nestedInfoHeaderLine.getField(ALLELE);
     if (vepAllele == null) {
       throw new MissingRequiredNestedValueException("SnpEff", ALLELE);
     }

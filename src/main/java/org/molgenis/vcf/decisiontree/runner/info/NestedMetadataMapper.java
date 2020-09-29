@@ -8,5 +8,5 @@ public interface NestedMetadataMapper {
 
   boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine);
 
-  Map<String, NestedField> map(VCFInfoHeaderLine vcfInfoHeaderLine);
+  NestedInfoHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine);
 }

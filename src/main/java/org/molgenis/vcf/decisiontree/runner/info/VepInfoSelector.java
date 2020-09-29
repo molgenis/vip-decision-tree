@@ -12,10 +12,10 @@ public class VepInfoSelector implements NestedInfoSelector {
   public static final String PICK = "PICK";
 
   @Override
-  public boolean isMatch(String infoValue, VariantContext vc, int alleleIndex, Map<String, NestedField> nestedFields) {
+  public boolean isMatch(String infoValue, VariantContext vc, int alleleIndex, NestedInfoHeaderLine nestedInfoHeaderLine) {
     boolean result = true;
-    NestedField pick = nestedFields.get(PICK);
-    NestedField vepAllele = nestedFields.get(ALLELE);
+    NestedField pick = nestedInfoHeaderLine.getField(PICK);
+    NestedField vepAllele = nestedInfoHeaderLine.getField(ALLELE);
     if (vepAllele == null) {
       throw new MissingRequiredNestedValueException("VEP", ALLELE);
     }

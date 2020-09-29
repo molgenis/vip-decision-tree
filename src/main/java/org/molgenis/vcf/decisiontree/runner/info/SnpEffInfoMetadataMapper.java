@@ -41,7 +41,7 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
   }
 
   @Override
-  public Map<String, NestedField> map(VCFInfoHeaderLine vcfInfoHeaderLine) {
+  public NestedInfoHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine) {
     Map<String, NestedField> nestedFields = new HashMap<>();
     int index = 0;
     for (String id : getNestedInfoIds(vcfInfoHeaderLine)) {
@@ -55,7 +55,7 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
       nestedFields.put(id, mapNestedMetadataToField(id, index, annField));
       index++;
     }
-    return nestedFields;
+    return NestedInfoHeaderLine.builder().nestedFields(nestedFields).build();
   }
 
   protected List<String> getNestedInfoIds(VCFInfoHeaderLine vcfInfoHeaderLine) {

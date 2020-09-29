@@ -6,7 +6,8 @@ import htsjdk.variant.vcf.VCFFileReader;
 import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField;
+import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
 import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadataParser;
 
 /**
@@ -16,7 +17,7 @@ public class VcfReader implements AutoCloseable {
 
   private final VCFFileReader vcfFileReader;
   private final VcfNestedMetadataParser vcfNestedMetadataParser;
-  private Map<String, Map<String, NestedField>> nestedMetadata;
+  private VcfNestedMetadata nestedMetadata;
   private boolean inited = false;
 
   public VcfReader(VCFFileReader vcfFileReader,

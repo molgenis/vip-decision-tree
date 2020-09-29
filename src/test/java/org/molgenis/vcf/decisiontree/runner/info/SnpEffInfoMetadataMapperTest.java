@@ -73,21 +73,15 @@ class SnpEffInfoMetadataMapperTest {
     when(headerLine.getDescription()).thenReturn(
         "Functional annotations: 'Allele | cDNA.pos / cDNA.length | Distance | ERRORS / WARNINGS / INFO' ");
 
-    Map<String, NestedField> actual = snpEffInfoMetadataMapper
+    NestedInfoHeaderLine actual = snpEffInfoMetadataMapper
         .map(headerLine);
 
-    Map<String, NestedField> expected = new HashMap<>();
-    expected.put("Allele", getFixedStringField("Allele", 0));
-    expected.put("cDNA.pos/cDNA.length", getFixeTwoIntegerField("cDNA.pos/cDNA.length", 1));
-    expected.put("Distance", getFixedOneIntegerField("Distance", 2));
-    expected.put("ERRORS/WARNINGS/INFO", getVariableFixedThreeStringField("ERRORS/WARNINGS/INFO", 3));
-    assertAll(
-        () -> assertTrue(expected.keySet().containsAll(actual.keySet())),
-        () -> assertEquals(expected.size(), actual.size()),
-        () -> assertEquals(expected.get("Allele"), actual.get("Allele")),
-        () -> assertEquals(expected.get("cDNA.pos/cDNA.length"), actual.get("cDNA.pos/cDNA.length")),
-        () -> assertEquals(expected.get("Distance"), actual.get("Distance")),
-        () -> assertEquals(expected.get("ERRORS/WARNINGS/INFO"), actual.get("ERRORS/WARNINGS/INFO")));
+    Map<String, NestedField> expectedMap = new HashMap<>();
+    expectedMap.put("Allele", getFixedStringField("Allele", 0));
+    expectedMap.put("cDNA.pos/cDNA.length", getFixeTwoIntegerField("cDNA.pos/cDNA.length", 1));
+    expectedMap.put("Distance", getFixedOneIntegerField("Distance", 2));
+    expectedMap.put("ERRORS/WARNINGS/INFO", getVariableFixedThreeStringField("ERRORS/WARNINGS/INFO", 3));
+    assertEquals(actual, NestedInfoHeaderLine.builder().nestedFields(expectedMap).build());
   }
 
   private NestedField getVariableFixedThreeStringField(String id, int index) {

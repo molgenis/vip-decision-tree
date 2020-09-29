@@ -21,8 +21,8 @@ public class VcfNestedMetadataParserImpl implements VcfNestedMetadataParser {
   }
 
   @Override
-  public Map<String, Map<String, NestedField>> map(VCFHeader header) {
-    Map<String, Map<String, NestedField>> nestedMetadata = new HashMap<>();
+  public VcfNestedMetadata map(VCFHeader header) {
+    Map<String, NestedInfoHeaderLine> nestedMetadata = new HashMap<>();
     for(VCFInfoHeaderLine headerLine : header.getInfoHeaderLines()){
       for(NestedMetadataMapper mapper : mappers) {
         if (mapper.canMap(headerLine)) {
@@ -31,7 +31,7 @@ public class VcfNestedMetadataParserImpl implements VcfNestedMetadataParser {
         }
       }
     }
-    return nestedMetadata;
+    return VcfNestedMetadata.builder().nestedLines(nestedMetadata).build();
   }
 
 }

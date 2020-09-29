@@ -5,5 +5,5 @@ import java.util.Map;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 
 public interface NestedInfoSelector {
-  boolean isMatch(String infoValue, VariantContext vc, int alleleIndex, Map<String,NestedField> nestedMetadata);
+  boolean isMatch(String infoValue, VariantContext vc, int alleleIndex, NestedInfoHeaderLine nestedInfoHeaderLine);
 }

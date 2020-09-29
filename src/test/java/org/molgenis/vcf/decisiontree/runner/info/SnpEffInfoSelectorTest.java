@@ -35,14 +35,15 @@ class SnpEffInfoSelectorTest {
 
   @Test
   void isMatch() {
-      VariantContext vc = mock(VariantContext.class);
-      when(alleleField.getIndex()).thenReturn(0);
-      Allele allele = mock(Allele.class);
-      when(allele.getBaseString()).thenReturn("A");
-      when(vc.getAlternateAllele(0)).thenReturn(allele);
-      Map<String, NestedField> nestedFields = new HashMap<>();
-      nestedFields.put(ALLELE, alleleField);
-      assertTrue(snpEffInfoSelector.isMatch("A|X|Y", vc, 1, nestedFields));
+    VariantContext vc = mock(VariantContext.class);
+    when(alleleField.getIndex()).thenReturn(0);
+    Allele allele = mock(Allele.class);
+    when(allele.getBaseString()).thenReturn("A");
+    when(vc.getAlternateAllele(0)).thenReturn(allele);
+    Map<String, NestedField> nestedFields = new HashMap<>();
+    nestedFields.put(ALLELE, alleleField);
+    assertTrue(snpEffInfoSelector.isMatch("A|X|Y", vc, 1,
+        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
   }
 
   @Test
@@ -54,6 +55,7 @@ class SnpEffInfoSelectorTest {
     when(vc.getAlternateAllele(0)).thenReturn(allele);
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
-    assertFalse(snpEffInfoSelector.isMatch("T|X|Y", vc, 1, nestedFields));
+    assertFalse(snpEffInfoSelector.isMatch("T|X|Y", vc, 1,
+        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
   }
 }

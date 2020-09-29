@@ -43,7 +43,7 @@ class VepInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     nestedFields.put(PICK, pickField);
-    assertTrue(vepInfoSelector.isMatch("A|1|Y|Z",vc, 1, nestedFields));
+    assertTrue(vepInfoSelector.isMatch("A|1|Y|Z",vc, 1, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
   }
 
   @Test
@@ -61,7 +61,7 @@ class VepInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     nestedFields.put(PICK, pickField);
-    assertTrue(vepInfoSelector.isMatch("A|1|Y|Z",vc, 1, nestedFields));
+    assertTrue(vepInfoSelector.isMatch("A|1|Y|Z",vc, 1, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
   }
 
   @Test
@@ -71,7 +71,7 @@ class VepInfoSelectorTest {
     when(vc.getAlternateAlleles()).thenReturn(Collections.singletonList(allele));
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
-    assertTrue(vepInfoSelector.isMatch("A|Y|Z",vc, 1, nestedFields));
+    assertTrue(vepInfoSelector.isMatch("A|Y|Z",vc, 1, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
   }
 
   @Test
@@ -83,7 +83,7 @@ class VepInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     nestedFields.put(PICK, pickField);
-    assertFalse(vepInfoSelector.isMatch("A||Y|Z",vc, 1, nestedFields));
+    assertFalse(vepInfoSelector.isMatch("A||Y|Z",vc, 1, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
 
   }
 
@@ -102,7 +102,7 @@ class VepInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     nestedFields.put(PICK, pickField);
-    assertTrue(vepInfoSelector.isMatch("-|1|Y|Z",vc, 1, nestedFields));
+    assertTrue(vepInfoSelector.isMatch("-|1|Y|Z",vc, 1, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
   }
 
   @Test
@@ -120,7 +120,7 @@ class VepInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     nestedFields.put(PICK, pickField);
-    assertTrue(vepInfoSelector.isMatch("-|1|Y|Z",vc, 1, nestedFields));
+    assertTrue(vepInfoSelector.isMatch("-|1|Y|Z",vc, 1, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
   }
 
   @Test
@@ -138,7 +138,7 @@ class VepInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     nestedFields.put(PICK, pickField);
-    assertTrue(vepInfoSelector.isMatch("A|1|Y|Z",vc, 1, nestedFields));
+    assertTrue(vepInfoSelector.isMatch("A|1|Y|Z",vc, 1, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
   }
 
   @Test
@@ -156,7 +156,7 @@ class VepInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     nestedFields.put(PICK, pickField);
-    assertTrue(vepInfoSelector.isMatch("-|1|Y|Z",vc, 1, nestedFields));
+    assertTrue(vepInfoSelector.isMatch("-|1|Y|Z",vc, 1, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
   }
 
 }

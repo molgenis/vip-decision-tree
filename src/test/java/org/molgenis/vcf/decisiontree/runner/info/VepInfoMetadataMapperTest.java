@@ -63,25 +63,17 @@ class VepInfoMetadataMapperTest {
     when(headerLine.getDescription()).thenReturn(
         "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|PUBMED");
 
-    Map<String, NestedField> actual = vepInfoMetadataMapper
+    NestedInfoHeaderLine actual = vepInfoMetadataMapper
         .map(headerLine);
 
-    Map<String, NestedField> expected = new HashMap<>();
-    expected.put("Allele", getFixedStringField("Allele", 0));
-    expected.put("cDNA_position", getFixedIntegerField("cDNA_position", 1));
-    expected.put("FLAGS", getVariableFlagField("FLAGS", 2));
-    expected.put("PICK", getFixedFlagField("PICK", 3));
-    expected.put("gnomAD_AF", getFixedFloatField("gnomAD_AF", 4));
-    expected.put("PUBMED", getVariableIntegerField("PUBMED", 5));
-    assertAll(
-        () -> assertTrue(expected.keySet().containsAll(actual.keySet())),
-        () -> assertEquals(expected.size(), actual.size()),
-        () -> assertEquals(expected.get("PICK"), actual.get("PICK")),
-        () -> assertEquals(expected.get("Allele"), actual.get("Allele")),
-        () -> assertEquals(expected.get("FLAGS"), actual.get("FLAGS")),
-        () -> assertEquals(expected.get("cDNA_position"), actual.get("cDNA_position")),
-        () -> assertEquals(expected.get("gnomAD_AF"), actual.get("gnomAD_AF")),
-        () -> assertEquals(expected.get("PUBMED"), actual.get("PUBMED")));
+    Map<String, NestedField> expectedMap = new HashMap<>();
+    expectedMap.put("Allele", getFixedStringField("Allele", 0));
+    expectedMap.put("cDNA_position", getFixedIntegerField("cDNA_position", 1));
+    expectedMap.put("FLAGS", getVariableFlagField("FLAGS", 2));
+    expectedMap.put("PICK", getFixedFlagField("PICK", 3));
+    expectedMap.put("gnomAD_AF", getFixedFloatField("gnomAD_AF", 4));
+    expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 5));
+    assertEquals(NestedInfoHeaderLine.builder().nestedFields(expectedMap).build(), actual);
   }
 
 

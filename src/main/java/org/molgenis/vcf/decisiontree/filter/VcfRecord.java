@@ -99,7 +99,7 @@ public class VcfRecord {
     }else {
       result = selector
           .isMatch(infoValue, variantContext, alleleIndex, metadata.getNestedMetadata()
-              .get(parentId));
+              .getNestedInfoHeaderLine(parentId));
     }
     return result;
   }

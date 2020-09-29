@@ -21,6 +21,8 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.ValueCountBuilder;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
 
 /**
  * {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields).
@@ -30,10 +32,9 @@ public class VcfMetadata {
   private static final String FIELD_TOKEN_SEPARATOR = "/";
 
   private final VCFHeader vcfHeader;
+  private final VcfNestedMetadata nestedMetadata;
 
-  private final Map<String, Map<String, NestedField>> nestedMetadata;
-
-  public VcfMetadata(VCFHeader vcfHeader, Map<String, Map<String,NestedField>> nestedMetadata) {
+  public VcfMetadata(VCFHeader vcfHeader, VcfNestedMetadata nestedMetadata) {
     this.vcfHeader = requireNonNull(vcfHeader);
     this.nestedMetadata = requireNonNull(nestedMetadata);
   }
@@ -68,12 +69,12 @@ public class VcfMetadata {
     String field = fieldTokens.get(1);
     String nestedField = fieldTokens.get(2);
 
-    Map<String, NestedField> nestedFieldMetadata = nestedMetadata.get(field);
+    NestedInfoHeaderLine nestedFieldMetadata = nestedMetadata.getNestedInfoHeaderLine(field);
     if(nestedFieldMetadata == null){
       throw new UnknownFieldException(field, INFO);
     }
-    if(nestedFieldMetadata.containsKey(nestedField)){
-      return nestedFieldMetadata.get(nestedField);
+    if(nestedFieldMetadata.hasField(nestedField)){
+      return nestedFieldMetadata.getField(nestedField);
     }else{
       throw new UnknownFieldException(nestedField, INFO_NESTED);
     }
@@ -229,7 +230,7 @@ public class VcfMetadata {
     return vcfHeader;
   }
 
-  public Map<String, Map<String, NestedField>> getNestedMetadata() {
+  public VcfNestedMetadata getNestedMetadata() {
     return nestedMetadata;
   }
 }
