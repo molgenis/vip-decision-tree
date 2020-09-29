@@ -3,10 +3,8 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Objects.requireNonNull;
 
 import htsjdk.variant.vcf.VCFFileReader;
-import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
 import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
 import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadataParser;
 
