@@ -1,5 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner;
 
+import java.util.Collection;
+import java.util.List;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -42,8 +44,8 @@ public class QueryValidatorImpl implements QueryValidator {
         break;
       case EQUALS:
       case NOT_EQUALS:
-        if(field.getSeparator() != null){
-          throw new UnsupportedMultiValueOperatorException(field, configBoolQuery.getOperator());
+        if(field.getSeparator() != null && !(configBoolQuery.getValue() instanceof Collection)){
+          throw new CountMismatchException(configBoolQuery);
         }
         break;
       default:

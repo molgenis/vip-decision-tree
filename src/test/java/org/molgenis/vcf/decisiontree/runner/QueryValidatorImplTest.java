@@ -34,9 +34,9 @@ class QueryValidatorImplTest {
   @Test
   void validateBooleanNodeEqualsOnCollection() {
     Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.STRING).separator('&').valueCount(
-        ValueCount.builder().type(Type.VARIABLE).build()).build();
+        ValueCount.builder().type(Type.FIXED).count(1).build()).build();
     assertThrows(
-        UnsupportedMultiValueOperatorException.class,
+        CountMismatchException.class,
         () -> validateBooleanNode(field, ConfigOperator.NOT_EQUALS));
   }
 
