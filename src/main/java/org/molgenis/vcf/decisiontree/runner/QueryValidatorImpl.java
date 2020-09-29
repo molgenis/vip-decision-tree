@@ -42,6 +42,9 @@ public class QueryValidatorImpl implements QueryValidator {
         break;
       case EQUALS:
       case NOT_EQUALS:
+        if(field.getSeparator() != null){
+          throw new UnsupportedMultiValueOperatorException(field, configBoolQuery.getOperator());
+        }
         break;
       default:
         throw new UnexpectedEnumException(configBoolQuery.getOperator());
