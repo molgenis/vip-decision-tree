@@ -70,7 +70,6 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.FLAG);
         break;
-      case "Consequence":
       case "Existing_variation":
         fieldBuilder
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
