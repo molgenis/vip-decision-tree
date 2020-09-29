@@ -84,7 +84,13 @@ public class VcfRecord {
         String[] split = singleValue.split(separator,-1);
         String stringValue = split[index];
         if (!stringValue.isEmpty()) {
-          value = getTypedInfoValue(field, stringValue);
+          if(field.getSeparator() != null) {
+            String nestedSeparator = Pattern.quote(nestedField.getSeparator().toString());
+            value = getTypedInfoValue(field, stringValue, nestedSeparator);
+          }
+          else{
+            value = getTypedInfoValue(field, stringValue);
+          }
         }
       }
     }

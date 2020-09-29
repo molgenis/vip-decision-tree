@@ -6,7 +6,9 @@ import static java.util.Collections.singletonList;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -221,7 +223,18 @@ public class VcfUtils {
     return bool;
   }
 
-    public static Object getTypedInfoValue(Field field, Object stringValue) {
+  public static Object getTypedInfoValue(Field field, String stringValue, String separator) {
+    Object value;
+    if(separator == null){
+      value = getTypedInfoValue(field, stringValue);
+    }else{
+      List<String> values = Arrays.asList(stringValue.split(separator));
+      value = values.stream().map(singleValue -> getTypedInfoValue(field, singleValue)).collect(Collectors.toList());
+    }
+    return value;
+  }
+
+    public static Object getTypedInfoValue(Field field, String stringValue) {
       Object typedValue;
       ValueType valueType = field.getValueType();
       switch (valueType) {

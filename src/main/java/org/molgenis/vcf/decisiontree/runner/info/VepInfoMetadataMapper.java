@@ -72,6 +72,11 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
         break;
       case "Consequence":
       case "Existing_variation":
+        fieldBuilder
+            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
+            .valueType(ValueType.STRING)
+            .separator('&');
+        break;
       case "CLIN_SIG":
       case "FLAGS":
         fieldBuilder
