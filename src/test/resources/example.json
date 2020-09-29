@@ -45,7 +45,7 @@
       "query": {
         "field": "INFO/ANN/Annotation",
         "operator": "==",
-        "value": "missense_variant"
+        "value": ["missense_variant"]
       },
       "outcomeTrue": {
         "nextNode": "done_include"

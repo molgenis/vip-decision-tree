@@ -17,6 +17,7 @@ import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField.NestedFieldBuilder;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
+import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.springframework.stereotype.Component;
 
@@ -91,6 +92,12 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
             .valueCount(ValueCount.builder().type(FIXED).count(3).build())
             .separator('/')
             .valueType(ValueType.STRING);
+        break;
+      case "Annotation":
+        fieldBuilder
+            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
+            .valueType(ValueType.STRING)
+            .separator('&');
         break;
       default:
         fieldBuilder
