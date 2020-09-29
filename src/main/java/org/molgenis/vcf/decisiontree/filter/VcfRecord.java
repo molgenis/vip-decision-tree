@@ -77,18 +77,18 @@ public class VcfRecord {
     List<String> infoValues = VcfUtils.getInfoAsStringList(variantContext, parentId);
     if (!infoValues.isEmpty()) {
       List<String> filteredInfo = infoValues.stream()
-          .filter(nestedValue -> isSelectedNestedValue(nestedValue, variantContext, alleleIndex, nestedField.getNestedInfoSelector(), parentId)).collect(
+          .filter(nestedValue -> isSelectedNestedValue(nestedValue, variantContext, alleleIndex,
+              nestedField.getNestedInfoSelector(), parentId)).collect(
               Collectors.toList());
       if (!filteredInfo.isEmpty()) {
         String singleValue = filteredInfo.get(0);
-        String[] split = singleValue.split(separator,-1);
+        String[] split = singleValue.split(separator, -1);
         String stringValue = split[index];
         if (!stringValue.isEmpty()) {
-          if(field.getSeparator() != null) {
+          if (field.getSeparator() != null) {
             String nestedSeparator = Pattern.quote(nestedField.getSeparator().toString());
             value = getTypedInfoValue(field, stringValue, nestedSeparator);
-          }
-          else{
+          } else {
             value = getTypedInfoValue(field, stringValue);
           }
         }
@@ -97,17 +97,12 @@ public class VcfRecord {
     return value;
   }
 
-  private boolean isSelectedNestedValue(String infoValue, VariantContext variantContext, int alleleIndex, NestedInfoSelector selector,
+  private boolean isSelectedNestedValue(String infoValue, VariantContext variantContext,
+      int alleleIndex, NestedInfoSelector selector,
       String parentId) {
-    boolean result;
-    if(variantContext.getAlternateAlleles().size() == 1){
-      result = true;
-    }else {
-      result = selector
-          .isMatch(infoValue, variantContext, alleleIndex, metadata.getNestedMetadata()
-              .getNestedInfoHeaderLine(parentId));
-    }
-    return result;
+    return selector
+        .isMatch(infoValue, variantContext, alleleIndex, metadata.getNestedMetadata()
+            .getNestedInfoHeaderLine(parentId));
   }
 
   private Object getCommonValue(Field field, int alleleIndex) {

@@ -7,41 +7,23 @@ import org.springframework.stereotype.Component;
 @Component
 public class VepInfoSelector implements NestedInfoSelector {
 
-  public static final String ALLELE = "Allele";
+  public static final String ALLELE_NUM = "ALLELE_NUM";
   public static final String PICK = "PICK";
 
   @Override
-  public boolean isMatch(String infoValue, VariantContext vc, int alleleIndex, NestedInfoHeaderLine nestedInfoHeaderLine) {
-    boolean result = true;
-    NestedField pick = nestedInfoHeaderLine.getField(PICK);
-    NestedField vepAllele = nestedInfoHeaderLine.getField(ALLELE);
-    if (vepAllele == null) {
-      throw new MissingRequiredNestedValueException("VEP", ALLELE);
+  public boolean isMatch(String infoValue, VariantContext vc, int alleleIndex,
+      NestedInfoHeaderLine nestedInfoHeaderLine) {
+    NestedField pickField = nestedInfoHeaderLine.getField(PICK);
+    NestedField alleleNum = nestedInfoHeaderLine.getField(ALLELE_NUM);
+    if (alleleNum == null) {
+      throw new MissingRequiredNestedValueException("VEP", ALLELE_NUM);
     }
     String[] values = infoValue.split("\\|");
-    result = matchAltAllele(vc, alleleIndex, result, vepAllele, values);
-    if (result && pick != null) {
-      result = "1".equals(values[pick.getIndex()]);
+    boolean isAlleleMatch = (alleleIndex == Integer.parseInt(values[alleleNum.getIndex()]));
+    boolean isPickMatch = true;
+    if (pickField != null) {
+      isPickMatch = "1".equals(values[pickField.getIndex()]);
     }
-    return result;
-  }
-
-  private boolean matchAltAllele(VariantContext vc, int alleleIndex, boolean result,
-      NestedField vepAllele, String[] values) {
-    //Matching on allele is only needed if more than one ALT is present
-    if (vc.getAlternateAlleles().size() > 1) {
-      String alt = vc.getAlternateAllele(alleleIndex - 1).getBaseString();
-      String ref = vc.getReference().getBaseString();
-      if (alt.length() >= ref.length()) {
-        result = alt.equals(values[vepAllele.getIndex()]);
-      } else {
-        if(alt.length() == 1){
-          result = "-".equals(values[vepAllele.getIndex()]);
-        }else{
-          result = alt.substring(1).equals(values[vepAllele.getIndex()]);
-        }
-      }
-    }
-    return result;
+    return isAlleleMatch && isPickMatch;
   }
 }

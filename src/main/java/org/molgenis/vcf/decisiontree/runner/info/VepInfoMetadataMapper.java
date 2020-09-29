@@ -66,6 +66,7 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
         .parent(vepField).fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector);
     switch (id) {
       case "PICK":
+      case "ALLELE_NUM":
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.INTEGER);
