@@ -1,7 +1,6 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import java.util.Collection;
-import java.util.List;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -27,20 +26,11 @@ public class QueryValidatorImpl implements QueryValidator {
         break;
       case IN:
       case NOT_IN:
-        if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
-          throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
-        } else {
-          validateSingleOrPerAlleleCount(field, DecisionType.BOOL);
-        }
+        validateIn(field);
         break;
       case CONTAINS:
       case NOT_CONTAINS:
-        if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
-          throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
-        } else if (field.getValueCount().getType() == Type.FIXED
-            && field.getValueCount().getCount() == 1) {
-          throw new UnsupportedValueCountException(field, DecisionType.BOOL);
-        }
+        validateContains(field);
         break;
       case EQUALS:
       case NOT_EQUALS:
@@ -50,6 +40,23 @@ public class QueryValidatorImpl implements QueryValidator {
         break;
       default:
         throw new UnexpectedEnumException(configBoolQuery.getOperator());
+    }
+  }
+
+  private void validateIn(Field field) {
+    if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
+      throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
+    } else {
+      validateSingleOrPerAlleleCount(field, DecisionType.BOOL);
+    }
+  }
+
+  private void validateContains(Field field) {
+    if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
+      throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
+    } else if (field.getValueCount().getType() == Type.FIXED
+        && field.getValueCount().getCount() == 1) {
+      throw new UnsupportedValueCountException(field, DecisionType.BOOL);
     }
   }
 
