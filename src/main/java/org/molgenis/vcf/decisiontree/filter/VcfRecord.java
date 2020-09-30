@@ -33,8 +33,7 @@ public class VcfRecord {
   private final VariantContext variantContext;
   private final VcfMetadata metadata;
 
-  public VcfRecord(VariantContext variantContext,
-      VcfMetadata metadata) {
+  public VcfRecord(VariantContext variantContext, VcfMetadata metadata) {
     this.variantContext = requireNonNull(variantContext);
     this.metadata = requireNonNull(metadata);
   }
@@ -43,22 +42,24 @@ public class VcfRecord {
     return variantContext.getNAlleles() - 1;
   }
 
-  public String getAltAllele(int altAlleleIndex) {
-    return variantContext.getAlternateAllele(altAlleleIndex).getBaseString();
+  public Allele getAltAllele(int altAlleleIndex) {
+    String bases = variantContext.getAlternateAllele(altAlleleIndex).getBaseString();
+    int alleleIndex = altAlleleIndex + 1;
+    return new Allele(bases, alleleIndex);
   }
 
-  public Object getValue(Field field, int alleleIndex) {
+  public Object getValue(Field field, Allele allele) {
     Object value;
     FieldType fieldType = field.getFieldType();
     switch (fieldType) {
       case COMMON:
-        value = getCommonValue(field, alleleIndex);
+        value = getCommonValue(field, allele);
         break;
       case INFO:
-        value = getInfoValue(field, alleleIndex);
+        value = getInfoValue(field, allele);
         break;
       case INFO_NESTED:
-        value = getNestedValue(field, alleleIndex);
+        value = getNestedValue(field, allele);
         break;
       case FORMAT:
         throw new UnsupportedOperationException("FORMAT values are not yet supported."); // TODO
@@ -68,7 +69,7 @@ public class VcfRecord {
     return value;
   }
 
-  private Object getNestedValue(Field field, int alleleIndex) {
+  private Object getNestedValue(Field field, Allele allele) {
     Object value = null;
     NestedField nestedField = (NestedField) field;
     String separator = Pattern.quote(nestedField.getParent().getSeparator().toString());
@@ -76,10 +77,16 @@ public class VcfRecord {
     String parentId = nestedField.getParent().getId();
     List<String> infoValues = VcfUtils.getInfoAsStringList(variantContext, parentId);
     if (!infoValues.isEmpty()) {
-      List<String> filteredInfo = infoValues.stream()
-          .filter(nestedValue -> isSelectedNestedValue(nestedValue, variantContext, alleleIndex,
-              nestedField.getNestedInfoSelector(), parentId)).collect(
-              Collectors.toList());
+      List<String> filteredInfo =
+          infoValues.stream()
+              .filter(
+                  nestedValue ->
+                      isSelectedNestedValue(
+                          nestedValue,
+                          allele,
+                          nestedField.getNestedInfoSelector(),
+                          parentId))
+              .collect(Collectors.toList());
       if (!filteredInfo.isEmpty()) {
         String singleValue = filteredInfo.get(0);
         String[] split = singleValue.split(separator, -1);
@@ -97,15 +104,18 @@ public class VcfRecord {
     return value;
   }
 
-  private boolean isSelectedNestedValue(String infoValue, VariantContext variantContext,
-      int alleleIndex, NestedInfoSelector selector,
+  private boolean isSelectedNestedValue(
+      String infoValue,
+      Allele allele,
+      NestedInfoSelector selector,
       String parentId) {
-    return selector
-        .isMatch(infoValue, variantContext, alleleIndex, metadata.getNestedMetadata()
-            .getNestedInfoHeaderLine(parentId));
+    return selector.isMatch(
+        infoValue,
+        allele,
+        metadata.getNestedMetadata().getNestedInfoHeaderLine(parentId));
   }
 
-  private Object getCommonValue(Field field, int alleleIndex) {
+  private Object getCommonValue(Field field, Allele allele) {
     Object value;
     switch (field.getId()) {
       case "#CHROM":
@@ -121,7 +131,7 @@ public class VcfRecord {
         value = variantContext.getReference().getBaseString();
         break;
       case "ALT":
-        value = getAltAllele(alleleIndex - 1);
+        value = allele.getBases();
         break;
       case "QUAL":
         value = variantContext.hasLog10PError() ? variantContext.getPhredScaledQual() : null;
@@ -152,7 +162,7 @@ public class VcfRecord {
     return value;
   }
 
-  private Object getInfoValue(Field field, int alleleIndex) {
+  private Object getInfoValue(Field field, Allele allele) {
     Object value;
 
     ValueCount valueCount = field.getValueCount();
@@ -160,11 +170,11 @@ public class VcfRecord {
     switch (valueCountType) {
       case A:
         List<?> aInfoList = getInfoList(field);
-        value = !aInfoList.isEmpty() ? aInfoList.get(alleleIndex - 1) : null;
+        value = !aInfoList.isEmpty() ? aInfoList.get(allele.getIndex() - 1) : null;
         break;
       case R:
         List<?> rInfoList = getInfoList(field);
-        value = !rInfoList.isEmpty() ? rInfoList.get(alleleIndex) : null;
+        value = !rInfoList.isEmpty() ? rInfoList.get(allele.getIndex()) : null;
         break;
       case VARIABLE:
         value = getInfoList(field);

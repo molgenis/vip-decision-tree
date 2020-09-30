@@ -11,10 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import htsjdk.variant.variantcontext.Allele;
 import htsjdk.variant.variantcontext.VariantContext;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,10 +49,10 @@ class VcfRecordTest {
 
   @Test
   void getAltAllele() {
-    Allele allele = mock(Allele.class);
+    htsjdk.variant.variantcontext.Allele allele = mock(htsjdk.variant.variantcontext.Allele.class);
     when(allele.getBaseString()).thenReturn("ACTG");
     when(variantContext.getAlternateAllele(2)).thenReturn(allele);
-    assertEquals("ACTG", vcfRecord.getAltAllele(2));
+    assertEquals(Allele.builder().bases("ACTG").index(3).build(), vcfRecord.getAltAllele(2));
   }
 
   @Test
@@ -66,7 +64,10 @@ class VcfRecordTest {
   void toDisplayString() {
     when(variantContext.getContig()).thenReturn("1");
     when(variantContext.getStart()).thenReturn(123);
-    Allele refAllele = when(mock(Allele.class).getBaseString()).thenReturn("A").getMock();
+    htsjdk.variant.variantcontext.Allele refAllele =
+        when(mock(htsjdk.variant.variantcontext.Allele.class).getBaseString())
+            .thenReturn("A")
+            .getMock();
     when(variantContext.getReference()).thenReturn(refAllele);
     assertEquals("1:123 A", vcfRecord.toDisplayString());
   }
@@ -77,7 +78,7 @@ class VcfRecordTest {
     when(variantContext.getContig()).thenReturn(contig);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("#CHROM");
-    assertEquals(contig, vcfRecord.getValue(field, 1));
+    assertEquals(contig, vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -86,7 +87,7 @@ class VcfRecordTest {
     when(variantContext.getStart()).thenReturn(pos);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("POS");
-    assertEquals(pos, vcfRecord.getValue(field, 1));
+    assertEquals(pos, vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -96,36 +97,32 @@ class VcfRecordTest {
     when(variantContext.getID()).thenReturn(idStr);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("ID");
-    assertEquals(List.of("rs123", "rs456"), vcfRecord.getValue(field, 1));
+    assertEquals(List.of("rs123", "rs456"), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
   void getValueCommonIdsMissing() {
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("ID");
-    assertEquals(emptyList(), vcfRecord.getValue(field, 1));
+    assertEquals(emptyList(), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
   void getValueCommonRef() {
     String ref = "ACTG";
-    Allele allele = mock(Allele.class);
+    htsjdk.variant.variantcontext.Allele allele = mock(htsjdk.variant.variantcontext.Allele.class);
     when(allele.getBaseString()).thenReturn(ref);
     when(variantContext.getReference()).thenReturn(allele);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("REF");
-    assertEquals(ref, vcfRecord.getValue(field, 1));
+    assertEquals(ref, vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
   void getValueCommonAlt() {
-    String alt = "ACTG";
-    Allele allele = mock(Allele.class);
-    when(allele.getBaseString()).thenReturn(alt);
-    when(variantContext.getAlternateAllele(0)).thenReturn(allele);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("ALT");
-    assertEquals(alt, vcfRecord.getValue(field, 1));
+    assertEquals("A", vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -134,14 +131,14 @@ class VcfRecordTest {
     when(variantContext.getPhredScaledQual()).thenReturn(1.23);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("QUAL");
-    assertEquals(1.23, (Double) vcfRecord.getValue(field, 1), 1E-6);
+    assertEquals(1.23, (Double) vcfRecord.getValue(field, createAllele()), 1E-6);
   }
 
   @Test
   void getValueCommonQualMissing() {
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("QUAL");
-    assertNull(vcfRecord.getValue(field, 1));
+    assertNull(vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -152,7 +149,7 @@ class VcfRecordTest {
     when(variantContext.getFiltersMaybeNull()).thenReturn(filters);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("FILTER");
-    assertEquals(new ArrayList<>(filters), vcfRecord.getValue(field, 1));
+    assertEquals(new ArrayList<>(filters), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -160,7 +157,7 @@ class VcfRecordTest {
     when(variantContext.getFiltersMaybeNull()).thenReturn(null);
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("FILTER");
-    assertEquals(emptyList(), vcfRecord.getValue(field, 1));
+    assertEquals(emptyList(), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -168,7 +165,7 @@ class VcfRecordTest {
     when(variantContext.getFiltersMaybeNull()).thenReturn(emptySet());
     Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
     when(field.getId()).thenReturn("FILTER");
-    assertEquals(singletonList("PASS"), vcfRecord.getValue(field, 1));
+    assertEquals(singletonList("PASS"), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -182,7 +179,7 @@ class VcfRecordTest {
             .build();
     int alleleIndex = 2;
     when(variantContext.getAttribute("my_field")).thenReturn(asList(1, 2));
-    assertEquals(2, vcfRecord.getValue(field, alleleIndex));
+    assertEquals(2, vcfRecord.getValue(field, createAllele(alleleIndex)));
   }
 
   @Test
@@ -196,7 +193,7 @@ class VcfRecordTest {
             .build();
     int alleleIndex = 2;
     when(variantContext.getAttribute("my_field")).thenReturn(asList(1.2, 2.3));
-    assertEquals(2.3, (Double) vcfRecord.getValue(field, alleleIndex), 1E-6);
+    assertEquals(2.3, (Double) vcfRecord.getValue(field, createAllele(alleleIndex)), 1E-6);
   }
 
   @Test
@@ -210,7 +207,7 @@ class VcfRecordTest {
             .build();
     int alleleIndex = 2;
     when(variantContext.getAttribute("my_field")).thenReturn(asList("str0", "str1"));
-    assertEquals("str1", vcfRecord.getValue(field, alleleIndex));
+    assertEquals("str1", vcfRecord.getValue(field, createAllele(alleleIndex)));
   }
 
   @Test
@@ -224,7 +221,7 @@ class VcfRecordTest {
             .build();
     int alleleIndex = 2;
     when(variantContext.getAttribute("my_field")).thenReturn(asList(1, 2, 3));
-    assertEquals(3, vcfRecord.getValue(field, alleleIndex));
+    assertEquals(3, vcfRecord.getValue(field, createAllele(alleleIndex)));
   }
 
   @Test
@@ -237,7 +234,7 @@ class VcfRecordTest {
             .valueType(ValueType.INTEGER)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(asList(1, 2));
-    assertEquals(asList(1, 2), vcfRecord.getValue(field, 1));
+    assertEquals(asList(1, 2), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -249,7 +246,8 @@ class VcfRecordTest {
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
             .valueType(ValueType.FLAG)
             .build();
-    assertThrows(FlagListException.class, () -> vcfRecord.getValue(field, 1));
+    Allele allele = createAllele();
+    assertThrows(FlagListException.class, () -> vcfRecord.getValue(field, allele));
   }
 
   @Test
@@ -262,7 +260,7 @@ class VcfRecordTest {
             .valueType(ValueType.INTEGER)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(asList(1, 2));
-    assertEquals(asList(1, 2), vcfRecord.getValue(field, 1));
+    assertEquals(asList(1, 2), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -275,7 +273,7 @@ class VcfRecordTest {
             .valueType(ValueType.INTEGER)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(1);
-    assertEquals(1, vcfRecord.getValue(field, 1));
+    assertEquals(1, vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -288,7 +286,7 @@ class VcfRecordTest {
             .valueType(ValueType.FLOAT)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(1.2);
-    assertEquals(1.2, (Double) vcfRecord.getValue(field, 1), 1E-6);
+    assertEquals(1.2, (Double) vcfRecord.getValue(field, createAllele()), 1E-6);
   }
 
   @Test
@@ -301,7 +299,7 @@ class VcfRecordTest {
             .valueType(ValueType.FLAG)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(true);
-    assertTrue((Boolean) vcfRecord.getValue(field, 1));
+    assertTrue((Boolean) vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -314,6 +312,14 @@ class VcfRecordTest {
             .valueType(ValueType.STRING)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn("str0");
-    assertEquals("str0", vcfRecord.getValue(field, 1));
+    assertEquals("str0", vcfRecord.getValue(field, createAllele()));
+  }
+
+  private Allele createAllele() {
+    return createAllele(1);
+  }
+
+  private Allele createAllele(int alleleIndex) {
+    return Allele.builder().bases("A").index(alleleIndex).build();
   }
 }

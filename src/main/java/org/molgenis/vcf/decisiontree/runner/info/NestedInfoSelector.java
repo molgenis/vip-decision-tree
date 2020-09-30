@@ -1,7 +1,8 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
-import htsjdk.variant.variantcontext.VariantContext;
+import org.molgenis.vcf.decisiontree.filter.Allele;
 
 public interface NestedInfoSelector {
-  boolean isMatch(String infoValue, VariantContext vc, int alleleIndex, NestedInfoHeaderLine nestedInfoHeaderLine);
+
+  boolean isMatch(String infoValue, Allele allele, NestedInfoHeaderLine nestedInfoHeaderLine);
 }
