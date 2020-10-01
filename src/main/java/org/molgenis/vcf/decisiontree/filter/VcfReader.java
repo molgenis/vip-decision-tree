@@ -18,30 +18,25 @@ public class VcfReader implements AutoCloseable {
   private VcfNestedMetadata nestedMetadata;
   private boolean inited = false;
 
-  public VcfReader(VCFFileReader vcfFileReader,
-      VcfNestedMetadataParser vcfNestedMetadataParser) {
+  public VcfReader(VCFFileReader vcfFileReader, VcfNestedMetadataParser vcfNestedMetadataParser) {
     this.vcfFileReader = requireNonNull(vcfFileReader);
     this.vcfNestedMetadataParser = requireNonNull(vcfNestedMetadataParser);
   }
 
-  private void initNestedMeta(){
-    if(!inited){
+  private void initNestedMeta() {
+    if (!inited) {
       nestedMetadata = vcfNestedMetadataParser.map(vcfFileReader.getFileHeader());
       inited = true;
     }
   }
 
   public Stream<VcfRecord> stream() {
-    return StreamSupport.stream(vcfFileReader.spliterator(), false).map(vc -> new VcfRecord(vc, getMetadata()));
+    return StreamSupport.stream(vcfFileReader.spliterator(), false).map(VcfRecord::new);
   }
 
   public VcfMetadata getMetadata() {
     initNestedMeta();
     return new VcfMetadata(vcfFileReader.getFileHeader(), nestedMetadata);
-  }
-
-  public VCFFileReader unwrap() {
-    return vcfFileReader;
   }
 
   @Override

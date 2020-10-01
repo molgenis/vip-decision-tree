@@ -4,5 +4,5 @@ import org.molgenis.vcf.decisiontree.filter.Allele;
 
 public interface NestedInfoSelector {
 
-  boolean isMatch(String infoValue, Allele allele, NestedInfoHeaderLine nestedInfoHeaderLine);
+  boolean isMatch(String infoValue, Allele allele);
 }

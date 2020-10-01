@@ -20,7 +20,6 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.runner.info.NestedInfoSelector;
 import org.molgenis.vcf.decisiontree.utils.VcfUtils;
 
 /**
@@ -31,11 +30,9 @@ public class VcfRecord {
   private static final List<String> PASS_FILTER = singletonList(VCFConstants.PASSES_FILTERS_v4);
 
   private final VariantContext variantContext;
-  private final VcfMetadata metadata;
 
-  public VcfRecord(VariantContext variantContext, VcfMetadata metadata) {
+  public VcfRecord(VariantContext variantContext) {
     this.variantContext = requireNonNull(variantContext);
-    this.metadata = requireNonNull(metadata);
   }
 
   public int getNrAltAlleles() {
@@ -80,12 +77,7 @@ public class VcfRecord {
       List<String> filteredInfo =
           infoValues.stream()
               .filter(
-                  nestedValue ->
-                      isSelectedNestedValue(
-                          nestedValue,
-                          allele,
-                          nestedField.getNestedInfoSelector(),
-                          parentId))
+                  nestedValue -> nestedField.getNestedInfoSelector().isMatch(nestedValue, allele))
               .collect(Collectors.toList());
       if (!filteredInfo.isEmpty()) {
         String singleValue = filteredInfo.get(0);
@@ -102,17 +94,6 @@ public class VcfRecord {
       }
     }
     return value;
-  }
-
-  private boolean isSelectedNestedValue(
-      String infoValue,
-      Allele allele,
-      NestedInfoSelector selector,
-      String parentId) {
-    return selector.isMatch(
-        infoValue,
-        allele,
-        metadata.getNestedMetadata().getNestedInfoHeaderLine(parentId));
   }
 
   private Object getCommonValue(Field field, Allele allele) {

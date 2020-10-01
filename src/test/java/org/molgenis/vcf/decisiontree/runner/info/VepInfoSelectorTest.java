@@ -38,9 +38,9 @@ class VepInfoSelectorTest {
     nestedFields.put(ALLELE_NUM, alleleField);
     nestedFields.put(PICK, pickField);
     Allele allele = Allele.builder().bases("A").index(1).build();
-    assertTrue(
-        vepInfoSelector.isMatch(
-            "1|1|Y|Z", allele, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
+    vepInfoSelector.setNestedInfoHeaderLine(
+        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build());
+    assertTrue(vepInfoSelector.isMatch("1|1|Y|Z", allele));
   }
 
   @Test
@@ -49,9 +49,9 @@ class VepInfoSelectorTest {
     nestedFields.put(ALLELE_NUM, alleleField);
     nestedFields.put(PICK, pickField);
     Allele allele = Allele.builder().bases("A").index(1).build();
-    assertFalse(
-        vepInfoSelector.isMatch(
-            "2|1|Y|Z", allele, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
+    vepInfoSelector.setNestedInfoHeaderLine(
+        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build());
+    assertFalse(vepInfoSelector.isMatch("2|1|Y|Z", allele));
   }
 
   @Test
@@ -61,9 +61,9 @@ class VepInfoSelectorTest {
     nestedFields.put(ALLELE_NUM, alleleField);
     nestedFields.put(PICK, pickField);
     Allele allele = Allele.builder().bases("A").index(1).build();
-    assertTrue(
-        vepInfoSelector.isMatch(
-            "1|1|Y|Z", allele, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
+    vepInfoSelector.setNestedInfoHeaderLine(
+        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build());
+    assertTrue(vepInfoSelector.isMatch("1|1|Y|Z", allele));
   }
 
   @Test
@@ -71,8 +71,8 @@ class VepInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE_NUM, alleleField);
     Allele allele = Allele.builder().bases("A").index(1).build();
-    assertTrue(
-        vepInfoSelector.isMatch(
-            "1|Y|Z", allele, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
+    vepInfoSelector.setNestedInfoHeaderLine(
+        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build());
+    assertTrue(vepInfoSelector.isMatch("1|Y|Z", allele));
   }
 }

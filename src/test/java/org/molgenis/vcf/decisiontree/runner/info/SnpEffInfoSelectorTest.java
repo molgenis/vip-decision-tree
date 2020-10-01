@@ -34,9 +34,9 @@ class SnpEffInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     Allele allele = Allele.builder().bases("A").index(1).build();
-    assertTrue(
-        snpEffInfoSelector.isMatch(
-            "A|X|Y", allele, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
+    snpEffInfoSelector.setNestedInfoHeaderLine(
+        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build());
+    assertTrue(snpEffInfoSelector.isMatch("A|X|Y", allele));
   }
 
   @Test
@@ -45,8 +45,8 @@ class SnpEffInfoSelectorTest {
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     Allele allele = Allele.builder().bases("A").index(1).build();
-    assertFalse(
-        snpEffInfoSelector.isMatch(
-            "T|X|Y", allele, NestedInfoHeaderLine.builder().nestedFields(nestedFields).build()));
+    snpEffInfoSelector.setNestedInfoHeaderLine(
+        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build());
+    assertFalse(snpEffInfoSelector.isMatch("T|X|Y", allele));
   }
 }

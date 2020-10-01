@@ -1,6 +1,8 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
@@ -23,16 +25,18 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 @ExtendWith(MockitoExtension.class)
 class VepInfoMetadataMapperTest {
 
+  @Mock
+  private VepInfoSelectorFactory vepInfoSelectorFactory;
   private VepInfoMetadataMapper vepInfoMetadataMapper;
   @Mock
   VCFInfoHeaderLine headerLine;
   private Field vepField;
+  @Mock
   private VepInfoSelector selector;
 
   @BeforeEach
   void setUp() {
-    selector = new VepInfoSelector();
-    vepInfoMetadataMapper = new VepInfoMetadataMapper(selector);
+    vepInfoMetadataMapper = new VepInfoMetadataMapper(vepInfoSelectorFactory);
 
     vepField = Field.builder()
         .id("CSQ")
@@ -59,6 +63,8 @@ class VepInfoMetadataMapperTest {
 
   @Test
   void map() {
+    when(vepInfoSelectorFactory.create()).thenReturn(selector);
+
     when(headerLine.getID()).thenReturn("CSQ");
     when(headerLine.getDescription()).thenReturn(
         "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|PUBMED");
