@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
 
 import htsjdk.variant.vcf.VCFFormatHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
@@ -36,11 +37,19 @@ class VcfMetadataTest {
 
   @BeforeEach
   void setUp() {
-    Map<String, Field> vepNestedMetadata = new HashMap<>();
-    vepNestedMetadata.put("Allele", createNestedField("Allele"));
-    vepNestedMetadata.put("PICK", createNestedField("PICK"));
-    vepNestedMetadata.put("consequence", createNestedField("consequence"));
-    vcfMetadata = new VcfMetadata(vcfHeader, vepNestedMetadata);
+    Map<String, Field> nestedFields = new HashMap<>();
+    nestedFields.put("Allele", createNestedField("Allele"));
+    nestedFields.put("PICK", createNestedField("PICK"));
+    nestedFields.put("consequence", createNestedField("consequence"));
+    Field vepField = Field.builder()
+        .id("VEP")
+        .fieldType(FieldType.INFO)
+        .valueType(ValueType.STRING)
+        .valueCount(ValueCount.builder().type(VARIABLE).build())
+        .separator('|')
+        .children(nestedFields)
+        .build();
+    vcfMetadata = new VcfMetadata(vcfHeader, Collections.singletonMap("VEP", vepField));
   }
 
 @Test

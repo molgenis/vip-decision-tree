@@ -63,13 +63,16 @@ public class VcfMetadata {
       throw new InvalidNumberOfTokensException(fieldTokens, fieldType, 2);
     }
     String field = fieldTokens.get(1);
-    String nestedField = fieldTokens.get(2);
+    String nestedFieldId = fieldTokens.get(2);
 
-    Map<String, Field> children = nestedFields.get(field).getChildren();
-    if(children.containsKey(nestedField)){
-      return children.get(nestedField);
+    Field nestedField = nestedFields.get(field);
+    if(nestedField == null){
+      throw new UnknownFieldException(field, INFO);
+    }
+    if(nestedField.getChildren().containsKey(nestedFieldId)){
+      return nestedField.getChildren().get(nestedFieldId);
     }else{
-      throw new UnknownFieldException(nestedField, INFO_NESTED);
+      throw new UnknownFieldException(nestedFieldId, INFO_NESTED);
     }
   }
 

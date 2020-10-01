@@ -3,6 +3,7 @@ package org.molgenis.vcf.decisiontree.runner.info;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.filter.Allele;
@@ -88,5 +89,23 @@ public class NestedValueSelector {
   private static BoolQuery toAlleleIndexQuery(Allele allele, BoolQuery query) {
     return BoolQuery.builder().field(query.getField()).operator(query.getOperator())
         .value(allele.getIndex()).build();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    NestedValueSelector that = (NestedValueSelector) o;
+    return queries.equals(that.queries) &&
+        separator.equals(that.separator);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(queries, separator);
   }
 }

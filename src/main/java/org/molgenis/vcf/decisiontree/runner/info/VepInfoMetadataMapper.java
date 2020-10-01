@@ -29,6 +29,12 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
   public static final char SEPARATOR = '|';
   public static final String PICK = "PICK";
   public static final String ALLELE_NUM = "ALLELE_NUM";
+  private final NestedValueSelectorFactory nestedValueSelectorFactory;
+
+  public VepInfoMetadataMapper(
+      NestedValueSelectorFactory nestedValueSelectorFactory) {
+    this.nestedValueSelectorFactory = nestedValueSelectorFactory;
+  }
 
   @Override
   public boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -66,7 +72,7 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
     List<BoolQuery> selectorQueries = new ArrayList<>();
     selectorQueries.add(createQuery(PICK,EQUALS,1, false, nestedFields, parentId));
     selectorQueries.add(createQuery(ALLELE_NUM,EQUALS,SELECTED_ALLELE_INDEX, true, nestedFields, parentId));
-    return new NestedValueSelector(selectorQueries,SEPARATOR);
+    return nestedValueSelectorFactory.create(selectorQueries,SEPARATOR);
   }
 
   private BoolQuery createQuery(String fieldName, Operator operator, Object value, boolean required, Map<String, Field> nestedFields, String parentId){

@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator.EQUALS;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
+import static org.molgenis.vcf.decisiontree.runner.info.NestedValueSelector.SELECTED_ALLELE;
 
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
@@ -30,11 +34,12 @@ class SnpEffInfoMetadataMapperTest {
   private Field.FieldBuilder snpEffField;
   @Mock
   private NestedValueSelector selector;
+  @Mock
+  private NestedValueSelectorFactory nestedValueSelectorFactory;
 
   @BeforeEach
   void setUp() {
-    snpEffInfoMetadataMapper = new SnpEffInfoMetadataMapper();
-
+    snpEffInfoMetadataMapper = new SnpEffInfoMetadataMapper(nestedValueSelectorFactory);
     snpEffField = Field.builder()
         .id(ANN)
         .fieldType(FieldType.INFO)
@@ -67,10 +72,20 @@ class SnpEffInfoMetadataMapperTest {
 
   @Test
   void map() {
+    when(nestedValueSelectorFactory.create(Collections.singletonList(
+        BoolQuery.builder().field(Field.builder()
+            .id("Allele")
+            .index(0)
+            .parentId(ANN)
+            .fieldType(FieldType.INFO_NESTED)
+            .valueCount(ValueCount.builder().type(FIXED).count(1).build())
+            .valueType(ValueType.STRING).build()).operator(EQUALS).value(SELECTED_ALLELE).build()), '|'))
+        .thenReturn(selector);
     when(headerLine.getID()).thenReturn("ANN");
     when(headerLine.getDescription()).thenReturn(
         "Functional annotations: 'Allele | cDNA.pos / cDNA.length | Distance | ERRORS / WARNINGS / INFO' ");
 
+    snpEffInfoMetadataMapper = new SnpEffInfoMetadataMapper(nestedValueSelectorFactory);
     Field actual = snpEffInfoMetadataMapper
         .map(headerLine);
 
@@ -78,8 +93,9 @@ class SnpEffInfoMetadataMapperTest {
     expectedMap.put("Allele", getFixedStringField("Allele", 0));
     expectedMap.put("cDNA.pos/cDNA.length", getFixeTwoIntegerField("cDNA.pos/cDNA.length", 1));
     expectedMap.put("Distance", getFixedOneIntegerField("Distance", 2));
-    expectedMap.put("ERRORS/WARNINGS/INFO", getVariableFixedThreeStringField("ERRORS/WARNINGS/INFO", 3));
-    assertEquals(actual, snpEffField.children(expectedMap).build());
+    expectedMap
+        .put("ERRORS/WARNINGS/INFO", getVariableFixedThreeStringField("ERRORS/WARNINGS/INFO", 3));
+    assertEquals(snpEffField.children(expectedMap).build(), actual);
   }
 
   private Field getVariableFixedThreeStringField(String id, int index) {

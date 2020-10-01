@@ -2,10 +2,15 @@ package org.molgenis.vcf.decisiontree.runner.info;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator.EQUALS;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
+import static org.molgenis.vcf.decisiontree.runner.info.NestedValueSelector.SELECTED_ALLELE;
+import static org.molgenis.vcf.decisiontree.runner.info.NestedValueSelector.SELECTED_ALLELE_INDEX;
 
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
@@ -25,14 +31,15 @@ class VepInfoMetadataMapperTest {
   private static final String VEP = "CSQ";
   private VepInfoMetadataMapper vepInfoMetadataMapper;
   @Mock
-  VCFInfoHeaderLine headerLine;
+  private VCFInfoHeaderLine headerLine;
   private Field.FieldBuilder vepField;
   private NestedValueSelector selector;
+  @Mock
+  private NestedValueSelectorFactory nestedValueSelectorFactory;
 
   @BeforeEach
   void setUp() {
-    selector = new NestedValueSelector(null,null);
-    vepInfoMetadataMapper = new VepInfoMetadataMapper();
+    vepInfoMetadataMapper = new VepInfoMetadataMapper(nestedValueSelectorFactory);
 
     vepField = Field.builder()
         .id("CSQ")
@@ -58,20 +65,38 @@ class VepInfoMetadataMapperTest {
 
   @Test
   void map() {
+    BoolQuery pickQuery = BoolQuery.builder().field(Field.builder()
+        .id("PICK")
+        .index(3)
+        .parentId("CSQ")
+        .fieldType(FieldType.INFO_NESTED)
+        .valueCount(ValueCount.builder().type(FIXED).count(1).build())
+        .valueType(ValueType.INTEGER).build()).operator(EQUALS).value(1).build();
+    BoolQuery alleleQuery = BoolQuery.builder().field(Field.builder()
+        .id("ALLELE_NUM")
+        .index(6)
+        .parentId("CSQ")
+        .fieldType(FieldType.INFO_NESTED)
+        .valueCount(ValueCount.builder().type(FIXED).count(1).build())
+        .valueType(ValueType.INTEGER).build()).operator(EQUALS).value(SELECTED_ALLELE_INDEX).build();
+    when(nestedValueSelectorFactory.create(
+        Arrays.asList(pickQuery, alleleQuery), '|'))
+        .thenReturn(selector);
+
     when(headerLine.getID()).thenReturn("CSQ");
     when(headerLine.getDescription()).thenReturn(
-        "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|PUBMED");
+        "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|PUBMED|ALLELE_NUM");
 
-    Field actual = vepInfoMetadataMapper
-        .map(headerLine);
+    Field actual = vepInfoMetadataMapper.map(headerLine);
 
     Map<String, Field> expectedMap = new HashMap<>();
     expectedMap.put("Allele", getFixedStringField("Allele", 0));
     expectedMap.put("cDNA_position", getFixedIntegerField("cDNA_position", 1));
-    expectedMap.put("FLAGS", getVariableIntegerField("FLAGS", 2));
+    expectedMap.put("FLAGS", getVariableStringField("FLAGS", 2));
     expectedMap.put("PICK", getFixedIntegerField("PICK", 3));
     expectedMap.put("gnomAD_AF", getFixedFloatField("gnomAD_AF", 4));
     expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 5));
+    expectedMap.put("ALLELE_NUM", getFixedIntegerField("ALLELE_NUM", 6));
     assertEquals(vepField.children(expectedMap).build(), actual);
   }
 
@@ -80,6 +105,14 @@ class VepInfoMetadataMapperTest {
         .fieldType(FieldType.INFO_NESTED).nestedValueSelector(selector)
         .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
         .valueType(ValueType.INTEGER)
+        .separator('&').build();
+  }
+
+  private Field getVariableStringField(String id, int index) {
+    return Field.builder().id(id).index(index).parentId(VEP)
+        .fieldType(FieldType.INFO_NESTED).nestedValueSelector(selector)
+        .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
+        .valueType(ValueType.STRING)
         .separator('&').build();
   }
 

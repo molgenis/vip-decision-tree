@@ -8,6 +8,7 @@ import static org.molgenis.vcf.decisiontree.runner.info.NestedValueSelector.SELE
 
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,12 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
       Pattern.compile("Functional annotations: '(.*?)'");
   public static final char SEPARATOR = '|';
   private static final String ALLELE = "Allele";
+  private final NestedValueSelectorFactory nestedValueSelectorFactory;
+
+  public SnpEffInfoMetadataMapper(
+      NestedValueSelectorFactory nestedValueSelectorFactory) {
+    this.nestedValueSelectorFactory = nestedValueSelectorFactory;
+  }
 
   @Override
   public boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -58,12 +65,10 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
             .fieldType(FieldType.INFO)
             .valueType(ValueType.STRING)
             .valueCount(ValueCount.builder().type(VARIABLE).build())
-            .separator(SEPARATOR).children(nestedFields)
-            .nestedValueSelector(selector).build();
+            .separator(SEPARATOR).children(nestedFields).build();
   }
 
   private NestedValueSelector createSelector(Map<String, Field> nestedFields, String parent) {
-    List<BoolQuery> selectorQueries = new ArrayList<>();
     BoolQuery query;
     Field field = nestedFields.get(ALLELE);
     if(field != null) {
@@ -71,8 +76,7 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
     }else{
       throw new MissingRequiredNestedValueException(ALLELE, parent);
     }
-    selectorQueries.add(query);
-    return new NestedValueSelector(selectorQueries,SEPARATOR);
+    return nestedValueSelectorFactory.create(Collections.singletonList(query),SEPARATOR);
   }
 
   protected List<String> getNestedInfoIds(VCFInfoHeaderLine vcfInfoHeaderLine) {
