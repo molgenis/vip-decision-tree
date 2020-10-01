@@ -3,9 +3,10 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Objects.requireNonNull;
 
 import htsjdk.variant.vcf.VCFFileReader;
+import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
+import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadataParser;
 
 /**
@@ -15,7 +16,7 @@ public class VcfReader implements AutoCloseable {
 
   private final VCFFileReader vcfFileReader;
   private final VcfNestedMetadataParser vcfNestedMetadataParser;
-  private VcfNestedMetadata nestedMetadata;
+  private Map<String, Field> nestedFields;
   private boolean inited = false;
 
   public VcfReader(VCFFileReader vcfFileReader, VcfNestedMetadataParser vcfNestedMetadataParser) {
@@ -25,7 +26,7 @@ public class VcfReader implements AutoCloseable {
 
   private void initNestedMeta() {
     if (!inited) {
-      nestedMetadata = vcfNestedMetadataParser.map(vcfFileReader.getFileHeader());
+      nestedFields = vcfNestedMetadataParser.map(vcfFileReader.getFileHeader());
       inited = true;
     }
   }
@@ -36,7 +37,7 @@ public class VcfReader implements AutoCloseable {
 
   public VcfMetadata getMetadata() {
     initNestedMeta();
-    return new VcfMetadata(vcfFileReader.getFileHeader(), nestedMetadata);
+    return new VcfMetadata(vcfFileReader.getFileHeader(), nestedFields);
   }
 
   @Override

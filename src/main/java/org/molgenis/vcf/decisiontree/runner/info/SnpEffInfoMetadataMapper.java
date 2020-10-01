@@ -1,21 +1,23 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
 import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator.EQUALS;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
+import static org.molgenis.vcf.decisiontree.runner.info.NestedValueSelector.SELECTED_ALLELE;
 
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField.NestedFieldBuilder;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -27,12 +29,8 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
   private static final String INFO_ID = "ANN";
   private static final Pattern INFO_DESCRIPTION_PATTERN =
       Pattern.compile("Functional annotations: '(.*?)'");
-
-  private final SnpEffInfoSelectorFactory snpEffInfoSelectorFactory;
-
-  public SnpEffInfoMetadataMapper(SnpEffInfoSelectorFactory snpEffInfoSelectorFactory) {
-    this.snpEffInfoSelectorFactory = requireNonNull(snpEffInfoSelectorFactory);
-  }
+  public static final char SEPARATOR = '|';
+  private static final String ALLELE = "Allele";
 
   @Override
   public boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -41,26 +39,40 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
   }
 
   @Override
-  public NestedInfoHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine) {
-    SnpEffInfoSelector infoSelector = snpEffInfoSelectorFactory.create();
-    Map<String, NestedField> nestedFields = new HashMap<>();
+  public Field map(VCFInfoHeaderLine vcfInfoHeaderLine) {
+    Map<String, Field> nestedFields = new HashMap<>();
     int index = 0;
     for (String id : getNestedInfoIds(vcfInfoHeaderLine)) {
-      Field annField =
-          Field.builder()
-              .id(vcfInfoHeaderLine.getID())
-              .fieldType(FieldType.INFO)
-              .valueType(ValueType.STRING)
-              .valueCount(ValueCount.builder().type(VARIABLE).build())
-              .separator('|')
-              .build();
-      nestedFields.put(id, mapNestedMetadataToField(id, index, annField, infoSelector));
+      nestedFields.put(id, mapNestedMetadataToField(id, index, vcfInfoHeaderLine.getID()));
       index++;
     }
-    NestedInfoHeaderLine nestedInfoHeaderLine =
-        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build();
-    infoSelector.setNestedInfoHeaderLine(nestedInfoHeaderLine);
-    return nestedInfoHeaderLine;
+    NestedValueSelector selector = createSelector(nestedFields, vcfInfoHeaderLine.getID());
+    for (Entry<String, Field> entry: nestedFields.entrySet()) {
+      Field field = entry.getValue();
+      field.setNestedValueSelector(selector);
+      nestedFields.put(entry.getKey(), field);
+    }
+    return
+        Field.builder()
+            .id(vcfInfoHeaderLine.getID())
+            .fieldType(FieldType.INFO)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(VARIABLE).build())
+            .separator(SEPARATOR).children(nestedFields)
+            .nestedValueSelector(selector).build();
+  }
+
+  private NestedValueSelector createSelector(Map<String, Field> nestedFields, String parent) {
+    List<BoolQuery> selectorQueries = new ArrayList<>();
+    BoolQuery query;
+    Field field = nestedFields.get(ALLELE);
+    if(field != null) {
+      query = BoolQuery.builder().field(field).operator(EQUALS).value(SELECTED_ALLELE).build();
+    }else{
+      throw new MissingRequiredNestedValueException(ALLELE, parent);
+    }
+    selectorQueries.add(query);
+    return new NestedValueSelector(selectorQueries,SEPARATOR);
   }
 
   protected List<String> getNestedInfoIds(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -75,15 +87,14 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
         .collect(Collectors.toList());
   }
 
-  protected NestedField mapNestedMetadataToField(
-      String id, int index, Field annField, NestedInfoSelector infoSelector) {
-    NestedFieldBuilder fieldBuilder =
-        NestedField.nestedBuilder()
+  protected Field mapNestedMetadataToField(
+      String id, int index, String parentId) {
+    Field.FieldBuilder fieldBuilder =
+        Field.builder()
             .id(id)
             .index(index)
-            .parent(annField)
-            .fieldType(FieldType.INFO_NESTED)
-            .nestedInfoSelector(infoSelector);
+            .parentId(parentId)
+            .fieldType(FieldType.INFO_NESTED);
     switch (id) {
       case "cDNA.pos/cDNA.length":
       case "CDS.pos/CDS.length":

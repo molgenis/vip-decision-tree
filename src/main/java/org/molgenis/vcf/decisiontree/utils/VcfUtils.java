@@ -8,6 +8,7 @@ import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -221,18 +222,19 @@ public class VcfUtils {
     return bool;
   }
 
-  public static Object getTypedInfoValue(Field field, String stringValue, String separator) {
+  public static Object getTypedInfoValue(Field field, String stringValue) {
     Object value;
+    Character separator = field.getSeparator();
     if(separator == null){
-      value = getTypedInfoValue(field, stringValue);
+      value = getTypedInfoValueInternal(field, stringValue);
     }else{
-      List<String> values = Arrays.asList(stringValue.split(separator));
-      value = values.stream().map(singleValue -> getTypedInfoValue(field, singleValue)).collect(Collectors.toList());
+      List<String> values = Arrays.asList(stringValue.split(Pattern.quote(separator.toString())));
+      value = values.stream().map(singleValue -> getTypedInfoValueInternal(field, singleValue)).collect(Collectors.toList());
     }
     return value;
   }
 
-    public static Object getTypedInfoValue(Field field, String stringValue) {
+    private static Object getTypedInfoValueInternal(Field field, String stringValue) {
       Object typedValue;
       ValueType valueType = field.getValueType();
       switch (valueType) {

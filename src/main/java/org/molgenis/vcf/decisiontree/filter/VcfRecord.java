@@ -4,22 +4,20 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedInfoValue;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.decisiontree.runner.info.NestedValueSelector;
+import org.molgenis.vcf.decisiontree.runner.info.MissingNestedInfoFieldException;
 import org.molgenis.vcf.decisiontree.utils.VcfUtils;
 
 /**
@@ -67,33 +65,13 @@ public class VcfRecord {
   }
 
   private Object getNestedValue(Field field, Allele allele) {
-    Object value = null;
-    NestedField nestedField = (NestedField) field;
-    String separator = Pattern.quote(nestedField.getParent().getSeparator().toString());
-    int index = nestedField.getIndex();
-    String parentId = nestedField.getParent().getId();
+    String parentId = field.getParentId();
     List<String> infoValues = VcfUtils.getInfoAsStringList(variantContext, parentId);
-    if (!infoValues.isEmpty()) {
-      List<String> filteredInfo =
-          infoValues.stream()
-              .filter(
-                  nestedValue -> nestedField.getNestedInfoSelector().isMatch(nestedValue, allele))
-              .collect(Collectors.toList());
-      if (!filteredInfo.isEmpty()) {
-        String singleValue = filteredInfo.get(0);
-        String[] split = singleValue.split(separator, -1);
-        String stringValue = split[index];
-        if (!stringValue.isEmpty()) {
-          if (field.getSeparator() != null) {
-            String nestedSeparator = Pattern.quote(nestedField.getSeparator().toString());
-            value = getTypedInfoValue(field, stringValue, nestedSeparator);
-          } else {
-            value = getTypedInfoValue(field, stringValue);
-          }
-        }
-      }
+    NestedValueSelector nestedValueSelector = field.getNestedValueSelector();
+    if(nestedValueSelector == null){
+      throw new MissingNestedInfoFieldException("selector");
     }
-    return value;
+    return nestedValueSelector.select(field, infoValues, allele);
   }
 
   private Object getCommonValue(Field field, Allele allele) {

@@ -7,6 +7,7 @@ import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,8 +21,8 @@ public class VcfNestedMetadataParserImpl implements VcfNestedMetadataParser {
   }
 
   @Override
-  public VcfNestedMetadata map(VCFHeader header) {
-    Map<String, NestedInfoHeaderLine> nestedMetadata = new HashMap<>();
+  public Map<String, Field> map(VCFHeader header) {
+    Map<String, Field> nestedMetadata = new HashMap<>();
     for(VCFInfoHeaderLine headerLine : header.getInfoHeaderLines()){
       for(NestedMetadataMapper mapper : mappers) {
         if (mapper.canMap(headerLine)) {
@@ -30,7 +31,7 @@ public class VcfNestedMetadataParserImpl implements VcfNestedMetadataParser {
         }
       }
     }
-    return VcfNestedMetadata.builder().nestedLines(nestedMetadata).build();
+    return nestedMetadata;
   }
 
 }

@@ -1,18 +1,21 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
 import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator.EQUALS;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
+import static org.molgenis.vcf.decisiontree.runner.info.NestedValueSelector.SELECTED_ALLELE_INDEX;
 
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
+import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField.NestedFieldBuilder;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -23,12 +26,9 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
 
   private static final String INFO_DESCRIPTION_PREFIX =
       "Consequence annotations from Ensembl VEP. Format: ";
-
-  private final VepInfoSelectorFactory vepInfoSelectorFactory;
-
-  public VepInfoMetadataMapper(VepInfoSelectorFactory vepInfoSelectorFactory) {
-    this.vepInfoSelectorFactory = requireNonNull(vepInfoSelectorFactory);
-  }
+  public static final char SEPARATOR = '|';
+  public static final String PICK = "PICK";
+  public static final String ALLELE_NUM = "ALLELE_NUM";
 
   @Override
   public boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -38,26 +38,46 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
   }
 
   @Override
-  public NestedInfoHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine) {
-    VepInfoSelector infoSelector = vepInfoSelectorFactory.create();
-    Map<String, NestedField> nestedFields = new HashMap<>();
+  public Field map(VCFInfoHeaderLine vcfInfoHeaderLine) {
+    Map<String, Field> nestedFields = new HashMap<>();
     int index = 0;
     for (String id : getNestedInfoIds(vcfInfoHeaderLine)) {
-      Field vepField =
-          Field.builder()
-              .id(vcfInfoHeaderLine.getID())
-              .fieldType(FieldType.INFO)
-              .valueType(ValueType.STRING)
-              .valueCount(ValueCount.builder().type(VARIABLE).build())
-              .separator('|')
-              .build();
-      nestedFields.put(id, mapNestedMetadataToField(id, index, vepField, infoSelector));
+      nestedFields.put(id, mapNestedMetadataToField(id, index, vcfInfoHeaderLine.getID()));
       index++;
     }
-    NestedInfoHeaderLine nestedInfoHeaderLine =
-        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build();
-    infoSelector.setNestedInfoHeaderLine(nestedInfoHeaderLine);
-    return nestedInfoHeaderLine;
+    NestedValueSelector selector = createSelector(nestedFields, vcfInfoHeaderLine.getID());
+    for (Entry<String, Field> entry: nestedFields.entrySet()) {
+      Field field = entry.getValue();
+      field.setNestedValueSelector(selector);
+      nestedFields.put(entry.getKey(), field);
+    }
+    return
+        Field.builder()
+            .id(vcfInfoHeaderLine.getID())
+            .fieldType(FieldType.INFO)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(VARIABLE).build())
+            .separator(SEPARATOR)
+            .children(nestedFields)
+            .build();
+  }
+
+  private NestedValueSelector createSelector(Map<String, Field> nestedFields, String parentId) {
+    List<BoolQuery> selectorQueries = new ArrayList<>();
+    selectorQueries.add(createQuery(PICK,EQUALS,1, false, nestedFields, parentId));
+    selectorQueries.add(createQuery(ALLELE_NUM,EQUALS,SELECTED_ALLELE_INDEX, true, nestedFields, parentId));
+    return new NestedValueSelector(selectorQueries,SEPARATOR);
+  }
+
+  private BoolQuery createQuery(String fieldName, Operator operator, Object value, boolean required, Map<String, Field> nestedFields, String parentId){
+    BoolQuery query = null;
+    Field field = nestedFields.get(fieldName);
+    if(field != null) {
+      query = BoolQuery.builder().field(field).operator(operator).value(value).build();
+    }else if(required){
+      throw new MissingRequiredNestedValueException(fieldName, parentId);
+    }
+    return query;
   }
 
   protected List<String> getNestedInfoIds(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -66,22 +86,15 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
     return asList(infoIds);
   }
 
-  protected NestedField mapNestedMetadataToField(
-      String id, int index, Field vepField, VepInfoSelector infoSelector) {
-    NestedFieldBuilder fieldBuilder =
-        NestedField.nestedBuilder()
+  protected Field mapNestedMetadataToField(
+      String id, int index, String parentId) {
+    Field.FieldBuilder fieldBuilder =
+        Field.builder()
             .id(id)
             .index(index)
-            .parent(vepField)
-            .fieldType(FieldType.INFO_NESTED)
-            .nestedInfoSelector(infoSelector);
+            .parentId(parentId)
+            .fieldType(FieldType.INFO_NESTED);
     switch (id) {
-      case "PICK":
-      case "ALLELE_NUM":
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-            .valueType(ValueType.INTEGER);
-        break;
       case "Consequence":
       case "Existing_variation":
       case "CLIN_SIG":
@@ -104,6 +117,8 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
       case "cDNA_position":
       case "CDS_position":
       case "Protein_position":
+      case PICK:
+      case ALLELE_NUM:
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.INTEGER);

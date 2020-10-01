@@ -23,12 +23,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
-import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
 
 @ExtendWith(MockitoExtension.class)
 class VcfMetadataTest {
@@ -39,12 +36,11 @@ class VcfMetadataTest {
 
   @BeforeEach
   void setUp() {
-    Map<String, NestedField> vepNestedMetadata = new HashMap<>();
+    Map<String, Field> vepNestedMetadata = new HashMap<>();
     vepNestedMetadata.put("Allele", createNestedField("Allele"));
     vepNestedMetadata.put("PICK", createNestedField("PICK"));
     vepNestedMetadata.put("consequence", createNestedField("consequence"));
-    NestedInfoHeaderLine nestedInfoHeaderLine = NestedInfoHeaderLine.builder().nestedFields(vepNestedMetadata).build();
-    vcfMetadata = new VcfMetadata(vcfHeader, VcfNestedMetadata.builder().nestedLines(Collections.singletonMap("VEP", nestedInfoHeaderLine)).build());
+    vcfMetadata = new VcfMetadata(vcfHeader, vepNestedMetadata);
   }
 
 @Test
@@ -270,9 +266,9 @@ class VcfMetadataTest {
     assertEquals(vcfHeader, vcfMetadata.unwrap());
   }
 
-  private NestedField createNestedField(String field) {
+  private Field createNestedField(String field) {
     ValueCount valueCount = ValueCount.builder().type(Type.VARIABLE).build();
     Field parent = Field.builder().id("VEP").fieldType(FieldType.INFO).valueType(ValueType.STRING).valueCount(valueCount).separator('|').build();
-    return NestedField.nestedBuilder().id(field).parent(parent).fieldType(FieldType.INFO_NESTED).valueType(ValueType.STRING).valueCount(valueCount).build();
+    return Field.builder().id(field).fieldType(FieldType.INFO_NESTED).valueType(ValueType.STRING).valueCount(valueCount).build();
   }
 }

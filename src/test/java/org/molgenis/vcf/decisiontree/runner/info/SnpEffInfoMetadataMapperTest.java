@@ -17,40 +17,36 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 
 @ExtendWith(MockitoExtension.class)
 class SnpEffInfoMetadataMapperTest {
-  @Mock
-  private SnpEffInfoSelectorFactory snpEffInfoSelectorFactory;
+
+  public static final String ANN = "ANN";
   private SnpEffInfoMetadataMapper snpEffInfoMetadataMapper;
   @Mock
   VCFInfoHeaderLine headerLine;
-  private Field snpEffField;
+  private Field.FieldBuilder snpEffField;
   @Mock
-  SnpEffInfoSelector selector;
+  private NestedValueSelector selector;
 
   @BeforeEach
   void setUp() {
-    snpEffInfoMetadataMapper = new SnpEffInfoMetadataMapper(snpEffInfoSelectorFactory);
+    snpEffInfoMetadataMapper = new SnpEffInfoMetadataMapper();
 
-    snpEffField =
-        Field.builder()
-            .id("ANN")
-            .fieldType(FieldType.INFO)
-            .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(VARIABLE).build())
-            .separator('|')
-            .build();
+    snpEffField = Field.builder()
+        .id(ANN)
+        .fieldType(FieldType.INFO)
+        .valueType(ValueType.STRING)
+        .valueCount(ValueCount.builder().type(VARIABLE).build())
+        .separator('|');
   }
 
   @Test
   void canMap() {
-    when(headerLine.getDescription())
-        .thenReturn(
-            "Functional annotations: 'Allele | Annotation | Annotation_Impact | Gene_Name | Gene_ID | Feature_Type | Feature_ID | Transcript_BioType | Rank | HGVS.c | HGVS.p | cDNA.pos / cDNA.length | CDS.pos / CDS.length | AA.pos / AA.length | Distance | ERRORS / WARNINGS / INFO' ");
+    when(headerLine.getDescription()).thenReturn(
+        "Functional annotations: 'Allele | Annotation | Annotation_Impact | Gene_Name | Gene_ID | Feature_Type | Feature_ID | Transcript_BioType | Rank | HGVS.c | HGVS.p | cDNA.pos / cDNA.length | CDS.pos / CDS.length | AA.pos / AA.length | Distance | ERRORS / WARNINGS / INFO' ");
     when(headerLine.getID()).thenReturn("ANN");
     assertTrue(snpEffInfoMetadataMapper.canMap(headerLine));
   }
@@ -64,82 +60,59 @@ class SnpEffInfoMetadataMapperTest {
   @Test
   void cantMapDesc() {
     when(headerLine.getID()).thenReturn("ANN");
-    when(headerLine.getDescription())
-        .thenReturn(
-            "Not Functional annotations: 'Allele | Annotation | Annotation_Impact | Gene_Name | Gene_ID | Feature_Type | Feature_ID | Transcript_BioType | Rank | HGVS.c | HGVS.p | cDNA.pos / cDNA.length | CDS.pos / CDS.length | AA.pos / AA.length | Distance | ERRORS / WARNINGS / INFO' ");
+    when(headerLine.getDescription()).thenReturn(
+        "Not Functional annotations: 'Allele | Annotation | Annotation_Impact | Gene_Name | Gene_ID | Feature_Type | Feature_ID | Transcript_BioType | Rank | HGVS.c | HGVS.p | cDNA.pos / cDNA.length | CDS.pos / CDS.length | AA.pos / AA.length | Distance | ERRORS / WARNINGS / INFO' ");
     assertFalse(snpEffInfoMetadataMapper.canMap(headerLine));
   }
 
   @Test
   void map() {
-    when(snpEffInfoSelectorFactory.create()).thenReturn(selector);
-
     when(headerLine.getID()).thenReturn("ANN");
-    when(headerLine.getDescription())
-        .thenReturn(
-            "Functional annotations: 'Allele | cDNA.pos / cDNA.length | Distance | ERRORS / WARNINGS / INFO' ");
+    when(headerLine.getDescription()).thenReturn(
+        "Functional annotations: 'Allele | cDNA.pos / cDNA.length | Distance | ERRORS / WARNINGS / INFO' ");
 
-    NestedInfoHeaderLine actual = snpEffInfoMetadataMapper.map(headerLine);
+    Field actual = snpEffInfoMetadataMapper
+        .map(headerLine);
 
-    Map<String, NestedField> expectedMap = new HashMap<>();
+    Map<String, Field> expectedMap = new HashMap<>();
     expectedMap.put("Allele", getFixedStringField("Allele", 0));
     expectedMap.put("cDNA.pos/cDNA.length", getFixeTwoIntegerField("cDNA.pos/cDNA.length", 1));
     expectedMap.put("Distance", getFixedOneIntegerField("Distance", 2));
-    expectedMap.put(
-        "ERRORS/WARNINGS/INFO", getVariableFixedThreeStringField("ERRORS/WARNINGS/INFO", 3));
-    NestedInfoHeaderLine nestedInfoHeaderLine =
-        NestedInfoHeaderLine.builder().nestedFields(expectedMap).build();
-    assertEquals(actual, nestedInfoHeaderLine);
+    expectedMap.put("ERRORS/WARNINGS/INFO", getVariableFixedThreeStringField("ERRORS/WARNINGS/INFO", 3));
+    assertEquals(actual, snpEffField.children(expectedMap).build());
   }
 
-  private NestedField getVariableFixedThreeStringField(String id, int index) {
-
-    return NestedField.nestedBuilder()
-        .id(id)
-        .index(index)
-        .parent(snpEffField)
+  private Field getVariableFixedThreeStringField(String id, int index) {
+    return Field.builder().id(id).index(index).parentId(ANN)
         .fieldType(FieldType.INFO_NESTED)
         .valueCount(ValueCount.builder().type(FIXED).count(3).build())
         .separator('/')
-        .nestedInfoSelector(selector)
-        .valueType(ValueType.STRING)
-        .build();
+        .nestedValueSelector(selector)
+        .valueType(ValueType.STRING).build();
   }
 
-  private NestedField getFixeTwoIntegerField(String id, int index) {
-    return NestedField.nestedBuilder()
-        .id(id)
-        .index(index)
-        .parent(snpEffField)
+  private Field getFixeTwoIntegerField(String id, int index) {
+    return Field.builder().id(id).index(index).parentId(ANN)
         .fieldType(FieldType.INFO_NESTED)
         .valueCount(ValueCount.builder().type(FIXED).count(2).build())
         .separator('/')
-        .nestedInfoSelector(selector)
-        .valueType(ValueType.INTEGER)
-        .build();
+        .nestedValueSelector(selector)
+        .valueType(ValueType.INTEGER).build();
   }
 
-  private NestedField getFixedOneIntegerField(String id, int index) {
-    return NestedField.nestedBuilder()
-        .id(id)
-        .index(index)
-        .parent(snpEffField)
+  private Field getFixedOneIntegerField(String id, int index) {
+    return Field.builder().id(id).index(index).parentId(ANN)
         .fieldType(FieldType.INFO_NESTED)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-        .nestedInfoSelector(selector)
-        .valueType(ValueType.INTEGER)
-        .build();
+        .nestedValueSelector(selector)
+        .valueType(ValueType.INTEGER).build();
   }
 
-  private NestedField getFixedStringField(String id, int index) {
-    return NestedField.nestedBuilder()
-        .id(id)
-        .index(index)
-        .parent(snpEffField)
+  private Field getFixedStringField(String id, int index) {
+    return Field.builder().id(id).index(index).parentId(ANN)
         .fieldType(FieldType.INFO_NESTED)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-        .nestedInfoSelector(selector)
-        .valueType(ValueType.STRING)
-        .build();
+        .nestedValueSelector(selector)
+        .valueType(ValueType.STRING).build();
   }
 }

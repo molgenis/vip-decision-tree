@@ -12,6 +12,7 @@ import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -19,8 +20,6 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.ValueCountBuilder;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
-import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
 
 /**
  * {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields).
@@ -30,11 +29,11 @@ public class VcfMetadata {
   private static final String FIELD_TOKEN_SEPARATOR = "/";
 
   private final VCFHeader vcfHeader;
-  private final VcfNestedMetadata nestedMetadata;
+  private final Map<String, Field> nestedFields;
 
-  public VcfMetadata(VCFHeader vcfHeader, VcfNestedMetadata nestedMetadata) {
+  public VcfMetadata(VCFHeader vcfHeader, Map<String, Field> nestedFields) {
     this.vcfHeader = requireNonNull(vcfHeader);
-    this.nestedMetadata = requireNonNull(nestedMetadata);
+    this.nestedFields = nestedFields;
   }
 
   public Field getField(String fieldId) {
@@ -56,7 +55,6 @@ public class VcfMetadata {
       default:
         throw new UnexpectedEnumException(fieldType);
     }
-
     return field;
   }
 
@@ -67,12 +65,9 @@ public class VcfMetadata {
     String field = fieldTokens.get(1);
     String nestedField = fieldTokens.get(2);
 
-    NestedInfoHeaderLine nestedFieldMetadata = nestedMetadata.getNestedInfoHeaderLine(field);
-    if(nestedFieldMetadata == null){
-      throw new UnknownFieldException(field, INFO);
-    }
-    if(nestedFieldMetadata.hasField(nestedField)){
-      return nestedFieldMetadata.getField(nestedField);
+    Map<String, Field> children = nestedFields.get(field).getChildren();
+    if(children.containsKey(nestedField)){
+      return children.get(nestedField);
     }else{
       throw new UnknownFieldException(nestedField, INFO_NESTED);
     }
@@ -228,7 +223,7 @@ public class VcfMetadata {
     return vcfHeader;
   }
 
-  public VcfNestedMetadata getNestedMetadata() {
-    return nestedMetadata;
+  public Map<String, Field> getNestedFields() {
+    return nestedFields;
   }
 }
