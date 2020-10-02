@@ -13,14 +13,14 @@ public class Variant {
 
   @NonNull VcfMetadata vcfMetadata;
   @NonNull VcfRecord vcfRecord;
-  @NonNull int alleleIndex;
+  @NonNull Allele allele;
 
   public Object getValue(Field field) {
-    return vcfRecord.getValue(field, alleleIndex);
+    return vcfRecord.getValue(field, allele);
   }
 
   public String toDisplayString() {
     return String.format(
-        "%s -> %s", vcfRecord.toDisplayString(), vcfRecord.getAltAllele(alleleIndex - 1));
+        "%s -> %s", vcfRecord.toDisplayString(), allele.getBases());
   }
 }

@@ -14,7 +14,7 @@
         "label": "1"
       },
       "outcomeFalse": {
-        "nextNode": "done_exclude",
+        "nextNode": "vkgl",
         "label": "3"
       },
       "outcomeMissing": {
@@ -25,9 +25,9 @@
     "gnomad": {
       "type": "BOOL",
       "query": {
-        "field": "INFO/GNOMAD",
-        "operator": ">=",
-        "value": 0.9
+        "field": "INFO/CSQ/gnomAD_AF",
+        "operator": "<",
+        "value": 0.01
       },
       "outcomeTrue": {
         "nextNode": "done_include"
@@ -37,7 +37,24 @@
         "label": "GNOMAD_F"
       },
       "outcomeMissing": {
-        "nextNode": "vkgl"
+        "nextNode": "snpEff"
+      }
+    },
+    "snpEff": {
+      "type": "BOOL",
+      "query": {
+        "field": "INFO/ANN/Annotation",
+        "operator": "==",
+        "value": ["missense_variant"]
+      },
+      "outcomeTrue": {
+        "nextNode": "done_include"
+      },
+      "outcomeFalse": {
+        "nextNode": "done_exclude"
+      },
+      "outcomeMissing": {
+        "nextNode": "done_include"
       }
     },
     "vkgl": {

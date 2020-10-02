@@ -34,22 +34,33 @@ class ClassifierImplTest {
     VcfMetadata vcfMetadata = mock(VcfMetadata.class);
 
     VcfReader vcfReader = mock(VcfReader.class);
+
+    Allele allele0 = mock(Allele.class);
     VcfRecord record0 = when(mock(VcfRecord.class).getNrAltAlleles()).thenReturn(1).getMock();
+    when(record0.getAltAllele(0)).thenReturn(allele0);
+
+    Allele allele1 = mock(Allele.class);
+    Allele allele2 = mock(Allele.class);
     VcfRecord record1 = when(mock(VcfRecord.class).getNrAltAlleles()).thenReturn(2).getMock();
+    doReturn(allele1).when(record1).getAltAllele(0);
+    doReturn(allele2).when(record1).getAltAllele(1);
     when(vcfReader.stream()).thenReturn(Stream.of(record0, record1));
     when(vcfReader.getMetadata()).thenReturn(vcfMetadata);
 
     DecisionTree decisionTree = mock(DecisionTree.class);
 
-    Variant variant0 = builder().vcfMetadata(vcfMetadata).vcfRecord(record0).alleleIndex(1).build();
+    Variant variant0 =
+        builder().vcfMetadata(vcfMetadata).vcfRecord(record0).allele(allele0).build();
     Decision decision0 = mock(Decision.class);
     doReturn(decision0).when(decisionTreeExecutor).execute(decisionTree, variant0);
 
-    Variant variant1 = builder().vcfMetadata(vcfMetadata).vcfRecord(record1).alleleIndex(1).build();
+    Variant variant1 =
+        builder().vcfMetadata(vcfMetadata).vcfRecord(record1).allele(allele1).build();
     Decision decision1 = mock(Decision.class);
     doReturn(decision1).when(decisionTreeExecutor).execute(decisionTree, variant1);
 
-    Variant variant2 = builder().vcfMetadata(vcfMetadata).vcfRecord(record1).alleleIndex(2).build();
+    Variant variant2 =
+        builder().vcfMetadata(vcfMetadata).vcfRecord(record1).allele(allele2).build();
     Decision decision2 = mock(Decision.class);
     doReturn(decision2).when(decisionTreeExecutor).execute(decisionTree, variant2);
 

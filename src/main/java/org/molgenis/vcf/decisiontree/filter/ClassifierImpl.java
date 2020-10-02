@@ -43,12 +43,12 @@ public class ClassifierImpl implements Classifier {
     int nrAltAlleles = vcfRecord.getNrAltAlleles();
     List<Decision> decisions;
     if (nrAltAlleles == 1) {
-      Decision decision = processVariant(vcfRecord, 1, decisionTree, vcfMetadata);
+      Decision decision = processVariant(vcfRecord, 0, decisionTree, vcfMetadata);
       decisions = singletonList(decision);
     } else {
       decisions = new ArrayList<>(nrAltAlleles);
       for (int i = 0; i < nrAltAlleles; ++i) {
-        Decision decision = processVariant(vcfRecord, i + 1, decisionTree, vcfMetadata);
+        Decision decision = processVariant(vcfRecord, i, decisionTree, vcfMetadata);
         decisions.add(decision);
       }
     }
@@ -56,8 +56,9 @@ public class ClassifierImpl implements Classifier {
   }
 
   private Decision processVariant(
-      VcfRecord vcfRecord, int alleleIndex, DecisionTree decisionTree, VcfMetadata vcfMetadata) {
-    Variant variant = new Variant(vcfMetadata, vcfRecord, alleleIndex);
+      VcfRecord vcfRecord, int altAlleleIndex, DecisionTree decisionTree, VcfMetadata vcfMetadata) {
+    Allele allele = vcfRecord.getAltAllele(altAlleleIndex);
+    Variant variant = new Variant(vcfMetadata, vcfRecord, allele);
     return decisionTreeExecutor.execute(decisionTree, variant);
   }
 }
