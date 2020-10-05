@@ -1,6 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import java.util.List;
+import java.util.Collection;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
@@ -57,16 +57,16 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
         matches = !executeLessQuery(field, value, queryValue);
         break;
       case IN:
-        matches = executeInQuery(value, (List<?>) queryValue);
+        matches = executeInQuery(value, (Collection<?>) queryValue);
         break;
       case NOT_IN:
-        matches = !executeInQuery(value, (List<?>) queryValue);
+        matches = !executeInQuery(value, (Collection<?>) queryValue);
         break;
       case CONTAINS:
-        matches = executeContainsQuery((List<?>) value, queryValue);
+        matches = executeContainsQuery((Collection<?>) value, queryValue);
         break;
       case NOT_CONTAINS:
-        matches = !executeContainsQuery((List<?>) value, queryValue);
+        matches = !executeContainsQuery((Collection<?>) value, queryValue);
         break;
       default:
         throw new UnexpectedEnumException(operator);
@@ -107,11 +107,11 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
     return matches;
   }
 
-  private boolean executeContainsQuery(List<?> values, Object queryValue) {
+  private boolean executeContainsQuery(Collection<?> values, Object queryValue) {
     return values.contains(queryValue);
   }
 
-  private boolean executeInQuery(Object value, List<?> queryValues) {
+  private boolean executeInQuery(Object value, Collection<?> queryValues) {
     return queryValues.contains(value);
   }
 }

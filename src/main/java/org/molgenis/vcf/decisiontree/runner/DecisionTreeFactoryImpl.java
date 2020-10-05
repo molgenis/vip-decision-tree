@@ -11,8 +11,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Component;
 @Component
 class DecisionTreeFactoryImpl implements DecisionTreeFactory {
 
+  public static final String FILE_COMMENT_CHARACTER = "#";
   private final QueryValidator queryValidator;
 
   DecisionTreeFactoryImpl(QueryValidator queryValidator) {
@@ -52,27 +54,30 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   public DecisionTree map(VcfMetadata vcfMetadata, Settings settings) {
     ConfigDecisionTree configDecisionTree = settings.getConfigDecisionTree();
     Map<String, Label> labelMap = mapLabels(configDecisionTree.getLabels());
-    Map<String, List<String>> filesMap = mapFiles(configDecisionTree.getFiles());
-    Map<String, Node> nodeMap = mapNodes(vcfMetadata, configDecisionTree.getNodes(), labelMap, filesMap);
+    Map<String, Set<String>> filesMap = mapFiles(configDecisionTree.getFiles());
+    Map<String, Node> nodeMap = mapNodes(vcfMetadata, configDecisionTree.getNodes(), labelMap,
+        filesMap);
     Node rootNode = nodeMap.get(configDecisionTree.getRootNode());
     return DecisionTree.builder().rootNode(rootNode).build();
   }
 
-  private Map<String, List<String>> mapFiles(Map<String, Path> files) {
-    Map<String, List<String>> filesMap;
+  private Map<String, Set<String>> mapFiles(Map<String, Path> files) {
+    Map<String, Set<String>> filesMap;
     if (files == null) {
       filesMap = emptyMap();
     } else {
       filesMap = new HashMap<>();
-          files.entrySet().stream()
-              .forEach(entry -> filesMap.put(entry.getKey(), this.mapFile(entry.getValue())));
+      files.entrySet()
+          .forEach(entry -> filesMap.put(entry.getKey(), this.mapFile(entry.getValue())));
     }
     return filesMap;
   }
 
-  private List<String> mapFile(Path value) {
+  private Set<String> mapFile(Path path) {
     try {
-      return Files.readAllLines(value);
+      return Files.readAllLines(path).stream()
+          .filter(value -> (!value.startsWith(FILE_COMMENT_CHARACTER) && !value.isEmpty()))
+          .collect(Collectors.toSet());
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
@@ -96,7 +101,8 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   }
 
   private Map<String, Node> mapNodes(
-      VcfMetadata vcfMetadata, Map<String, ConfigNode> configNodeMap, Map<String, Label> labelMap, Map<String, List<String>> files) {
+      VcfMetadata vcfMetadata, Map<String, ConfigNode> configNodeMap, Map<String, Label> labelMap,
+      Map<String, Set<String>> files) {
     // first pass: create nodes
     Map<String, Node> nodeMap =
         configNodeMap.entrySet().stream()
@@ -114,7 +120,8 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     return nodeMap;
   }
 
-  private Node toNode(VcfMetadata vcfMetadata, String id, ConfigNode configNode, Map<String, List<String>> files) {
+  private Node toNode(VcfMetadata vcfMetadata, String id, ConfigNode configNode,
+      Map<String, Set<String>> files) {
     Node node;
     switch (configNode.getType()) {
       case BOOL:
@@ -133,7 +140,8 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     return node;
   }
 
-  private BoolNode toBoolNode(VcfMetadata vcfMetadata, String id, ConfigBoolNode nodeConfig, Map<String, List<String>> files) {
+  private BoolNode toBoolNode(VcfMetadata vcfMetadata, String id, ConfigBoolNode nodeConfig,
+      Map<String, Set<String>> files) {
     BoolQuery boolQuery = toBoolQuery(vcfMetadata, nodeConfig.getQuery(), files);
     return BoolNode.builder()
         .id(id)
@@ -142,12 +150,13 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .build();
   }
 
-  private BoolQuery toBoolQuery(VcfMetadata vcfMetadata, ConfigBoolQuery configBoolQuery, Map<String, List<String>> files) {
+  private BoolQuery toBoolQuery(VcfMetadata vcfMetadata, ConfigBoolQuery configBoolQuery,
+      Map<String, Set<String>> files) {
     Operator operator = toOperator(configBoolQuery.getOperator());
     Field field = vcfMetadata.getField(configBoolQuery.getField());
     queryValidator.validateBooleanNode(configBoolQuery, field);
     Object value = configBoolQuery.getValue();
-    if(value instanceof String && value.toString().startsWith(FILE_PREFIX)){
+    if (value instanceof String && value.toString().startsWith(FILE_PREFIX)) {
       value = files.get(((String) value).substring(FILE_PREFIX.length()));
     }
     return BoolQuery.builder()

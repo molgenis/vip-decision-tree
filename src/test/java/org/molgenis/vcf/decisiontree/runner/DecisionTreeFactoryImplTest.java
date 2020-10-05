@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,6 +69,7 @@ class DecisionTreeFactoryImplTest{
     Settings settings = Settings.builder().configDecisionTree(decisionTree).build();
     DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
 
-    assertEquals(Arrays.asList("unit","test","value"), ((BoolNode)decisionTree.getRootNode()).getQuery().getValue());
+    assertEquals(Set.of("unit", "test", "value"),
+        ((BoolNode) decisionTree.getRootNode()).getQuery().getValue());
   }
 }
