@@ -23,6 +23,7 @@ public class ConfigDecisionTreeLoaderImpl implements ConfigDecisionTreeLoader {
     ObjectMapper mapper = new ObjectMapper();
     SimpleModule module = new SimpleModule();
     module.addDeserializer(ConfigNode.class, new ConfigNodeDeserializer());
+    module.addDeserializer(Path.class, new PathDeserializer());
     mapper.registerModule(module);
 
     ConfigDecisionTree configDecisionTree;

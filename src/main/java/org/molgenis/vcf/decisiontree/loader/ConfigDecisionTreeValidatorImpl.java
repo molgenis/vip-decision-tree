@@ -1,7 +1,9 @@
 package org.molgenis.vcf.decisiontree.loader;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
 
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
@@ -34,14 +36,15 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
 
   private void validateNodes(ConfigDecisionTree configDecisionTree) {
     Map<String, ConfigNode> nodes = configDecisionTree.getNodes();
-    nodes.forEach((key, value) -> validateNode(key, value, nodes));
+    Map<String, Path> files = configDecisionTree.getFiles();
+    nodes.forEach((key, value) -> validateNode(key, value, nodes, files));
   }
 
-  private void validateNode(String id, ConfigNode node, Map<String, ConfigNode> nodes) {
+  private void validateNode(String id, ConfigNode node, Map<String, ConfigNode> nodes, Map<String, Path> files) {
     validateAlphanumericValue("id", id);
     switch (node.getType()) {
       case BOOL:
-        validateBoolNode(id, (ConfigBoolNode) node, nodes);
+        validateBoolNode(id, (ConfigBoolNode) node, nodes, files);
         break;
       case CATEGORICAL:
         validateCategoricalNode(id, (ConfigCategoricalNode) node, nodes);
@@ -54,10 +57,21 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
     }
   }
 
-  private void validateBoolNode(String id, ConfigBoolNode node, Map<String, ConfigNode> nodes) {
+  private void validateBoolNode(String id, ConfigBoolNode node, Map<String, ConfigNode> nodes, Map<String, Path> files) {
+    validateValue(id, node.getQuery().getValue(), files);
     validateOutcome(id, "outcomeTrue", nodes, node.getOutcomeTrue());
     validateOutcome(id, "outcomeFalse", nodes, node.getOutcomeFalse());
     validateOutcome(id, "outcomeMissing", nodes, node.getOutcomeMissing());
+  }
+
+  private void validateValue(String id, Object value, Map<String, Path> files) {
+    if(value instanceof String && value.toString().startsWith(FILE_PREFIX)){
+      String file = value.toString().substring(FILE_PREFIX.length());
+      if(!files.containsKey(file)){
+        throw new ConfigDecisionTreeValidationException(
+            format("Unknown file value '%s' for node %s",file, id));
+      }
+    }
   }
 
   private void validateCategoricalNode(
