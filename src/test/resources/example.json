@@ -1,13 +1,7 @@
 {
-  "files": {
-    "clinvar" : {
-      "path" : "clinvar.txt"
-    }
-  },
   "rootNode": "filter",
   "nodes": {
     "filter": {
-      "label": "filter",
       "type": "BOOL",
       "description": "All filters passed",
       "query": {
@@ -18,143 +12,200 @@
         ]
       },
       "outcomeTrue": {
-        "nextNode": "vkgl"
+        "nextNode": "vkgl_mvl"
       },
       "outcomeFalse": {
-        "nextNode": "exit_lb"
+        "nextNode": "exit_remove"
       },
       "outcomeMissing": {
-        "nextNode": "vkgl"
+        "nextNode": "vkgl_mvl"
+      }
+    },
+    "artefact": {
+      "type": "BOOL",
+      "description": "Artefact",
+      "query": {
+        "field": "INFO/CSQ/ARTEFACT",
+        "operator": "==",
+        "value": "1"
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_remove"
+      },
+      "outcomeFalse": {
+        "nextNode": "hla"
+      },
+      "outcomeMissing": {
+        "nextNode": "hla"
+      }
+    },
+    "hla": {
+      "type": "BOOL",
+      "description": "Is HLA gene",
+      "query": {
+        "field": "INFO/CSQ/GENE",
+        "operator": "contains_any",
+        "value": [
+          "3105",
+          "3106",
+          "3107",
+          "3123",
+          "3127",
+          "3117",
+          "3119"
+        ]
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_remove"
+      },
+      "outcomeFalse": {
+        "nextNode": "gnomad_af"
+      },
+      "outcomeMissing": {
+        "nextNode": "gnomad_af"
       }
     },
     "spliceAI": {
-      "label": "spliceAI",
+      "description": "SpliceAI",
       "type": "BOOL_MULTI",
       "fields": [
-        "INFO/CSQ/SpliceAI_pred_DS_AG",
-        "INFO/CSQ/SpliceAI_pred_DS_AL",
-        "INFO/CSQ/SpliceAI_pred_DS_DG",
-        "INFO/CSQ/SpliceAI_pred_DS_DL"
+        "INFO/TEST/SpliceAI_pred_DS_AG",
+        "INFO/TEST/SpliceAI_pred_DS_AL",
+        "INFO/TEST/SpliceAI_pred_DS_DG",
+        "INFO/TEST/SpliceAI_pred_DS_DL"
       ],
       "outcomes": [
         {
+          "description": "Any SpliceAI score  > 0.42",
           "operator": "OR",
           "queries": [
             {
-              "field": "INFO/CSQ/SpliceAI_pred_DS_AG",
+              "field": "INFO/TEST/SpliceAI_pred_DS_AG",
               "operator": ">",
               "value": 0.42
             },
             {
-              "field": "INFO/CSQ/SpliceAI_pred_DS_AL",
+              "field": "INFO/TEST/SpliceAI_pred_DS_AL",
               "operator": ">",
               "value": 0.42
             },
             {
-              "field": "INFO/CSQ/SpliceAI_pred_DS_DG",
+              "field": "INFO/TEST/SpliceAI_pred_DS_DG",
               "operator": ">",
               "value": 0.42
             },
             {
-              "field": "INFO/CSQ/SpliceAI_pred_DS_DL",
+              "field": "INFO/TEST/SpliceAI_pred_DS_DL",
               "operator": ">",
               "value": 0.42
             }
           ],
           "outcomeTrue": {
-            "nextNode": "exit_lp"
+            "nextNode": "exit_keep"
           }
         }
       ],
       "outcomeDefault": {
-        "nextNode": "annotSV"
+        "nextNode": "capice"
       },
       "outcomeMissing": {
-        "nextNode": "annotSV"
+        "nextNode": "capice"
       }
     },
-    "vkgl": {
-      "label": "VKGL",
-      "type": "CATEGORICAL",
-      "description": "VKGL classification",
-      "field": "INFO/CSQ/VKGL_CL",
-      "outcomeMap": {
-        "P": {
-          "nextNode": "exit_p"
+    "vkgl_mvl": {
+      "description": "MVL or VKGL Consensus.",
+      "type": "BOOL_MULTI",
+      "fields": [
+        "INFO/CSQ/VKGL_CL",
+        "INFO/CSQ/VKGL_UMCG"
+      ],
+      "outcomes": [
+        {
+          "description": "VKGL/MVL == P/LP",
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/CSQ/VKGL_CL",
+              "operator": "in",
+              "value": [
+                "P",
+                "LP"
+              ]
+            },
+            {
+              "field": "INFO/CSQ/VKGL_UMCG",
+              "operator": "in",
+              "value": [
+                "P",
+                "LP"
+              ]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_keep"
+          }
         },
-        "LP": {
-          "nextNode": "exit_lp"
-        },
-        "LB": {
-          "nextNode": "exit_lb"
-        },
-        "B": {
-          "nextNode": "exit_b"
+        {
+          "description": "VKGL/MVL == B/LB",
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/CSQ/VKGL_CL",
+              "operator": "in",
+              "value": [
+                "B",
+                "LB"
+              ]
+            },
+            {
+              "field": "INFO/CSQ/VKGL_UMCG",
+              "operator": "in",
+              "value": [
+                "B",
+                "LB"
+              ]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_remove"
+          }
         }
+      ],
+      "outcomeDefault": {
+        "nextNode": "artefact"
       },
       "outcomeMissing": {
-        "nextNode": "clinVar"
-      },
-      "outcomeDefault": {
-        "nextNode": "clinVar"
+        "nextNode": "artefact"
       }
     },
-    "annotSV": {
-      "label": "AnnotSV",
-      "type": "CATEGORICAL",
-      "description": "VKGL classification",
-      "field": "INFO/CSQ/ASV_ACMG_class",
-      "outcomeMap": {
-        "5": {
-          "nextNode": "exit_p"
-        },
-        "4": {
-          "nextNode": "exit_lp"
-        },
-        "2": {
-          "nextNode": "exit_lb"
-        },
-        "1": {
-          "nextNode": "exit_b"
-        }
-      },
-      "outcomeMissing": {
-        "nextNode": "impact"
-      },
-      "outcomeDefault": {
-        "nextNode": "impact"
-      }
-    },
-    "gnomad": {
-      "label": "GnomAD",
+    "gnomad_af": {
+      "description": "gnomAD AF < 0.5%",
       "type": "BOOL",
-      "description": "gnomAD_AF < 0.02",
       "query": {
         "field": "INFO/CSQ/gnomAD_AF",
         "operator": "<",
-        "value": 0.02
+        "value": 0.005
       },
       "outcomeTrue": {
-        "nextNode": "effect"
+        "nextNode": "gnomad_hn"
       },
       "outcomeFalse": {
-        "nextNode": "exit_lb"
+        "nextNode": "exit_remove"
       },
       "outcomeMissing": {
-        "nextNode": "effect"
+        "nextNode": "gnomad_hn"
       }
     },
-    "effect": {
-      "label": "Effect",
+    "gnomad_hn": {
       "type": "BOOL",
-      "description": "Consequence contains 'missense'",
+      "description": "gnomAD Homozygote count > 5",
       "query": {
-        "field": "INFO/CSQ/Consequence",
-        "operator": "contains",
-        "value": "missense_variant"
+        "field": "INFO/CSQ/gnomAD_HN",
+        "operator": ">",
+        "value": 5
       },
       "outcomeTrue": {
-        "nextNode": "sift"
+        "nextNode": "exit_remove"
       },
       "outcomeFalse": {
         "nextNode": "spliceAI"
@@ -163,206 +214,35 @@
         "nextNode": "spliceAI"
       }
     },
-    "clinVar": {
-      "label": "ClinVar",
-      "type": "BOOL_MULTI",
-      "fields": [
-        "INFO/CLINVAR"
-      ],
-      "outcomes": [
-        {
-          "queries": [
-            {
-              "field": "INFO/CLINVAR",
-              "operator": "contains_any",
-              "value": "file:clinvar"
-            }
-          ],
-          "outcomeTrue": {
-            "nextNode": "gnomad"
-          }
-        },
-        {
-          "queries": [
-            {
-              "field": "INFO/CLINVAR",
-              "operator": "contains_any",
-              "value": [
-                "LB",
-                "B"
-              ]
-            }
-          ],
-          "outcomeTrue": {
-            "nextNode": "exit_lb"
-          }
-        },
-        {
-          "queries": [
-            {
-              "field": "INFO/CLINVAR",
-              "operator": "contains_any",
-              "value": [
-                "LP",
-                "P"
-              ]
-            }
-          ],
-          "outcomeTrue": {
-            "nextNode": "exit_lp"
-          }
-        }
-      ],
-      "outcomeDefault": {
-        "nextNode": "gnomad"
-      },
-      "outcomeMissing": {
-        "nextNode": "gnomad"
-      }
-    },
-    "sift": {
-      "label": "SIFT",
-      "description": "SIFT qualitative prediction",
+    "capice": {
       "type": "BOOL",
+      "description": "CAPICE score < 0.15",
       "query": {
-        "field": "INFO/CSQ/SIFT",
+        "field": "INFO/CSQ/CAPICE_SC",
         "operator": "<",
-        "value": 0.05
+        "value": 0.15
       },
       "outcomeTrue": {
-        "nextNode": "exit_lp"
+        "nextNode": "exit_remove"
       },
       "outcomeFalse": {
-        "nextNode": "polyphen"
+        "nextNode": "exit_keep"
       },
       "outcomeMissing": {
-        "nextNode": "polyphen"
+        "nextNode": "exit_missing"
       }
     },
-    "polyphen": {
-      "label": "PolyPhen",
-      "description": "PolyPhen qualitative prediction",
-      "type": "BOOL_MULTI",
-      "fields": [
-        "INFO/CSQ/PolyPhen"
-      ],
-      "outcomes": [
-        {
-          "queries": [
-            {
-              "field": "INFO/CSQ/PolyPhen",
-              "operator": "<",
-              "value": 0.15
-            }
-          ],
-          "outcomeTrue": {
-            "nextNode": "exit_lb"
-          }
-        },
-        {
-          "operator": "AND",
-          "queries": [
-            {
-              "field": "INFO/CSQ/PolyPhen",
-              "operator": ">",
-              "value": 0.15
-            },
-            {
-              "field": "INFO/CSQ/PolyPhen",
-              "operator": "<",
-              "value": 0.85
-            }
-          ],
-          "outcomeTrue": {
-            "nextNode": "exit_vus"
-          }
-        },
-        {
-          "queries": [
-            {
-              "field": "INFO/CSQ/PolyPhen",
-              "operator": ">",
-              "value": 0.85
-            }
-          ],
-          "outcomeTrue": {
-            "nextNode": "exit_lp"
-          }
-        }
-      ],
-      "outcomeDefault": {
-        "nextNode": "impact"
-      },
-      "outcomeMissing": {
-        "nextNode": "impact"
-      }
-    },
-    "impact": {
-      "label": "IMPACT",
-      "type": "CATEGORICAL",
-      "description": "IMPACT rating",
-      "field": "INFO/CSQ/IMPACT",
-      "outcomeMap": {
-        "MODIFIER": {
-          "nextNode": "exit_lb"
-        },
-        "LOW": {
-          "nextNode": "exit_lb"
-        },
-        "MODERATE": {
-          "nextNode": "exit_vus"
-        },
-        "HIGH": {
-          "nextNode": "exit_lp"
-        }
-      },
-      "outcomeMissing": {
-        "nextNode": "flag"
-      }
-    },
-    "flag": {
-      "label": "FLAG",
-      "type": "BOOL",
-      "description": "flag exists",
-      "query": {
-        "field": "INFO/FLAG1",
-        "operator": "==",
-        "value": true
-      },
-      "outcomeTrue": {
-        "nextNode": "exit_lp"
-      },
-      "outcomeFalse": {
-        "nextNode": "exit_lb"
-      },
-      "outcomeMissing": {
-        "nextNode": "exit_vus"
-      }
-    },
-    "exit_b": {
-      "label": "Benign",
-      "type": "LEAF",
-      "class": "B"
-    },
-    "exit_lb": {
-      "label": "Likely Benign",
-      "type": "LEAF",
-      "class": "LB"
-    },
-    "exit_vus": {
-      "label": "Variant of Unknown Significance",
-      "type": "LEAF",
-      "class": "VUS"
-    },
-    "exit_lp": {
-      "label": "Likely Pathogenic",
+    "exit_keep": {
       "type": "LEAF",
       "class": "LP"
     },
-    "exit_p": {
-      "label": "Pathogenic",
+    "exit_missing": {
       "type": "LEAF",
-      "class": "P"
+      "class": "MISS"
+    },
+    "exit_remove": {
+      "type": "LEAF",
+      "class": "LB"
     }
   }
 }
