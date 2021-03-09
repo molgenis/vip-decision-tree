@@ -1,5 +1,5 @@
 {
-  "rootNode": "genPanel",
+  "rootNode": "capice",
   "nodes": {
     "capice": {
       "type": "BOOL",
@@ -30,14 +30,14 @@
         "value": 0.01
       },
       "outcomeTrue": {
-        "nextNode": "capice"
+        "nextNode": "snpEff"
       },
       "outcomeFalse": {
         "nextNode": "done_exclude",
         "label": "GNOMAD_F"
       },
       "outcomeMissing": {
-        "nextNode": "capice"
+        "nextNode": "snpEff"
       }
     },
     "snpEff": {
