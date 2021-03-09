@@ -28,7 +28,8 @@
 
   <scm>
     <connection>scm:git:git://github.com/molgenis/vip-decision-tree.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/molgenis/vip-decision-tree.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/molgenis/vip-decision-tree.git
+    </developerConnection>
     <url>https://github.com/molgenis/vip-decision-tree</url>
   </scm>
 
@@ -43,6 +44,7 @@
     <samtools.htsjdk.version>2.21.3</samtools.htsjdk.version>
     <download-maven-plugin.version>1.6.0</download-maven-plugin.version>
     <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+    <rdf.version>3.6.0-M1</rdf.version>
   </properties>
 
   <profiles>
@@ -91,6 +93,31 @@
         <artifactId>junit-jupiter-engine</artifactId>
         <version>${junit-jupiter.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-rio-hdt</artifactId>
+        <version>${rdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-repository-sparql</artifactId>
+        <version>${rdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-repository-manager</artifactId>
+        <version>${rdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-repository-sail</artifactId>
+        <version>${rdf.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.rdf4j</groupId>
+        <artifactId>rdf4j-sail-nativerdf</artifactId>
+        <version>${rdf.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -98,6 +125,27 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.rdf4j</groupId>
+      <artifactId>rdf4j-rio-hdt</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.rdf4j</groupId>
+      <artifactId>rdf4j-repository-sparql</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.rdf4j</groupId>
+      <artifactId>rdf4j-repository-sail</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.rdf4j</groupId>
+      <artifactId>rdf4j-sail-nativerdf</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.rdf4j</groupId>
+      <artifactId>rdf4j-repository-manager</artifactId>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>

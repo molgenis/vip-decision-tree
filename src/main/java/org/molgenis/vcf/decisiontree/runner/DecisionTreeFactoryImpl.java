@@ -199,6 +199,15 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       case NOT_CONTAINS:
         operator = Operator.NOT_CONTAINS;
         break;
+      case CONTAINS_ALL:
+        operator = Operator.CONTAINS_ALL;
+        break;
+      case CONTAINS_ANY:
+        operator = Operator.CONTAINS_ANY;
+        break;
+      case CONTAINS_NONE:
+        operator = Operator.CONTAINS_NONE;
+        break;
       default:
         throw new UnexpectedEnumException(configOperator);
     }
