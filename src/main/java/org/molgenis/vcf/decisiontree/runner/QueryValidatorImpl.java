@@ -37,6 +37,11 @@ public class QueryValidatorImpl implements QueryValidator {
       case NOT_CONTAINS:
         validateContains(field, configBoolQuery);
         break;
+      case CONTAINS_ALL:
+      case CONTAINS_ANY:
+      case CONTAINS_NONE:
+        validateContainsMulti(field, configBoolQuery);
+        break;
       case EQUALS:
       case NOT_EQUALS:
         validateEquals(field, configBoolQuery);
@@ -89,12 +94,22 @@ public class QueryValidatorImpl implements QueryValidator {
     }
   }
 
+  private void validateContainsMulti(Field field, ConfigBoolQuery configBoolQuery) {
+    validateFileValueAllowed(configBoolQuery, field);
+    if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
+      throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
+    } else if (field.getValueCount().getType() == Type.FIXED
+        && field.getValueCount().getCount() == 1) {
+      throw new UnsupportedValueCountException(field, DecisionType.BOOL);
+    }
+  }
+
   private void validateSingleOrPerAlleleCount(Field field, DecisionType decisionType) {
     if (field.getValueCount().getType() == Type.G ||
         field.getValueCount().getType() == Type.VARIABLE) {
       throw new UnsupportedValueCountTypeException(field, decisionType);
     } else if (field.getValueCount().getType() == Type.FIXED
-        && field.getValueCount().getCount() != 1){
+        && field.getValueCount().getCount() != 1) {
       throw new UnsupportedValueCountException(field, decisionType);
     }
   }

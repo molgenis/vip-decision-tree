@@ -28,7 +28,8 @@
 
   <scm>
     <connection>scm:git:git://github.com/molgenis/vip-decision-tree.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/molgenis/vip-decision-tree.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/molgenis/vip-decision-tree.git
+    </developerConnection>
     <url>https://github.com/molgenis/vip-decision-tree</url>
   </scm>
 

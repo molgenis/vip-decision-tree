@@ -1,5 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -334,6 +335,162 @@ class BoolNodeEvaluatorTest {
     Variant variant = mock(Variant.class);
     when(variant.getValue(field)).thenReturn(2);
     assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsAll() {
+    Field field = mock(Field.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_ALL;
+    List<String> queryValue = asList("test1", "test2");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsAllFalse() {
+    Field field = mock(Field.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_ALL;
+    List<String> queryValue = asList("test1", "test4");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsAny() {
+    Field field = mock(Field.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_ANY;
+    List<String> queryValue = asList("test1", "test4");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsAnyFalse() {
+    Field field = mock(Field.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_ANY;
+    List<String> queryValue = asList("test4", "test5");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsNone() {
+    Field field = mock(Field.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_NONE;
+    List<String> queryValue = asList("test4", "test5");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsNoneFalse() {
+    Field field = mock(Field.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_NONE;
+    List<String> queryValue = asList("test1", "test5");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
   }
 
   @Test

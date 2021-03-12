@@ -68,17 +68,29 @@ class QueryValidatorImplTest {
 
   @Test
   void validateBooleanNodeContainsFixed1() {
-    Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.STRING).valueCount(
-        ValueCount.builder().type(Type.FIXED).count(1).build()).build();
+    Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.STRING)
+        .valueCount(
+            ValueCount.builder().type(Type.FIXED).count(1).build()).build();
     assertThrows(
         UnsupportedValueCountException.class,
         () -> validateBooleanNode(field, ConfigOperator.CONTAINS));
   }
 
   @Test
+  void validateBooleanNodeContainsMultiFixed1() {
+    Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.STRING)
+        .valueCount(
+            ValueCount.builder().type(Type.FIXED).count(1).build()).build();
+    assertThrows(
+        UnsupportedValueCountException.class,
+        () -> validateBooleanNode(field, ConfigOperator.CONTAINS_ALL));
+  }
+
+  @Test
   void validateBooleanNodeInFixed2() {
-    Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.STRING).valueCount(
-        ValueCount.builder().type(Type.FIXED).count(2).build()).build();
+    Field field = Field.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.STRING)
+        .valueCount(
+            ValueCount.builder().type(Type.FIXED).count(2).build()).build();
     assertThrows(
         UnsupportedValueCountException.class,
         () -> validateBooleanNode(field, IN));

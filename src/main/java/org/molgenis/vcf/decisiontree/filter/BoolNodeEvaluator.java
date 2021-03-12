@@ -68,6 +68,15 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
       case NOT_CONTAINS:
         matches = !executeContainsQuery((Collection<?>) value, queryValue);
         break;
+      case CONTAINS_ALL:
+        matches = executeContainsAllQuery((Collection<?>) value, (Collection<?>) queryValue);
+        break;
+      case CONTAINS_ANY:
+        matches = executeContainsAnyQuery((Collection<?>) value, (Collection<?>) queryValue);
+        break;
+      case CONTAINS_NONE:
+        matches = executeContainsNoneQuery((Collection<?>) value, (Collection<?>) queryValue);
+        break;
       default:
         throw new UnexpectedEnumException(operator);
     }
@@ -109,6 +118,23 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
 
   private boolean executeContainsQuery(Collection<?> values, Object queryValue) {
     return values.contains(queryValue);
+  }
+
+  private boolean executeContainsAllQuery(Collection<?> values, Collection<?> queryValues) {
+    return values.containsAll(queryValues);
+  }
+
+  private boolean executeContainsAnyQuery(Collection<?> values, Collection<?> queryValues) {
+    for (Object queryValue : queryValues) {
+      if (values.contains(queryValue)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean executeContainsNoneQuery(Collection<?> values, Collection<?> queryValues) {
+    return !executeContainsAnyQuery(values, queryValues);
   }
 
   private boolean executeInQuery(Object value, Collection<?> queryValues) {
