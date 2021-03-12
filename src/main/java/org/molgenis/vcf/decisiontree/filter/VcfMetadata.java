@@ -155,12 +155,16 @@ public class VcfMetadata {
         .build();
   }
 
-  private FieldImpl toCompoundField(List<String> fieldTokens, FieldType fieldType) {
+  private Field toCompoundField(List<String> fieldTokens, FieldType fieldType) {
     if (fieldTokens.size() != 2) {
       throw new InvalidNumberOfTokensException(fieldTokens, fieldType, 2);
     }
     String field = fieldTokens.get(1);
     VCFCompoundHeaderLine vcfCompoundHeaderLine = getVcfCompoundHeaderLine(fieldType, field);
+
+    if (vcfCompoundHeaderLine == null) {
+      return new MissingField(field);
+    }
 
     ValueType valueType;
     VCFHeaderLineType lineType = vcfCompoundHeaderLine.getType();
@@ -227,7 +231,9 @@ public class VcfMetadata {
       case INFO:
         vcfCompoundHeaderLine = vcfHeader.getInfoHeaderLine(field);
         if (vcfCompoundHeaderLine == null) {
-          throw new UnknownFieldException(field, fieldType);
+          if (strict) {
+            throw new UnknownFieldException(field, INFO_NESTED);
+          }
         }
         break;
       default:
