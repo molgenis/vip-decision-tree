@@ -61,4 +61,14 @@ class NodeEvaluatorServiceImplTest {
     when(categoricalNodeEvaluator.evaluate(categoricalNode, variant)).thenReturn(nodeOutcome);
     assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant));
   }
+
+  @Test
+  void evaluateCategoricalNodeMissing() {
+    CategoricalNode categoricalNode =
+        when(mock(CategoricalNode.class).getDecisionType()).thenReturn(CATEGORICAL).getMock();
+    Variant variant = mock(Variant.class);
+    NodeOutcome nodeOutcome = mock(NodeOutcome.class);
+    when(categoricalNodeEvaluator.evaluate(categoricalNode, variant)).thenReturn(nodeOutcome);
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant));
+  }
 }
