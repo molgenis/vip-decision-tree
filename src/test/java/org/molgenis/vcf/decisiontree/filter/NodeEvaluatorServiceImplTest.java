@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.decisiontree.filter.model.DecisionType.BOOL;
 import static org.molgenis.vcf.decisiontree.filter.model.DecisionType.CATEGORICAL;
+import static org.molgenis.vcf.decisiontree.filter.model.DecisionType.EXISTS;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
+import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,6 +40,16 @@ class NodeEvaluatorServiceImplTest {
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
     when(boolNodeEvaluator.evaluate(boolNode, variant)).thenReturn(nodeOutcome);
     assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(boolNode, variant));
+  }
+
+  @Test
+  void evaluateExistsNode() {
+    ExistsNode existsNode = when(mock(ExistsNode.class).getDecisionType()).thenReturn(EXISTS)
+        .getMock();
+    Variant variant = mock(Variant.class);
+    NodeOutcome nodeOutcome = mock(NodeOutcome.class);
+    when(existsNodeEvaluator.evaluate(existsNode, variant)).thenReturn(nodeOutcome);
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(existsNode, variant));
   }
 
   @Test
