@@ -9,6 +9,7 @@ import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
@@ -22,32 +23,34 @@ public class QueryValidatorImpl implements QueryValidator {
 
   @Override
   public void validateBooleanNode(ConfigBoolQuery configBoolQuery, Field field) {
-    switch (configBoolQuery.getOperator()) {
-      case GREATER:
-      case LESS:
-      case LESS_OR_EQUAL:
-      case GREATER_OR_EQUAL:
-        validateLesserGreater(field, configBoolQuery);
-        break;
-      case IN:
-      case NOT_IN:
-        validateIn(field);
-        break;
-      case CONTAINS:
-      case NOT_CONTAINS:
-        validateContains(field, configBoolQuery);
-        break;
-      case CONTAINS_ALL:
-      case CONTAINS_ANY:
-      case CONTAINS_NONE:
-        validateContainsMulti(field, configBoolQuery);
-        break;
-      case EQUALS:
-      case NOT_EQUALS:
-        validateEquals(field, configBoolQuery);
-        break;
-      default:
-        throw new UnexpectedEnumException(configBoolQuery.getOperator());
+    if (!(field instanceof MissingField)) {
+      switch (configBoolQuery.getOperator()) {
+        case GREATER:
+        case LESS:
+        case LESS_OR_EQUAL:
+        case GREATER_OR_EQUAL:
+          validateLesserGreater(field, configBoolQuery);
+          break;
+        case IN:
+        case NOT_IN:
+          validateIn(field);
+          break;
+        case CONTAINS:
+        case NOT_CONTAINS:
+          validateContains(field, configBoolQuery);
+          break;
+        case CONTAINS_ALL:
+        case CONTAINS_ANY:
+        case CONTAINS_NONE:
+          validateContainsMulti(field, configBoolQuery);
+          break;
+        case EQUALS:
+        case NOT_EQUALS:
+          validateEquals(field, configBoolQuery);
+          break;
+        default:
+          throw new UnexpectedEnumException(configBoolQuery.getOperator());
+      }
     }
   }
 

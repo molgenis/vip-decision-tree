@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 
@@ -27,7 +27,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateLessTrueInteger() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.INTEGER);
 
     Operator operator = Operator.LESS;
@@ -53,7 +53,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateLessEqualTrueInteger() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.INTEGER);
 
     Operator operator = Operator.LESS_OR_EQUAL;
@@ -79,7 +79,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateLessFalseFloat() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.FLOAT);
 
     Operator operator = Operator.LESS;
@@ -105,7 +105,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateGreaterFalseInteger() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.INTEGER);
 
     Operator operator = Operator.GREATER;
@@ -131,7 +131,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateGreaterTrueFloat() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.FLOAT);
 
     Operator operator = Operator.GREATER;
@@ -157,7 +157,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateGreaterEqualTrueFloat() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.FLOAT);
 
     Operator operator = Operator.GREATER_OR_EQUAL;
@@ -183,7 +183,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateInTrueString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.IN;
@@ -209,7 +209,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateNotInFalseString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_IN;
@@ -235,7 +235,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateContainsTrueString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.CONTAINS;
@@ -261,7 +261,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateNotContainsFalseString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_CONTAINS;
@@ -287,7 +287,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateEqualsString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.EQUALS;
@@ -313,7 +313,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateNotEqualsInteger() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_EQUALS;
@@ -339,7 +339,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateContainsAll() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.CONTAINS_ALL;
@@ -365,7 +365,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateContainsAllFalse() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.CONTAINS_ALL;
@@ -391,7 +391,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateContainsAny() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.CONTAINS_ANY;
@@ -417,7 +417,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateContainsAnyFalse() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.CONTAINS_ANY;
@@ -443,7 +443,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateContainsNone() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.CONTAINS_NONE;
@@ -469,7 +469,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateContainsNoneFalse() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.CONTAINS_NONE;
@@ -495,7 +495,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateMissing() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_EQUALS;
@@ -520,7 +520,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateMissingMissing() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_EQUALS;

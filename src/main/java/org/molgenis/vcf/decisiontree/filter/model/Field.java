@@ -1,27 +1,16 @@
 package org.molgenis.vcf.decisiontree.filter.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Value;
-import lombok.experimental.NonFinal;
+public interface Field {
 
-@Value
-@Builder
-@NonFinal
-@AllArgsConstructor
-public class Field {
+  String getId();
 
-  @NonNull String id;
-  @NonNull FieldType fieldType;
-  @NonNull ValueType valueType;
-  @NonNull ValueCount valueCount;
-  /**
-   * Returns count for FIXED value type, null otherwise
-   */
-  Integer count;
-  /**
-   * Returns separator for INFO_NESTED type, null otherwise
-   */
-  Character separator;
+  FieldType getFieldType();
+
+  ValueType getValueType();
+
+  ValueCount getValueCount();
+
+  Integer getCount();
+
+  Character getSeparator();
 }

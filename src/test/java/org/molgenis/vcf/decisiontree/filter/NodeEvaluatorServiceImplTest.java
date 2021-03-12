@@ -18,13 +18,17 @@ import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 @ExtendWith(MockitoExtension.class)
 class NodeEvaluatorServiceImplTest {
   @Mock private BoolNodeEvaluator boolNodeEvaluator;
-  @Mock private CategoricalNodeEvaluator categoricalNodeEvaluator;
+  @Mock
+  private CategoricalNodeEvaluator categoricalNodeEvaluator;
+  @Mock
+  private ExistsNodeEvaluator existsNodeEvaluator;
   private NodeEvaluatorServiceImpl nodeEvaluatorService;
 
   @BeforeEach
   void setUp() {
     nodeEvaluatorService =
-        new NodeEvaluatorServiceImpl(boolNodeEvaluator, categoricalNodeEvaluator);
+        new NodeEvaluatorServiceImpl(boolNodeEvaluator, categoricalNodeEvaluator,
+            existsNodeEvaluator);
   }
 
   @Test

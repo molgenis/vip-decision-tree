@@ -8,7 +8,6 @@ import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -21,7 +20,7 @@ import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -54,7 +53,8 @@ class DecisionTreeFactoryImplTest{
   void map() throws FileNotFoundException {
     Map<String, Path> files = Collections.singletonMap("test", ResourceUtils.getFile("classpath:test.txt").toPath());
     ConfigBoolQuery query =
-        ConfigBoolQuery.builder().field("INFO/testField").operator(IN).value(FILE_PREFIX + "test").build();
+        ConfigBoolQuery.builder().field("INFO/testField").operator(IN).value(FILE_PREFIX + "test")
+            .build();
     ConfigLeafNode leafNode = ConfigLeafNode.builder().clazz("end").build();
     ConfigNodeOutcome outcome = ConfigNodeOutcome.builder().nextNode("end").build();
     ConfigNode configNode = ConfigBoolNode.builder().query(query).outcomeTrue(
@@ -64,8 +64,9 @@ class DecisionTreeFactoryImplTest{
     when(decisionTree.getFiles()).thenReturn(files);
     when(decisionTree.getNodes()).thenReturn(nodes);
     when(decisionTree.getRootNode()).thenReturn("test");
-    when(vcfMetadata.getField("INFO/testField")).thenReturn(Field.builder().id("testField").fieldType(INFO).valueType(
-        ValueType.STRING).valueCount(ValueCount.builder().type(Type.A).build()).build());
+    when(vcfMetadata.getField("INFO/testField")).thenReturn(
+        FieldImpl.builder().id("testField").fieldType(INFO).valueType(
+            ValueType.STRING).valueCount(ValueCount.builder().type(Type.A).build()).build());
     Settings settings = Settings.builder().configDecisionTree(decisionTree).build();
     DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
 

@@ -22,7 +22,9 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.Label;
 import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
 import org.molgenis.vcf.decisiontree.filter.model.Node;
@@ -32,6 +34,7 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigLabel;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
@@ -124,6 +127,9 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       Map<String, Set<String>> files) {
     Node node;
     switch (configNode.getType()) {
+      case EXISTS:
+        node = toExistsNode(vcfMetadata, id, (ConfigExistsNode) configNode);
+        break;
       case BOOL:
         node = toBoolNode(vcfMetadata, id, (ConfigBoolNode) configNode, files);
         break;
@@ -138,6 +144,15 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
             String.format("unexpected enum '%s'", configNode.getType().toString()));
     }
     return node;
+  }
+
+  private Node toExistsNode(VcfMetadata vcfMetadata, String id, ConfigExistsNode configNode) {
+    Field field = vcfMetadata.getField(configNode.getField());
+    return ExistsNode.builder()
+        .id(id)
+        .field(field)
+        .description(configNode.getDescription())
+        .build();
   }
 
   private BoolNode toBoolNode(VcfMetadata vcfMetadata, String id, ConfigBoolNode nodeConfig,
@@ -240,6 +255,9 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     }
 
     switch (configNode.getType()) {
+      case EXISTS:
+        updateExistsNode((ExistsNode) node, (ConfigExistsNode) configNode, nodeMap, labelMap);
+        break;
       case BOOL:
         updateBoolNode((BoolNode) node, (ConfigBoolNode) configNode, nodeMap, labelMap);
         break;
@@ -251,6 +269,18 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         throw new IllegalArgumentException(
             String.format("unexpected enum '%s'", configNode.getType().toString()));
     }
+  }
+
+  private void updateExistsNode(
+      ExistsNode node,
+      ConfigExistsNode configNode,
+      Map<String, Node> nodeMap,
+      Map<String, Label> labelMap) {
+    NodeOutcome outcomeTrue = toNodeOutcome(configNode.getOutcomeTrue(), nodeMap, labelMap);
+    node.setOutcomeTrue(outcomeTrue);
+
+    NodeOutcome outcomeFalse = toNodeOutcome(configNode.getOutcomeFalse(), nodeMap, labelMap);
+    node.setOutcomeFalse(outcomeFalse);
   }
 
   private void updateBoolNode(

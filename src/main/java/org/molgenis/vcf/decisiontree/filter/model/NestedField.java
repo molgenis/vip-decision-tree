@@ -11,11 +11,14 @@ import org.molgenis.vcf.decisiontree.runner.info.NestedInfoSelector;
 
 @Value
 @NonFinal
-public class NestedField extends Field {
+public class NestedField extends FieldImpl {
 
-  @NonNull final int index;
-  @NonNull final Field parent;
-  @Setter NestedInfoSelector nestedInfoSelector;
+  @NonNull
+  final int index;
+  @NonNull
+  final FieldImpl parent;
+  @Setter
+  NestedInfoSelector nestedInfoSelector;
 
   // Suppress 'Methods should not have too many parameters'
   @SuppressWarnings("java:S107")
@@ -27,7 +30,7 @@ public class NestedField extends Field {
       Integer count,
       Character separator, int index,
       NestedInfoSelector nestedInfoSelector,
-      Field parent) {
+      FieldImpl parent) {
     super(id,
         fieldType,
         valueType,

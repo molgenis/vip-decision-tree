@@ -9,7 +9,7 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 
 class CategoricalNodeEvaluatorTest {
@@ -23,7 +23,7 @@ class CategoricalNodeEvaluatorTest {
 
   @Test
   void evaluate() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     String key = "key";
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
     Map<String, NodeOutcome> outcomeMap = Map.of(key, nodeOutcome);
@@ -37,7 +37,7 @@ class CategoricalNodeEvaluatorTest {
 
   @Test
   void evaluateDefault() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     String key = "key";
     NodeOutcome outcomeDefault = mock(NodeOutcome.class);
     CategoricalNode node =
@@ -55,7 +55,7 @@ class CategoricalNodeEvaluatorTest {
 
   @Test
   void evaluateMissing() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     NodeOutcome outcomeMissing = mock(NodeOutcome.class);
     CategoricalNode node =
         CategoricalNode.builder()
@@ -71,7 +71,7 @@ class CategoricalNodeEvaluatorTest {
 
   @Test
   void evaluateDefaultMissing() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     String key = "key";
     CategoricalNode node =
         CategoricalNode.builder().id("cat_id").field(field).outcomeMap(Map.of()).build();
@@ -83,7 +83,7 @@ class CategoricalNodeEvaluatorTest {
 
   @Test
   void evaluateMissingMissing() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     CategoricalNode node =
         CategoricalNode.builder().id("cat_id").field(field).outcomeMap(Map.of()).build();
 

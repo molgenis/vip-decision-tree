@@ -1,6 +1,19 @@
 {
-  "rootNode": "capice",
+  "rootNode": "capice_exists",
   "nodes": {
+    "capice_exists": {
+      "type": "EXISTS",
+      "description": "CAPICE exists",
+      "field": "INFO/CAP",
+      "outcomeTrue": {
+        "nextNode": "capice",
+        "label": "capice_exists"
+      },
+      "outcomeFalse": {
+        "nextNode": "vkgl",
+        "label": "capice_not_exists"
+      }
+    },
     "capice": {
       "type": "BOOL",
       "description": "CAPICE score >= 0.9",
@@ -43,9 +56,11 @@
     "snpEff": {
       "type": "BOOL",
       "query": {
-        "field": "INFO/ANN/Annotation",
+        "field": "INFO/ANN/Annotetion",
         "operator": "==",
-        "value": ["missense_variant"]
+        "value": [
+          "missense_variant"
+        ]
       },
       "outcomeTrue": {
         "nextNode": "done_include"

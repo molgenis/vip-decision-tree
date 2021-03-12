@@ -15,14 +15,14 @@ import static org.mockito.Mockito.when;
 import htsjdk.variant.variantcontext.VariantContext;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 
 class VcfUtilsTest {
 
   @Test
   void getInfoAsInteger() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Integer value = 1;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -33,7 +33,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerFromString() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = "1";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -44,7 +44,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerFromStringMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = ".";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -55,7 +55,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerFromNull() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Integer value = null;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -66,7 +66,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerInvalidType() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Double value = 1.23;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -78,7 +78,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerList() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<Integer> values = asList(1, 2);
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -89,7 +89,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListSingleton() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<Integer> values = singletonList(1);
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -100,7 +100,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListSingletonString() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = singletonList("1");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -111,7 +111,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListSingletonStringMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = singletonList(".");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -122,7 +122,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListNull() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<Integer> values = null;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -133,7 +133,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListEmptyList() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<Integer> values = emptyList();
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -144,7 +144,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListFromStringList() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = asList("1", "2");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -155,7 +155,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListFromStringListMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = asList(".", ".");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -166,7 +166,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListFromString() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = "1";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -177,7 +177,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListFromStringMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = ".";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -188,7 +188,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsIntegerListInvalidType() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Double value = 1.;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -200,7 +200,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDouble() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Double value = 1.;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -211,7 +211,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleFromString() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = "1";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -222,7 +222,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleFromStringMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = ".";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -233,7 +233,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleFromNull() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Double value = null;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -244,7 +244,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleInvalidType() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Integer value = 1;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -256,7 +256,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleList() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<Double> values = asList(1., 2.);
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -271,7 +271,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListSingleton() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<Double> values = singletonList(1.);
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -285,7 +285,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListSingletonString() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = singletonList("1.0");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -299,7 +299,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListSingletonStringMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = singletonList(".");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -310,7 +310,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListNull() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<Double> values = null;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -321,7 +321,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListEmptyList() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<Double> values = emptyList();
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -332,7 +332,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListFromStringList() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = asList("1", "2");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -347,7 +347,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListFromStringListMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = asList(".", ".");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -358,7 +358,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListFromString() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = "1";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -372,7 +372,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListFromStringMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = ".";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -383,7 +383,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListInvalidType() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Integer value = 1;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -395,7 +395,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsString() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = "str1";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -406,7 +406,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringFromMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = ".";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -417,7 +417,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringFromNull() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = null;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -428,7 +428,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringInvalidType() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Double value = 1.23;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -440,7 +440,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringList() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = asList("1", "2");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -451,7 +451,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringListSingleton() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = singletonList("1");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -462,7 +462,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringListSingletonMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = singletonList(".");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -473,7 +473,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringListNull() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = null;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -484,7 +484,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringListEmptyList() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = emptyList();
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -495,7 +495,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringListFromListMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     List<String> values = asList(".", ".");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
@@ -506,7 +506,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringListFromString() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = "1";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -517,7 +517,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringListFromMissing() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     String value = ".";
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -528,7 +528,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsStringListInvalidType() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Double value = 1.;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -540,7 +540,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsBooleanTrue() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Boolean value = true;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -550,7 +550,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsBooleanFalse() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Boolean value = false;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -560,7 +560,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsBooleanNull() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Boolean value = null;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
@@ -570,7 +570,7 @@ class VcfUtilsTest {
   @Test
   void getInfoAsBooleanInvalidType() {
     String key = "my_key";
-    Field field = when(mock(Field.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
     Double value = 1.;
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(value).getMock();
