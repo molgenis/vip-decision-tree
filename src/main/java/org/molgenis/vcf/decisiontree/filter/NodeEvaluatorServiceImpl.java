@@ -6,7 +6,6 @@ import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
-import org.molgenis.vcf.decisiontree.filter.model.MissingNode;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.springframework.stereotype.Component;
 
@@ -40,9 +39,6 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
       case EXISTS:
         nodeOutcome = existsNodeEvaluator.evaluate((ExistsNode) node, variant);
         break;
-      case MISSING:
-        nodeOutcome = getMissingOutcome((MissingNode) node);
-        break;
       case BOOL:
         nodeOutcome = boolNodeEvaluator.evaluate((BoolNode) node, variant);
         break;
@@ -53,9 +49,5 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
         throw new UnexpectedEnumException(decisionType);
     }
     return nodeOutcome;
-  }
-
-  private NodeOutcome getMissingOutcome(MissingNode node) {
-    return node.getOutcomeMissing();
   }
 }
