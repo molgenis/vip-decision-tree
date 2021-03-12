@@ -33,7 +33,7 @@ public class VcfMetadata {
 
   private final VCFHeader vcfHeader;
   private final VcfNestedMetadata nestedMetadata;
-  private final Boolean strict;
+  private final boolean strict;
 
   public VcfMetadata(VCFHeader vcfHeader, VcfNestedMetadata nestedMetadata, boolean strict) {
     this.vcfHeader = requireNonNull(vcfHeader);
@@ -230,10 +230,8 @@ public class VcfMetadata {
         break;
       case INFO:
         vcfCompoundHeaderLine = vcfHeader.getInfoHeaderLine(field);
-        if (vcfCompoundHeaderLine == null) {
-          if (strict) {
-            throw new UnknownFieldException(field, INFO_NESTED);
-          }
+        if (vcfCompoundHeaderLine == null && strict) {
+          throw new UnknownFieldException(field, INFO_NESTED);
         }
         break;
       default:
