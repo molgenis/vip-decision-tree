@@ -230,7 +230,7 @@ class VcfMetadataTest {
 
   @Test
   void getFieldInfoUnknown() {
-    assertThrows(UnknownFieldException.class, () -> vcfMetadata.getField("INFO/unknown"));
+    assertThrows(UnknownFieldException.class, () -> vcfMetadataStrict.getField("INFO/unknown"));
   }
 
   @Test
