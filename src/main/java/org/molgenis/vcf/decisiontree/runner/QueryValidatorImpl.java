@@ -37,12 +37,10 @@ public class QueryValidatorImpl implements QueryValidator {
           break;
         case CONTAINS:
         case NOT_CONTAINS:
-          validateContains(field, configBoolQuery);
-          break;
         case CONTAINS_ALL:
         case CONTAINS_ANY:
         case CONTAINS_NONE:
-          validateContainsMulti(field, configBoolQuery);
+          validateContains(field, configBoolQuery);
           break;
         case EQUALS:
         case NOT_EQUALS:
@@ -88,16 +86,6 @@ public class QueryValidatorImpl implements QueryValidator {
   }
 
   private void validateContains(Field field, ConfigBoolQuery configBoolQuery) {
-    validateFileValueAllowed(configBoolQuery, field);
-    if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
-      throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
-    } else if (field.getValueCount().getType() == Type.FIXED
-        && field.getValueCount().getCount() == 1) {
-      throw new UnsupportedValueCountException(field, DecisionType.BOOL);
-    }
-  }
-
-  private void validateContainsMulti(Field field, ConfigBoolQuery configBoolQuery) {
     validateFileValueAllowed(configBoolQuery, field);
     if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
       throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
