@@ -9,7 +9,9 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
+import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
+import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 
 class CategoricalNodeEvaluatorTest {
@@ -33,6 +35,22 @@ class CategoricalNodeEvaluatorTest {
     Variant variant = mock(Variant.class);
     when(variant.getValue(field)).thenReturn(key);
     assertEquals(nodeOutcome, categoricalNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateMissingField() {
+    Field field = mock(MissingField.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    CategoricalNode node =
+        CategoricalNode.builder()
+            .id("cat_id")
+            .field(field)
+            .outcomeMap(Map.of())
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    assertEquals(outcomeMissing, categoricalNodeEvaluator.evaluate(node, variant));
   }
 
   @Test

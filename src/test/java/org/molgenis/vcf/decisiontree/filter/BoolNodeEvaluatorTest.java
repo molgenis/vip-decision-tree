@@ -13,6 +13,7 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
+import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 
@@ -539,5 +540,29 @@ class BoolNodeEvaluatorTest {
 
     Variant variant = mock(Variant.class);
     assertThrows(EvaluationException.class, () -> boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateMissingField() {
+    MissingField field = mock(MissingField.class);
+
+    Operator operator = Operator.NOT_EQUALS;
+    String queryValue = "str1";
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    assertEquals(outcomeMissing, boolNodeEvaluator.evaluate(node, variant));
   }
 }
