@@ -11,7 +11,7 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class ExistsNode implements DecisionNode {
 
-  @NonNull NodeType nodeType = NodeType.EXISTS;
+  @NonNull NodeType nodeType = NodeType.DECISION;
   @NonNull String id;
   @NonNull Field field;
   String description;
