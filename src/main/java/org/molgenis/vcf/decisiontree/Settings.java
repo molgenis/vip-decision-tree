@@ -13,4 +13,5 @@ public class Settings {
   ConfigDecisionTree configDecisionTree;
   AppSettings appSettings;
   WriterSettings writerSettings;
+  boolean strict;
 }

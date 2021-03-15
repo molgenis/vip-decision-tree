@@ -5,6 +5,7 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
+import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.springframework.stereotype.Component;
 
@@ -13,17 +14,21 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
 
   private final BoolNodeEvaluator boolNodeEvaluator;
   private final CategoricalNodeEvaluator categoricalNodeEvaluator;
+  private final ExistsNodeEvaluator existsNodeEvaluator;
 
   NodeEvaluatorServiceImpl() {
     boolNodeEvaluator = new BoolNodeEvaluator();
     categoricalNodeEvaluator = new CategoricalNodeEvaluator();
+    existsNodeEvaluator = new ExistsNodeEvaluator();
   }
 
   // Testability
   NodeEvaluatorServiceImpl(
-      BoolNodeEvaluator boolNodeEvaluator, CategoricalNodeEvaluator categoricalNodeEvaluator) {
+      BoolNodeEvaluator boolNodeEvaluator, CategoricalNodeEvaluator categoricalNodeEvaluator,
+      ExistsNodeEvaluator existsNodeEvaluator) {
     this.boolNodeEvaluator = boolNodeEvaluator;
     this.categoricalNodeEvaluator = categoricalNodeEvaluator;
+    this.existsNodeEvaluator = existsNodeEvaluator;
   }
 
   @Override
@@ -31,6 +36,9 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
     NodeOutcome nodeOutcome;
     DecisionType decisionType = node.getDecisionType();
     switch (decisionType) {
+      case EXISTS:
+        nodeOutcome = existsNodeEvaluator.evaluate((ExistsNode) node, variant);
+        break;
       case BOOL:
         nodeOutcome = boolNodeEvaluator.evaluate((BoolNode) node, variant);
         break;

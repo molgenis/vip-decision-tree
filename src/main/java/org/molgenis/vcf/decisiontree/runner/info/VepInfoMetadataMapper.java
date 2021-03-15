@@ -9,7 +9,7 @@ import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField.NestedFieldBuilder;
@@ -43,8 +43,8 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
     Map<String, NestedField> nestedFields = new HashMap<>();
     int index = 0;
     for (String id : getNestedInfoIds(vcfInfoHeaderLine)) {
-      Field vepField =
-          Field.builder()
+      FieldImpl vepField =
+          FieldImpl.builder()
               .id(vcfInfoHeaderLine.getID())
               .fieldType(FieldType.INFO)
               .valueType(ValueType.STRING)
@@ -67,7 +67,7 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
   }
 
   protected NestedField mapNestedMetadataToField(
-      String id, int index, Field vepField, VepInfoSelector infoSelector) {
+      String id, int index, FieldImpl vepField, VepInfoSelector infoSelector) {
     NestedFieldBuilder fieldBuilder =
         NestedField.nestedBuilder()
             .id(id)

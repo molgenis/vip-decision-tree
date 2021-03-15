@@ -6,6 +6,7 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,13 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
     NodeOutcome nodeOutcome;
 
     BoolQuery query = node.getQuery();
+    if (query.getField() instanceof MissingField) {
+      if (node.getOutcomeMissing() != null) {
+        return node.getOutcomeMissing();
+      } else {
+        throw new EvaluationException(node, variant, "missing 'missingOutcome'");
+      }
+    }
     Object value = variant.getValue(query.getField());
     if (value != null) {
       boolean matches = executeQuery(query, value);

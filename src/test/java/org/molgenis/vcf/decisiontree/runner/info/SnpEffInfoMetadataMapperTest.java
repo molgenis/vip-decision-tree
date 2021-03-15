@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
@@ -28,7 +28,7 @@ class SnpEffInfoMetadataMapperTest {
   private SnpEffInfoMetadataMapper snpEffInfoMetadataMapper;
   @Mock
   VCFInfoHeaderLine headerLine;
-  private Field snpEffField;
+  private FieldImpl snpEffField;
   @Mock
   SnpEffInfoSelector selector;
 
@@ -37,7 +37,7 @@ class SnpEffInfoMetadataMapperTest {
     snpEffInfoMetadataMapper = new SnpEffInfoMetadataMapper(snpEffInfoSelectorFactory);
 
     snpEffField =
-        Field.builder()
+        FieldImpl.builder()
             .id("ANN")
             .fieldType(FieldType.INFO)
             .valueType(ValueType.STRING)

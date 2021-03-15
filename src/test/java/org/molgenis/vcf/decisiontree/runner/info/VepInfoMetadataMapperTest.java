@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
@@ -30,7 +30,7 @@ class VepInfoMetadataMapperTest {
   private VepInfoMetadataMapper vepInfoMetadataMapper;
   @Mock
   VCFInfoHeaderLine headerLine;
-  private Field vepField;
+  private FieldImpl vepField;
   @Mock
   private VepInfoSelector selector;
 
@@ -38,7 +38,7 @@ class VepInfoMetadataMapperTest {
   void setUp() {
     vepInfoMetadataMapper = new VepInfoMetadataMapper(vepInfoSelectorFactory);
 
-    vepField = Field.builder()
+    vepField = FieldImpl.builder()
         .id("CSQ")
         .fieldType(FieldType.INFO)
         .valueType(ValueType.STRING)
