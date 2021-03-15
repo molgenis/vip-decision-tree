@@ -56,7 +56,7 @@
     "snpEff": {
       "type": "BOOL",
       "query": {
-        "field": "INFO/ANN/Annotetion",
+        "field": "INFO/ANN/Annotation",
         "operator": "==",
         "value": [
           "missense_variant"
