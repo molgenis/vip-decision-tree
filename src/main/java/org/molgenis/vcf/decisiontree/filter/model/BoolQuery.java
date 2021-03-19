@@ -17,7 +17,10 @@ public class BoolQuery {
     IN,
     NOT_IN,
     CONTAINS,
-    NOT_CONTAINS
+    NOT_CONTAINS,
+    CONTAINS_ALL,
+    CONTAINS_ANY,
+    CONTAINS_NONE
   }
 
   @NonNull Field field;

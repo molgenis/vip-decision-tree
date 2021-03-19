@@ -1,13 +1,20 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
+import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 
 public class CategoricalNodeEvaluator implements NodeEvaluator<CategoricalNode> {
   @Override
   public NodeOutcome evaluate(CategoricalNode node, Variant variant) {
     NodeOutcome nodeOutcome;
-
+    if (node.getField() instanceof MissingField) {
+      if (node.getOutcomeMissing() != null) {
+        return node.getOutcomeMissing();
+      } else {
+        throw new EvaluationException(node, variant, "missing 'missingOutcome'");
+      }
+    }
     String value = (String) variant.getValue(node.getField());
     if (value != null) {
       nodeOutcome = node.getOutcomeMap().get(value);

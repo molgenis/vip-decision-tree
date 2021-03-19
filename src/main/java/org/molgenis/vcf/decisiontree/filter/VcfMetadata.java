@@ -14,7 +14,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
+import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.ValueCountBuilder;
@@ -31,10 +33,12 @@ public class VcfMetadata {
 
   private final VCFHeader vcfHeader;
   private final VcfNestedMetadata nestedMetadata;
+  private final boolean strict;
 
-  public VcfMetadata(VCFHeader vcfHeader, VcfNestedMetadata nestedMetadata) {
+  public VcfMetadata(VCFHeader vcfHeader, VcfNestedMetadata nestedMetadata, boolean strict) {
     this.vcfHeader = requireNonNull(vcfHeader);
     this.nestedMetadata = requireNonNull(nestedMetadata);
+    this.strict = requireNonNull(strict);
   }
 
   public Field getField(String fieldId) {
@@ -68,13 +72,21 @@ public class VcfMetadata {
     String nestedField = fieldTokens.get(2);
 
     NestedInfoHeaderLine nestedFieldMetadata = nestedMetadata.getNestedInfoHeaderLine(field);
-    if(nestedFieldMetadata == null){
-      throw new UnknownFieldException(field, INFO);
+    if (nestedFieldMetadata == null) {
+      if (strict) {
+        throw new UnknownFieldException(field, INFO);
+      } else {
+        return new MissingField(field);
+      }
     }
-    if(nestedFieldMetadata.hasField(nestedField)){
+    if (nestedFieldMetadata.hasField(nestedField)) {
       return nestedFieldMetadata.getField(nestedField);
-    }else{
-      throw new UnknownFieldException(nestedField, INFO_NESTED);
+    } else {
+      if (strict) {
+        throw new UnknownFieldException(nestedField, INFO_NESTED);
+      } else {
+        return new MissingField(nestedField);
+      }
     }
   }
 
@@ -104,7 +116,7 @@ public class VcfMetadata {
     return fieldType;
   }
 
-  private Field toCommonField(List<String> fieldTokens) {
+  private FieldImpl toCommonField(List<String> fieldTokens) {
     if (fieldTokens.size() > 1) {
       throw new InvalidNumberOfTokensException(fieldTokens, COMMON, 1);
     }
@@ -135,7 +147,7 @@ public class VcfMetadata {
       default:
         throw new UnsupportedFieldException(field);
     }
-    return Field.builder()
+    return FieldImpl.builder()
         .id(field)
         .fieldType(COMMON)
         .valueType(valueType)
@@ -149,6 +161,10 @@ public class VcfMetadata {
     }
     String field = fieldTokens.get(1);
     VCFCompoundHeaderLine vcfCompoundHeaderLine = getVcfCompoundHeaderLine(fieldType, field);
+
+    if (vcfCompoundHeaderLine == null) {
+      return new MissingField(field);
+    }
 
     ValueType valueType;
     VCFHeaderLineType lineType = vcfCompoundHeaderLine.getType();
@@ -195,7 +211,7 @@ public class VcfMetadata {
         throw new UnexpectedEnumException(countType);
     }
 
-    return Field.builder()
+    return FieldImpl.builder()
         .id(field)
         .fieldType(fieldType)
         .valueType(valueType)
@@ -214,8 +230,8 @@ public class VcfMetadata {
         break;
       case INFO:
         vcfCompoundHeaderLine = vcfHeader.getInfoHeaderLine(field);
-        if (vcfCompoundHeaderLine == null) {
-          throw new UnknownFieldException(field, fieldType);
+        if (vcfCompoundHeaderLine == null && strict) {
+          throw new UnknownFieldException(field, INFO_NESTED);
         }
         break;
       default:

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField.NestedFieldBuilder;
@@ -46,8 +46,8 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
     Map<String, NestedField> nestedFields = new HashMap<>();
     int index = 0;
     for (String id : getNestedInfoIds(vcfInfoHeaderLine)) {
-      Field annField =
-          Field.builder()
+      FieldImpl annField =
+          FieldImpl.builder()
               .id(vcfInfoHeaderLine.getID())
               .fieldType(FieldType.INFO)
               .valueType(ValueType.STRING)
@@ -76,7 +76,7 @@ public class SnpEffInfoMetadataMapper implements NestedMetadataMapper {
   }
 
   protected NestedField mapNestedMetadataToField(
-      String id, int index, Field annField, NestedInfoSelector infoSelector) {
+      String id, int index, FieldImpl annField, NestedInfoSelector infoSelector) {
     NestedFieldBuilder fieldBuilder =
         NestedField.nestedBuilder()
             .id(id)

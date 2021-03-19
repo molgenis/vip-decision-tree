@@ -13,7 +13,7 @@
 
   <groupId>org.molgenis</groupId>
   <artifactId>vip-decision-tree</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.0.4-SNAPSHOT</version>
 
   <name>vip-decision-tree</name>
   <description>Decision tree module for filtering and labelling VCF files</description>
@@ -28,7 +28,8 @@
 
   <scm>
     <connection>scm:git:git://github.com/molgenis/vip-decision-tree.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/molgenis/vip-decision-tree.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/molgenis/vip-decision-tree.git
+    </developerConnection>
     <url>https://github.com/molgenis/vip-decision-tree</url>
   </scm>
 

@@ -15,12 +15,15 @@ public class VcfReader implements AutoCloseable {
 
   private final VCFFileReader vcfFileReader;
   private final VcfNestedMetadataParser vcfNestedMetadataParser;
+  private final boolean strict;
   private VcfNestedMetadata nestedMetadata;
   private boolean inited = false;
 
-  public VcfReader(VCFFileReader vcfFileReader, VcfNestedMetadataParser vcfNestedMetadataParser) {
+  public VcfReader(VCFFileReader vcfFileReader, VcfNestedMetadataParser vcfNestedMetadataParser,
+      boolean strict) {
     this.vcfFileReader = requireNonNull(vcfFileReader);
     this.vcfNestedMetadataParser = requireNonNull(vcfNestedMetadataParser);
+    this.strict = strict;
   }
 
   private void initNestedMeta() {
@@ -36,7 +39,7 @@ public class VcfReader implements AutoCloseable {
 
   public VcfMetadata getMetadata() {
     initNestedMeta();
-    return new VcfMetadata(vcfFileReader.getFileHeader(), nestedMetadata);
+    return new VcfMetadata(vcfFileReader.getFileHeader(), nestedMetadata, strict);
   }
 
   @Override

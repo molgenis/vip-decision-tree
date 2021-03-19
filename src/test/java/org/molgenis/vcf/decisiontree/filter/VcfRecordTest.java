@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
@@ -74,7 +74,8 @@ class VcfRecordTest {
   void getValueCommonChrom() {
     String contig = "1";
     when(variantContext.getContig()).thenReturn(contig);
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("#CHROM");
     assertEquals(contig, vcfRecord.getValue(field, createAllele()));
   }
@@ -83,7 +84,8 @@ class VcfRecordTest {
   void getValueCommonPos() {
     int pos = 123;
     when(variantContext.getStart()).thenReturn(pos);
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("POS");
     assertEquals(pos, vcfRecord.getValue(field, createAllele()));
   }
@@ -93,14 +95,16 @@ class VcfRecordTest {
     String idStr = "rs123;rs456";
     when(variantContext.hasID()).thenReturn(true);
     when(variantContext.getID()).thenReturn(idStr);
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("ID");
     assertEquals(List.of("rs123", "rs456"), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
   void getValueCommonIdsMissing() {
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("ID");
     assertEquals(emptyList(), vcfRecord.getValue(field, createAllele()));
   }
@@ -111,14 +115,16 @@ class VcfRecordTest {
     htsjdk.variant.variantcontext.Allele allele = mock(htsjdk.variant.variantcontext.Allele.class);
     when(allele.getBaseString()).thenReturn(ref);
     when(variantContext.getReference()).thenReturn(allele);
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("REF");
     assertEquals(ref, vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
   void getValueCommonAlt() {
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("ALT");
     assertEquals("A", vcfRecord.getValue(field, createAllele()));
   }
@@ -127,14 +133,16 @@ class VcfRecordTest {
   void getValueCommonQual() {
     when(variantContext.hasLog10PError()).thenReturn(true);
     when(variantContext.getPhredScaledQual()).thenReturn(1.23);
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("QUAL");
     assertEquals(1.23, (Double) vcfRecord.getValue(field, createAllele()), 1E-6);
   }
 
   @Test
   void getValueCommonQualMissing() {
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("QUAL");
     assertNull(vcfRecord.getValue(field, createAllele()));
   }
@@ -145,7 +153,8 @@ class VcfRecordTest {
     filters.add("filter0");
     filters.add("filter1");
     when(variantContext.getFiltersMaybeNull()).thenReturn(filters);
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("FILTER");
     assertEquals(new ArrayList<>(filters), vcfRecord.getValue(field, createAllele()));
   }
@@ -153,7 +162,8 @@ class VcfRecordTest {
   @Test
   void getValueCommonFiltersMissing() {
     when(variantContext.getFiltersMaybeNull()).thenReturn(null);
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("FILTER");
     assertEquals(emptyList(), vcfRecord.getValue(field, createAllele()));
   }
@@ -161,15 +171,16 @@ class VcfRecordTest {
   @Test
   void getValueCommonFiltersPass() {
     when(variantContext.getFiltersMaybeNull()).thenReturn(emptySet());
-    Field field = when(mock(Field.class).getFieldType()).thenReturn(FieldType.COMMON).getMock();
+    FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
+        .getMock();
     when(field.getId()).thenReturn("FILTER");
     assertEquals(singletonList("PASS"), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
   void getValueInfoAltInteger() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.A).build())
@@ -182,8 +193,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoAltFloat() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.A).build())
@@ -196,8 +207,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoAltString() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.A).build())
@@ -210,8 +221,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoRef() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.R).build())
@@ -224,8 +235,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoVariable() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
@@ -237,8 +248,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoVariableFlag() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
@@ -250,8 +261,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoFixed() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.FIXED).count(2).build())
@@ -263,8 +274,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoFixedOneInteger() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
@@ -276,8 +287,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoFixedOneFloat() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
@@ -289,8 +300,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoFixedOneFlag() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
@@ -302,8 +313,8 @@ class VcfRecordTest {
 
   @Test
   void getValueInfoFixedOneString() {
-    Field field =
-        Field.builder()
+    FieldImpl field =
+        FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
             .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())

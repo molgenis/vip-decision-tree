@@ -10,6 +10,7 @@ import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
@@ -43,6 +44,9 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
   private void validateNode(String id, ConfigNode node, Map<String, ConfigNode> nodes, Map<String, Path> files) {
     validateAlphanumericValue("id", id);
     switch (node.getType()) {
+      case EXISTS:
+        validateExistsNode(id, (ConfigExistsNode) node, nodes);
+        break;
       case BOOL:
         validateBoolNode(id, (ConfigBoolNode) node, nodes, files);
         break;
@@ -57,7 +61,13 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
     }
   }
 
-  private void validateBoolNode(String id, ConfigBoolNode node, Map<String, ConfigNode> nodes, Map<String, Path> files) {
+  private void validateExistsNode(String id, ConfigExistsNode node, Map<String, ConfigNode> nodes) {
+    validateOutcome(id, "outcomeTrue", nodes, node.getOutcomeTrue());
+    validateOutcome(id, "outcomeFalse", nodes, node.getOutcomeFalse());
+  }
+
+  private void validateBoolNode(String id, ConfigBoolNode node, Map<String, ConfigNode> nodes,
+      Map<String, Path> files) {
     validateValue(id, node.getQuery().getValue(), files);
     validateOutcome(id, "outcomeTrue", nodes, node.getOutcomeTrue());
     validateOutcome(id, "outcomeFalse", nodes, node.getOutcomeFalse());
@@ -65,7 +75,7 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
   }
 
   private void validateValue(String id, Object value, Map<String, Path> files) {
-    if(value instanceof String && value.toString().startsWith(FILE_PREFIX)){
+    if (value instanceof String && value.toString().startsWith(FILE_PREFIX)) {
       String file = value.toString().substring(FILE_PREFIX.length());
       if(!files.containsKey(file)){
         throw new ConfigDecisionTreeValidationException(

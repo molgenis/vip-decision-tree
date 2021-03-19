@@ -4,6 +4,7 @@ public interface ConfigNode {
   enum Type {
     BOOL,
     CATEGORICAL,
+    EXISTS,
     LEAF
   }
 

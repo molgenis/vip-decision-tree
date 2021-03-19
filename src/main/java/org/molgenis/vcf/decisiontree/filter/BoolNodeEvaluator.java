@@ -6,6 +6,7 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,13 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
     NodeOutcome nodeOutcome;
 
     BoolQuery query = node.getQuery();
+    if (query.getField() instanceof MissingField) {
+      if (node.getOutcomeMissing() != null) {
+        return node.getOutcomeMissing();
+      } else {
+        throw new EvaluationException(node, variant, "missing 'missingOutcome'");
+      }
+    }
     Object value = variant.getValue(query.getField());
     if (value != null) {
       boolean matches = executeQuery(query, value);
@@ -68,6 +76,15 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
       case NOT_CONTAINS:
         matches = !executeContainsQuery((Collection<?>) value, queryValue);
         break;
+      case CONTAINS_ALL:
+        matches = executeContainsAllQuery((Collection<?>) value, (Collection<?>) queryValue);
+        break;
+      case CONTAINS_ANY:
+        matches = executeContainsAnyQuery((Collection<?>) value, (Collection<?>) queryValue);
+        break;
+      case CONTAINS_NONE:
+        matches = executeContainsNoneQuery((Collection<?>) value, (Collection<?>) queryValue);
+        break;
       default:
         throw new UnexpectedEnumException(operator);
     }
@@ -109,6 +126,23 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
 
   private boolean executeContainsQuery(Collection<?> values, Object queryValue) {
     return values.contains(queryValue);
+  }
+
+  private boolean executeContainsAllQuery(Collection<?> values, Collection<?> queryValues) {
+    return values.containsAll(queryValues);
+  }
+
+  private boolean executeContainsAnyQuery(Collection<?> values, Collection<?> queryValues) {
+    for (Object queryValue : queryValues) {
+      if (values.contains(queryValue)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean executeContainsNoneQuery(Collection<?> values, Collection<?> queryValues) {
+    return !executeContainsAnyQuery(values, queryValues);
   }
 
   private boolean executeInQuery(Object value, Collection<?> queryValues) {

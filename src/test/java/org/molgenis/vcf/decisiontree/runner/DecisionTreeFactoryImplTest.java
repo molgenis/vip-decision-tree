@@ -8,20 +8,24 @@ import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
+import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -31,6 +35,7 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
 import org.springframework.util.ResourceUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,14 +52,18 @@ class DecisionTreeFactoryImplTest{
 
   @BeforeEach
   void setUp() {
-      decisionTreeFactory = new DecisionTreeFactoryImpl(queryValidator);
+    decisionTreeFactory = new DecisionTreeFactoryImpl(queryValidator);
   }
 
-  @Test
-  void map() throws FileNotFoundException {
-    Map<String, Path> files = Collections.singletonMap("test", ResourceUtils.getFile("classpath:test.txt").toPath());
+  @ParameterizedTest
+  @MethodSource("provideOperatorsForMap")
+  void map(Operator expectedOperator, ConfigOperator configOperator) throws FileNotFoundException {
+    Map<String, Path> files = Collections
+        .singletonMap("test", ResourceUtils.getFile("classpath:test.txt").toPath());
     ConfigBoolQuery query =
-        ConfigBoolQuery.builder().field("INFO/testField").operator(IN).value(FILE_PREFIX + "test").build();
+        ConfigBoolQuery.builder().field("INFO/testField").operator(configOperator)
+            .value(FILE_PREFIX + "test")
+            .build();
     ConfigLeafNode leafNode = ConfigLeafNode.builder().clazz("end").build();
     ConfigNodeOutcome outcome = ConfigNodeOutcome.builder().nextNode("end").build();
     ConfigNode configNode = ConfigBoolNode.builder().query(query).outcomeTrue(
@@ -64,12 +73,29 @@ class DecisionTreeFactoryImplTest{
     when(decisionTree.getFiles()).thenReturn(files);
     when(decisionTree.getNodes()).thenReturn(nodes);
     when(decisionTree.getRootNode()).thenReturn("test");
-    when(vcfMetadata.getField("INFO/testField")).thenReturn(Field.builder().id("testField").fieldType(INFO).valueType(
-        ValueType.STRING).valueCount(ValueCount.builder().type(Type.A).build()).build());
+    when(vcfMetadata.getField("INFO/testField")).thenReturn(
+        FieldImpl.builder().id("testField").fieldType(INFO).valueType(
+            ValueType.STRING).valueCount(ValueCount.builder().type(Type.A).build()).build());
     Settings settings = Settings.builder().configDecisionTree(decisionTree).build();
     DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
 
-    assertEquals(Set.of("unit", "test", "value"),
-        ((BoolNode) decisionTree.getRootNode()).getQuery().getValue());
+    assertAll(
+        () -> assertEquals(expectedOperator,
+            ((BoolNode) decisionTree.getRootNode()).getQuery().getOperator()),
+        () -> assertEquals(Set.of("unit", "test", "value"),
+            ((BoolNode) decisionTree.getRootNode()).getQuery().getValue())
+    );
+  }
+
+  private static Stream<Arguments> provideOperatorsForMap() {
+    return Stream.of(
+        Arguments.of(Operator.IN, ConfigOperator.IN),
+        Arguments.of(Operator.NOT_IN, ConfigOperator.NOT_IN),
+        Arguments.of(Operator.CONTAINS, ConfigOperator.CONTAINS),
+        Arguments.of(Operator.NOT_CONTAINS, ConfigOperator.NOT_CONTAINS),
+        Arguments.of(Operator.CONTAINS_ALL, ConfigOperator.CONTAINS_ALL),
+        Arguments.of(Operator.CONTAINS_ANY, ConfigOperator.CONTAINS_ANY),
+        Arguments.of(Operator.CONTAINS_NONE, ConfigOperator.CONTAINS_NONE)
+    );
   }
 }

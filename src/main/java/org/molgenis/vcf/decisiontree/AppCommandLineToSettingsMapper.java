@@ -8,6 +8,7 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_LABELS;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PATH;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_STRICT;
 
 import java.nio.file.Path;
 import org.apache.commons.cli.CommandLine;
@@ -37,11 +38,13 @@ class AppCommandLineToSettingsMapper {
     Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
     ConfigDecisionTree configDecisionTree = createDecisionTree(commandLine);
     WriterSettings writerSettings = createWriterSettings(commandLine);
+    boolean strict = commandLine.hasOption(OPT_STRICT);
     return Settings.builder()
         .inputVcfPath(inputPath)
         .configDecisionTree(configDecisionTree)
         .appSettings(appSettings)
         .writerSettings(writerSettings)
+        .strict(strict)
         .build();
   }
 

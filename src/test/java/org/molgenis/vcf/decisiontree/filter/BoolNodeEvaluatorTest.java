@@ -1,5 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -11,7 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
+import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 
@@ -26,7 +28,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateLessTrueInteger() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.INTEGER);
 
     Operator operator = Operator.LESS;
@@ -52,7 +54,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateLessEqualTrueInteger() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.INTEGER);
 
     Operator operator = Operator.LESS_OR_EQUAL;
@@ -78,7 +80,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateLessFalseFloat() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.FLOAT);
 
     Operator operator = Operator.LESS;
@@ -104,7 +106,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateGreaterFalseInteger() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.INTEGER);
 
     Operator operator = Operator.GREATER;
@@ -130,7 +132,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateGreaterTrueFloat() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.FLOAT);
 
     Operator operator = Operator.GREATER;
@@ -156,7 +158,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateGreaterEqualTrueFloat() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.FLOAT);
 
     Operator operator = Operator.GREATER_OR_EQUAL;
@@ -182,7 +184,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateInTrueString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.IN;
@@ -208,7 +210,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateNotInFalseString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_IN;
@@ -234,7 +236,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateContainsTrueString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.CONTAINS;
@@ -260,7 +262,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateNotContainsFalseString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_CONTAINS;
@@ -286,7 +288,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateEqualsString() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.EQUALS;
@@ -312,7 +314,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateNotEqualsInteger() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_EQUALS;
@@ -337,8 +339,164 @@ class BoolNodeEvaluatorTest {
   }
 
   @Test
+  void evaluateContainsAll() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_ALL;
+    List<String> queryValue = asList("test1", "test2");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsAllFalse() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_ALL;
+    List<String> queryValue = asList("test1", "test4");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsAny() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_ANY;
+    List<String> queryValue = asList("test1", "test4");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsAnyFalse() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_ANY;
+    List<String> queryValue = asList("test4", "test5");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsNone() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_NONE;
+    List<String> queryValue = asList("test4", "test5");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateContainsNoneFalse() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.CONTAINS_NONE;
+    List<String> queryValue = asList("test1", "test5");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
   void evaluateMissing() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_EQUALS;
@@ -363,7 +521,7 @@ class BoolNodeEvaluatorTest {
 
   @Test
   void evaluateMissingMissing() {
-    Field field = mock(Field.class);
+    FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
 
     Operator operator = Operator.NOT_EQUALS;
@@ -382,5 +540,29 @@ class BoolNodeEvaluatorTest {
 
     Variant variant = mock(Variant.class);
     assertThrows(EvaluationException.class, () -> boolNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateMissingField() {
+    MissingField field = mock(MissingField.class);
+
+    Operator operator = Operator.NOT_EQUALS;
+    String queryValue = "str1";
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    assertEquals(outcomeMissing, boolNodeEvaluator.evaluate(node, variant));
   }
 }

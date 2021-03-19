@@ -26,6 +26,8 @@ class AppCommandLineOptions {
   static final String OPT_DEBUG_LONG = "debug";
   static final String OPT_VERSION = "v";
   static final String OPT_VERSION_LONG = "version";
+  static final String OPT_STRICT = "s";
+  static final String OPT_STRICT_LONG = "strict";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -55,6 +57,12 @@ class AppCommandLineOptions {
         Option.builder(OPT_FORCE)
             .longOpt(OPT_FORCE_LONG)
             .desc("Override the output file if it already exists.")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_STRICT)
+            .longOpt(OPT_STRICT_LONG)
+            .desc(
+                "Throw exception if field from the decision tree is missing entirely in the input VCF.")
             .build());
     appOptions.addOption(
         Option.builder(OPT_LABELS)
