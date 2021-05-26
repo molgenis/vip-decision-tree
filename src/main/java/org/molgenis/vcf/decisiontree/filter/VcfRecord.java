@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -74,13 +73,8 @@ public class VcfRecord {
     String parentId = nestedField.getParent().getId();
     List<String> infoValues = VcfUtils.getInfoAsStringList(variantContext, parentId);
     if (!infoValues.isEmpty()) {
-      List<String> filteredInfo =
-          infoValues.stream()
-              .filter(
-                  nestedValue -> nestedField.getNestedInfoSelector().isMatch(nestedValue, allele))
-              .collect(Collectors.toList());
-      if (!filteredInfo.isEmpty()) {
-        String singleValue = filteredInfo.get(0);
+      String singleValue = nestedField.getNestedInfoSelector().select(infoValues, allele);
+      if (singleValue != null) {
         String[] split = singleValue.split(separator, -1);
         String stringValue = split[index];
         if (!stringValue.isEmpty()) {

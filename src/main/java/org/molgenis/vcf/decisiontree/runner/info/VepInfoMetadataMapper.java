@@ -77,7 +77,13 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
             .nestedInfoSelector(infoSelector);
     switch (id) {
       case "PICK":
+      case "PREFERRED":
       case "ALLELE_NUM":
+      case "STRAND":
+      case "HGNC_ID":
+      case "cDNA_position":
+      case "CDS_position":
+      case "Protein_position":
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.INTEGER);
@@ -98,15 +104,6 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
             .valueType(ValueType.INTEGER)
             .separator('&');
-        break;
-      case "STRAND":
-      case "HGNC_ID":
-      case "cDNA_position":
-      case "CDS_position":
-      case "Protein_position":
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-            .valueType(ValueType.INTEGER);
         break;
       case "gnomAD_AF":
       case "gnomAD_AFR_AF":

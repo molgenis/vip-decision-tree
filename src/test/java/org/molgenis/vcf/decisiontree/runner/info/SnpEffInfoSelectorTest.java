@@ -1,11 +1,12 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.decisiontree.runner.info.SnpEffInfoSelector.ALLELE;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,24 +30,24 @@ class SnpEffInfoSelectorTest {
   }
 
   @Test
-  void isMatch() {
+  void select() {
     when(alleleField.getIndex()).thenReturn(0);
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     Allele allele = Allele.builder().bases("A").index(1).build();
     snpEffInfoSelector.setNestedInfoHeaderLine(
         NestedInfoHeaderLine.builder().nestedFields(nestedFields).build());
-    assertTrue(snpEffInfoSelector.isMatch("A|X|Y", allele));
+    assertEquals("A|X|Y", snpEffInfoSelector.select(List.of("A|X|Y"), allele));
   }
 
   @Test
-  void noMatch() {
+  void selectNull() {
     when(alleleField.getIndex()).thenReturn(0);
     Map<String, NestedField> nestedFields = new HashMap<>();
     nestedFields.put(ALLELE, alleleField);
     Allele allele = Allele.builder().bases("A").index(1).build();
     snpEffInfoSelector.setNestedInfoHeaderLine(
         NestedInfoHeaderLine.builder().nestedFields(nestedFields).build());
-    assertFalse(snpEffInfoSelector.isMatch("T|X|Y", allele));
+    assertNull(snpEffInfoSelector.select(List.of("T|X|Y"), allele));
   }
 }

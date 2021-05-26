@@ -1,7 +1,6 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
-import static java.util.Objects.requireNonNull;
-
+import java.util.List;
 import org.molgenis.vcf.decisiontree.filter.Allele;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 
@@ -9,25 +8,32 @@ public class SnpEffInfoSelector implements NestedInfoSelector {
 
   public static final String ALLELE = "Allele";
 
-  private NestedInfoHeaderLine nestedInfoHeaderLine;
+  private NestedField alleleIndexField;
 
   @Override
-  public boolean isMatch(String infoValue, Allele allele) {
-    NestedField vepAllele = nestedInfoHeaderLine.getField(ALLELE);
-    if (vepAllele == null) {
-      throw new MissingRequiredNestedValueException("SnpEff", ALLELE);
-    }
+  public String select(List<String> infoValues, Allele allele) {
+    String[] tokens =
+        infoValues.stream()
+            .map(SnpEffInfoSelector::toValues)
+            .filter(infoValue -> isMatch(infoValue, allele))
+            .findFirst()
+            .orElse(null);
+    return tokens != null ? String.join("|", tokens) : null;
+  }
+
+  private static String[] toValues(String infoValue) {
+    return infoValue.split("\\|");
+  }
+
+  private boolean isMatch(String[] tokens, Allele allele) {
     String alt = allele.getBases();
-    String[] values = infoValue.split("\\|");
-    return alt.equals(values[vepAllele.getIndex()]);
+    return alt.equals(tokens[alleleIndexField.getIndex()]);
   }
 
   public void setNestedInfoHeaderLine(NestedInfoHeaderLine nestedInfoHeaderLine) {
-    requireNonNull(nestedInfoHeaderLine);
-    NestedField vepAllele = nestedInfoHeaderLine.getField(ALLELE);
-    if (vepAllele == null) {
+    alleleIndexField = nestedInfoHeaderLine.getField(ALLELE);
+    if (alleleIndexField == null) {
       throw new MissingRequiredNestedValueException("SnpEff", ALLELE);
     }
-    this.nestedInfoHeaderLine = nestedInfoHeaderLine;
   }
 }
