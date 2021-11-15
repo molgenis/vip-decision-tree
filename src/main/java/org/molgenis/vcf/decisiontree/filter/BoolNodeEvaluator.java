@@ -26,7 +26,7 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
       }
     }
     Object value = variant.getValue(query.getField());
-    if (value != null) {
+    if (!isMissingValue(value)) {
       boolean matches = executeQuery(query, value);
       nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();
     } else {
@@ -37,6 +37,10 @@ public class BoolNodeEvaluator implements NodeEvaluator<BoolNode> {
     }
 
     return nodeOutcome;
+  }
+
+  private boolean isMissingValue(Object value) {
+    return value == null || (value instanceof Collection<?> && ((Collection<?>) value).isEmpty());
   }
 
   private boolean executeQuery(BoolQuery boolQuery, Object value) {
