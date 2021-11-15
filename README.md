@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/molgenis/vip-decision-tree.svg?branch=master)](https://travis-ci.org/molgenis/vip-decision-tree)
+[![Build Status](https://app.travis-ci.com/molgenis/vip-decision-tree.svg?branch=master)](https://app.travis-ci.com/molgenis/vip-decision-tree)
 [![Quality Status](https://sonarcloud.io/api/project_badges/measure?project=molgenis_vip-decision-tree&metric=alert_status)](https://sonarcloud.io/dashboard?id=molgenis_vip-decision-tree)
 # Variant Interpretation Pipeline - VCF Decision Tree
 Command-line application to classify variants in any VCF (Variant Call Format) file based on a decision tree.
