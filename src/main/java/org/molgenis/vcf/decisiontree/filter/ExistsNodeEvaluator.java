@@ -1,5 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import java.util.Collection;
 import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
@@ -15,10 +16,13 @@ public class ExistsNodeEvaluator implements NodeEvaluator<ExistsNode> {
       nodeOutcome = node.getOutcomeFalse();
     } else {
       Object value = variant.getValue(node.getField());
-      boolean matches = value != null;
+      boolean matches = !isMissingValue(value);
       nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();
     }
     return nodeOutcome;
   }
 
+  private boolean isMissingValue(Object value) {
+    return value == null || (value instanceof Collection<?> && ((Collection<?>) value).isEmpty());
+  }
 }
