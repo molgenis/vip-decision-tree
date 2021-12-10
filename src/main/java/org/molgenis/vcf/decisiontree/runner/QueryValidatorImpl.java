@@ -107,9 +107,11 @@ public class QueryValidatorImpl implements QueryValidator {
 
   @Override
   public void validateCategoricalNode(Field field) {
-    if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
-      throw new UnsupportedValueTypeException(field, DecisionType.CATEGORICAL);
+    if (!(field instanceof MissingField)) {
+      if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
+        throw new UnsupportedValueTypeException(field, DecisionType.CATEGORICAL);
+      }
+      validateSingleOrPerAlleleCount(field, DecisionType.CATEGORICAL);
     }
-    validateSingleOrPerAlleleCount(field, DecisionType.CATEGORICAL);
   }
 }

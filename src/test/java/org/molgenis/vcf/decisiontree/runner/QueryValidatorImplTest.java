@@ -1,11 +1,13 @@
 package org.molgenis.vcf.decisiontree.runner;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
 
 import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
+import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -155,6 +157,22 @@ class QueryValidatorImplTest {
     assertThrows(
         FileValueNotAllowedException.class,
         () -> queryValidator.validateBooleanNode(query, field));
+  }
+
+  @Test
+  void validateBooleanNodeMissing() {
+    MissingField field = MissingField.builder().id("test").build();
+    ConfigBoolQuery query = ConfigBoolQuery.builder().field("test").operator(
+        ConfigOperator.EQUALS).value("file:test").build();
+    assertDoesNotThrow(
+        () -> queryValidator.validateBooleanNode(query, field));
+  }
+
+  @Test
+  void validateCategoricalNodeMissing() {
+    MissingField field = MissingField.builder().id("test").build();
+    assertDoesNotThrow(
+        () -> queryValidator.validateCategoricalNode(field));
   }
 
   @Test
