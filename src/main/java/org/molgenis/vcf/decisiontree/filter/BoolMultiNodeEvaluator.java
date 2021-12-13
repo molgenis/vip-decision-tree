@@ -28,10 +28,7 @@ public class BoolMultiNodeEvaluator extends AbstractBoolNodeEvaluator implements
     }
 
     for (BoolClause clause : node.getClauses()) {
-      if (clause.getQueryList().size() > 1 && clause.getOperator() == null) {
-        throw new EvaluationException(node, variant,
-            "Clause has more than one query without an AND/OR operator.");
-      } else if (clause.getQueryList().size() == 1) {
+      if (clause.getQueryList().size() == 1) {
         BoolQuery query = clause.getQueryList().get(0);
         Object value = variant.getValue(query.getField());
         if (isMissingValue(value)) {
