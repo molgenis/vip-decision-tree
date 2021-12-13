@@ -54,19 +54,54 @@
       }
     },
     "snpEff": {
-      "type": "BOOL",
-      "query": {
-        "field": "INFO/ANN/Annotation",
-        "operator": "==",
-        "value": [
-          "missense_variant"
-        ]
-      },
-      "outcomeTrue": {
+      "type": "BOOL_MULTI",
+      "fields": [
+        "INFO/ANN/Annotation",
+        "INFO/ANN/Annotation_Impact",
+        "INFO/ANN/Gene_Name"
+      ],
+      "outcomes": [
+        {
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/ANN/Annotation",
+              "operator": "==",
+              "value": [
+                "missense_variant"
+              ]
+            },
+            {
+              "field": "INFO/ANN/Annotation_Impact",
+              "operator": "==",
+              "value": "HIGH"
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "done_include"
+          }
+        },
+        {
+          "operator": "AND",
+          "queries": [
+            {
+              "field": "INFO/ANN/Gene_Name",
+              "operator": "==",
+              "value": "LMNA"
+            },
+            {
+              "field": "INFO/ANN/Annotation_Impact",
+              "operator": "==",
+              "value": "LOW"
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "done_exclude"
+          }
+        }
+      ],
+      "outcomeDefault": {
         "nextNode": "done_include"
-      },
-      "outcomeFalse": {
-        "nextNode": "done_exclude"
       },
       "outcomeMissing": {
         "nextNode": "done_include"
