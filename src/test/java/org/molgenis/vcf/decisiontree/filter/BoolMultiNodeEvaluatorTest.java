@@ -182,4 +182,63 @@ class BoolMultiNodeEvaluatorTest {
     when(variant.getValue(field2)).thenReturn(2);
     assertEquals(outcome1, boolMultiNodeEvaluator.evaluate(node, variant));
   }
+
+  @Test
+  void evaluateSingleQuery() {
+    FieldImpl field1 = mock(FieldImpl.class);
+    when(field1.getValueType()).thenReturn(ValueType.INTEGER);
+
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field1).operator(Operator.GREATER).value(1).build();
+    NodeOutcome outcomeDefault = mock(NodeOutcome.class, "outcomeDefault");
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
+    NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
+
+    BoolClause boolClause1 = BoolClause.builder().id("123").operator(BoolClause.Operator.OR)
+        .queryList(List.of(boolQuery)).outcomeTrue(outcome1).build();
+    List<BoolClause> clauses = List.of(boolClause1);
+
+    BoolMultiNode node =
+        BoolMultiNode.builder()
+            .id("bool_node")
+            .fields(List.of(field1))
+            .clauses(clauses)
+            .outcomeDefault(outcomeDefault)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field1)).thenReturn(2);
+    assertEquals(outcome1, boolMultiNodeEvaluator.evaluate(node, variant));
+  }
+
+  @Test
+  void evaluateSingleQueryMissingValue() {
+    FieldImpl field1 = mock(FieldImpl.class);
+    when(field1.getValueType()).thenReturn(ValueType.INTEGER);
+
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field1).operator(Operator.LESS).value(1).build();
+    NodeOutcome outcomeDefault = mock(NodeOutcome.class, "outcomeDefault");
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
+    NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
+
+    BoolClause boolClause1 = BoolClause.builder().id("123").operator(BoolClause.Operator.OR)
+        .queryList(List.of(boolQuery)).outcomeTrue(outcome1).build();
+    List<BoolClause> clauses = List.of(boolClause1);
+
+    BoolMultiNode node =
+        BoolMultiNode.builder()
+            .id("bool_node")
+            .fields(List.of(field1))
+            .clauses(clauses)
+            .outcomeDefault(outcomeDefault)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field1)).thenReturn(null);
+    assertEquals(outcomeMissing, boolMultiNodeEvaluator.evaluate(node, variant));
+  }
+
 }
