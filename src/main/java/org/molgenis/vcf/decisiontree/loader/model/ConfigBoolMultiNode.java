@@ -10,7 +10,6 @@ import lombok.Setter;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.NodeType;
 
 @Value

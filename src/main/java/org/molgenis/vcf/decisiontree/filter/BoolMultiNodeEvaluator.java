@@ -16,34 +16,44 @@ public class BoolMultiNodeEvaluator extends AbstractBoolNodeEvaluator implements
 
   @Override
   public NodeOutcome evaluate(BoolMultiNode node, Variant variant) {
+    NodeOutcome outcome = node.getOutcomeDefault();
+    outcome = checkFields(node, variant, outcome);
 
+    for (BoolClause clause : node.getClauses()) {
+      outcome = evaluateClause(node, variant, outcome, clause);
+    }
+    return outcome;
+  }
+
+  private NodeOutcome checkFields(BoolMultiNode node, Variant variant, NodeOutcome outcome) {
     for (Field field : node.getFields()) {
       if (field instanceof MissingField) {
         if (node.getOutcomeMissing() != null) {
-          return node.getOutcomeMissing();
+          outcome = node.getOutcomeMissing();
         } else {
           throw new EvaluationException(node, variant, "missing 'missingOutcome'");
         }
       }
     }
+    return outcome;
+  }
 
-    for (BoolClause clause : node.getClauses()) {
-      if (clause.getQueryList().size() == 1) {
-        BoolQuery query = clause.getQueryList().get(0);
-        Object value = variant.getValue(query.getField());
-        if (isMissingValue(value)) {
-          return node.getOutcomeMissing();
-        }
-        if (executeQuery(query, value)) {
-          return clause.getOutcomeTrue();
-        }
-      } else {
-        if (evaluateMultiQuery(clause, variant)) {
-          return clause.getOutcomeTrue();
-        }
+  private NodeOutcome evaluateClause(BoolMultiNode node, Variant variant, NodeOutcome outcome,
+      BoolClause clause) {
+    if (clause.getQueryList().size() == 1) {
+      BoolQuery query = clause.getQueryList().get(0);
+      Object value = variant.getValue(query.getField());
+      if (isMissingValue(value)) {
+        outcome = node.getOutcomeMissing();
+      } else if (executeQuery(query, value)) {
+        outcome = clause.getOutcomeTrue();
+      }
+    } else {
+      if (evaluateMultiQuery(clause, variant)) {
+        outcome = clause.getOutcomeTrue();
       }
     }
-    return node.getOutcomeDefault();
+    return outcome;
   }
 
   private boolean evaluateMultiQuery(BoolClause clause, Variant variant) {

@@ -195,7 +195,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     List<BoolClause> boolClauses = nodeConfig.getOutcomes().stream()
         .map(clause -> toBoolClause(vcfMetadata, clause, files)).collect(
             Collectors.toList());
-    List<Field> fields = nodeConfig.getFields().stream().map(field -> vcfMetadata.getField(field))
+    List<Field> fields = nodeConfig.getFields().stream().map(vcfMetadata::getField)
         .collect(
             Collectors.toList());
     return BoolMultiNode.builder()

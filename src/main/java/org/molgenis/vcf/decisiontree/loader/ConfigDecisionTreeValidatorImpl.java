@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
-import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolClause;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
@@ -24,7 +23,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
+
   private static final Pattern PATTERN_ALPHANUMERIC_UNDERSCORE = Pattern.compile("[a-zA-Z0-9_]+");
+  public static final String OUTCOME_TRUE = "outcomeTrue";
+  public static final String OUTCOME_FALSE = "outcomeFalse";
+  public static final String OUTCOME_MISSING = "outcomeMissing";
+  public static final String OUTCOME_DEFAULT = "outcomeDefault";
 
   @Override
   public void validate(ConfigDecisionTree configDecisionTree) {
@@ -70,16 +74,16 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
   }
 
   private void validateExistsNode(String id, ConfigExistsNode node, Map<String, ConfigNode> nodes) {
-    validateOutcome(id, "outcomeTrue", nodes, node.getOutcomeTrue());
-    validateOutcome(id, "outcomeFalse", nodes, node.getOutcomeFalse());
+    validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
+    validateOutcome(id, OUTCOME_FALSE, nodes, node.getOutcomeFalse());
   }
 
   private void validateBoolNode(String id, ConfigBoolNode node, Map<String, ConfigNode> nodes,
       Map<String, Path> files) {
     validateValue(id, node.getQuery().getValue(), files);
-    validateOutcome(id, "outcomeTrue", nodes, node.getOutcomeTrue());
-    validateOutcome(id, "outcomeFalse", nodes, node.getOutcomeFalse());
-    validateOutcome(id, "outcomeMissing", nodes, node.getOutcomeMissing());
+    validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
+    validateOutcome(id, OUTCOME_FALSE, nodes, node.getOutcomeFalse());
+    validateOutcome(id, OUTCOME_MISSING, nodes, node.getOutcomeMissing());
   }
 
 
@@ -87,8 +91,8 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
       Map<String, ConfigNode> nodes, Map<String, Path> files) {
     validateFields(node);
     validateOutcomes(id, node.getOutcomes(), nodes, files);
-    validateOutcome(id, "outcomeMissing", nodes, node.getOutcomeMissing());
-    validateOutcome(id, "outcomeDefault", nodes, node.getOutcomeDefault());
+    validateOutcome(id, OUTCOME_MISSING, nodes, node.getOutcomeMissing());
+    validateOutcome(id, OUTCOME_DEFAULT, nodes, node.getOutcomeDefault());
   }
 
   private void validateFields(ConfigBoolMultiNode node) {
@@ -129,7 +133,7 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
       for (ConfigBoolQuery query : outcome.getQueries()) {
         validateValue(id, query.getValue(), files);
       }
-      validateOutcome(id, "outcomeTrue", nodes, outcome.getOutcomeTrue());
+      validateOutcome(id, OUTCOME_TRUE, nodes, outcome.getOutcomeTrue());
     }
   }
 
@@ -156,8 +160,8 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
               }
             });
 
-    validateOutcome(id, "outcomeDefault", nodes, node.getOutcomeDefault());
-    validateOutcome(id, "outcomeMissing", nodes, node.getOutcomeMissing());
+    validateOutcome(id, OUTCOME_DEFAULT, nodes, node.getOutcomeDefault());
+    validateOutcome(id, OUTCOME_MISSING, nodes, node.getOutcomeMissing());
   }
 
   private void validateLeafNode(String id, ConfigLeafNode node) {
