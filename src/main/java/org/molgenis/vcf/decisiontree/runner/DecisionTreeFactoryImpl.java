@@ -11,12 +11,15 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
+import org.molgenis.vcf.decisiontree.filter.model.BoolClause;
+import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
@@ -29,9 +32,12 @@ import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
 import org.molgenis.vcf.decisiontree.filter.model.Node;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.NodeType;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolClause;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigClauseOperator;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigLabel;
@@ -132,6 +138,9 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       case BOOL:
         node = toBoolNode(vcfMetadata, id, (ConfigBoolNode) configNode, files);
         break;
+      case BOOL_MULTI:
+        node = toBoolMultiNode(vcfMetadata, id, (ConfigBoolMultiNode) configNode, files);
+        break;
       case CATEGORICAL:
         node = toCategoricalNode(vcfMetadata, id, (ConfigCategoricalNode) configNode);
         break;
@@ -178,6 +187,48 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .operator(operator)
         .value(value)
         .build();
+  }
+
+  private BoolMultiNode toBoolMultiNode(VcfMetadata vcfMetadata, String id,
+      ConfigBoolMultiNode nodeConfig,
+      Map<String, Set<String>> files) {
+    List<BoolClause> boolClauses = nodeConfig.getOutcomes().stream()
+        .map(clause -> toBoolClause(vcfMetadata, clause, files)).collect(
+            Collectors.toList());
+    List<Field> fields = nodeConfig.getFields().stream().map(field -> vcfMetadata.getField(field))
+        .collect(
+            Collectors.toList());
+    return BoolMultiNode.builder()
+        .id(id)
+        .fields(fields)
+        .description(nodeConfig.getDescription())
+        .clauses(boolClauses)
+        .build();
+  }
+
+  private BoolClause toBoolClause(VcfMetadata vcfMetadata, ConfigBoolClause configBoolClause,
+      Map<String, Set<String>> files) {
+    List<BoolQuery> queries = configBoolClause.getQueries().stream()
+        .map(query -> toBoolQuery(vcfMetadata, query, files)).collect(
+            Collectors.toList());
+    return BoolClause.builder().id(configBoolClause.getId()).queryList(queries)
+        .operator(toClauseOperator(configBoolClause.getOperator()))
+        .build();
+  }
+
+  private BoolClause.Operator toClauseOperator(ConfigClauseOperator configOperator) {
+    BoolClause.Operator operator;
+    switch (configOperator) {
+      case AND:
+        operator = BoolClause.Operator.AND;
+        break;
+      case OR:
+        operator = BoolClause.Operator.OR;
+        break;
+      default:
+        throw new UnexpectedEnumException(configOperator);
+    }
+    return operator;
   }
 
   private Operator toOperator(ConfigOperator configOperator) {
@@ -260,6 +311,10 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       case BOOL:
         updateBoolNode((BoolNode) node, (ConfigBoolNode) configNode, nodeMap, labelMap);
         break;
+      case BOOL_MULTI:
+        updateBoolMultiNode((BoolMultiNode) node, (ConfigBoolMultiNode) configNode, nodeMap,
+            labelMap);
+        break;
       case CATEGORICAL:
         updateEnumNode(
             (CategoricalNode) node, (ConfigCategoricalNode) configNode, nodeMap, labelMap);
@@ -295,6 +350,32 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
 
     NodeOutcome outcomeMissing = toNodeOutcome(configNode.getOutcomeMissing(), nodeMap, labelMap);
     node.setOutcomeMissing(outcomeMissing);
+  }
+
+  private void updateBoolMultiNode(
+      BoolMultiNode node,
+      ConfigBoolMultiNode configNode,
+      Map<String, Node> nodeMap,
+      Map<String, Label> labelMap) {
+    Map<String, ConfigBoolClause> clauses = configNode.getOutcomes().stream()
+        .collect(Collectors.toMap(ConfigBoolClause::getId, clause -> clause));
+    node.setClauses(node.getClauses().stream()
+        .map(clause -> updateClause(clause, clauses.get(clause.getId()), nodeMap, labelMap))
+        .collect(Collectors.toList()));
+
+    NodeOutcome outcomeMissing = toNodeOutcome(configNode.getOutcomeMissing(), nodeMap, labelMap);
+    node.setOutcomeMissing(outcomeMissing);
+
+    NodeOutcome outcomeDefault = toNodeOutcome(configNode.getOutcomeDefault(), nodeMap, labelMap);
+    node.setOutcomeDefault(outcomeDefault);
+  }
+
+  private BoolClause updateClause(BoolClause clause, ConfigBoolClause configBoolClause,
+      Map<String, Node> nodeMap, Map<String, Label> labelMap) {
+    NodeOutcome outcomeDefault = toNodeOutcome(configBoolClause.getOutcomeTrue(), nodeMap,
+        labelMap);
+    clause.setOutcomeTrue(outcomeDefault);
+    return clause;
   }
 
   private void updateEnumNode(

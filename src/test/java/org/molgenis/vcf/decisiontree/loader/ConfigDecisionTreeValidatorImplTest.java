@@ -6,15 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigClauseOperator.AND;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigClauseOperator.OR;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.EQUALS;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolClause;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
@@ -71,6 +74,96 @@ class ConfigDecisionTreeValidatorImplTest {
             .build();
     assertDoesNotThrow(() -> configDecisionTreeValidator.validate(configDecisionTree));
   }
+
+  @Test
+  void validateBoolMultiNode() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery1 =
+        ConfigBoolQuery.builder().field("field1").operator(EQUALS).value(1).build();
+    ConfigBoolQuery configBoolQuery2 =
+        ConfigBoolQuery.builder().field("field2").operator(EQUALS).value(1).build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolClause clause1 = new ConfigBoolClause("1",
+        List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
+    ConfigBoolClause clause2 = new ConfigBoolClause("2",
+        List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, OR);
+    List<ConfigBoolClause> clauses = List.of(clause1, clause2);
+    ConfigBoolMultiNode configBoolMultiNode =
+        ConfigBoolMultiNode.builder()
+            .id("node1")
+            .fields(List.of("field1", "field2"))
+            .outcomes(clauses)
+            .outcomeDefault(configNodeOutcome)
+            .outcomeMissing(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .nodes(Map.of("node", configBoolMultiNode, "exit", configLeafNode))
+            .build();
+    assertDoesNotThrow(() -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+  @Test
+  void validateBoolMultiNodeSingleOr() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery1 =
+        ConfigBoolQuery.builder().field("field1").operator(EQUALS).value(1).build();
+    ConfigBoolQuery configBoolQuery2 =
+        ConfigBoolQuery.builder().field("field2").operator(EQUALS).value(1).build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolClause clause1 = new ConfigBoolClause("1",
+        List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
+    ConfigBoolClause clause2 = new ConfigBoolClause("2", List.of(configBoolQuery1),
+        configNodeOutcome, OR);
+    List<ConfigBoolClause> clauses = List.of(clause1, clause2);
+    ConfigBoolMultiNode configBoolMultiNode =
+        ConfigBoolMultiNode.builder()
+            .id("node1")
+            .fields(List.of("field1", "field2"))
+            .outcomes(clauses)
+            .outcomeDefault(configNodeOutcome)
+            .outcomeMissing(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .nodes(Map.of("node", configBoolMultiNode, "exit", configLeafNode))
+            .build();
+    assertThrows(ConfigDecisionTreeValidationException.class,
+        () -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+  @Test
+  void validateBoolMultiNodeMissingOperator() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery1 =
+        ConfigBoolQuery.builder().field("field1").operator(EQUALS).value(1).build();
+    ConfigBoolQuery configBoolQuery2 =
+        ConfigBoolQuery.builder().field("field2").operator(EQUALS).value(1).build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolClause clause1 = new ConfigBoolClause("1",
+        List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
+    ConfigBoolClause clause2 = new ConfigBoolClause("2",
+        List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, null);
+    List<ConfigBoolClause> clauses = List.of(clause1, clause2);
+    ConfigBoolMultiNode configBoolMultiNode =
+        ConfigBoolMultiNode.builder()
+            .id("node1")
+            .fields(List.of("field1", "field2"))
+            .outcomes(clauses)
+            .outcomeDefault(configNodeOutcome)
+            .outcomeMissing(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .nodes(Map.of("node", configBoolMultiNode, "exit", configLeafNode))
+            .build();
+    assertThrows(ConfigDecisionTreeValidationException.class,
+        () -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
 
   @Test
   void validateCategoricalNode() {

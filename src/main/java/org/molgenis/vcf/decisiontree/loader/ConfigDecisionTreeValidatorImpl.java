@@ -4,10 +4,15 @@ import static java.lang.String.format;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
+import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolClause;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
@@ -50,6 +55,9 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
       case BOOL:
         validateBoolNode(id, (ConfigBoolNode) node, nodes, files);
         break;
+      case BOOL_MULTI:
+        validateBoolMultiNode(id, (ConfigBoolMultiNode) node, nodes, files);
+        break;
       case CATEGORICAL:
         validateCategoricalNode(id, (ConfigCategoricalNode) node, nodes);
         break;
@@ -74,12 +82,63 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
     validateOutcome(id, "outcomeMissing", nodes, node.getOutcomeMissing());
   }
 
+
+  private void validateBoolMultiNode(String id, ConfigBoolMultiNode node,
+      Map<String, ConfigNode> nodes, Map<String, Path> files) {
+    validateFields(node);
+    validateOutcomes(id, node.getOutcomes(), nodes, files);
+    validateOutcome(id, "outcomeMissing", nodes, node.getOutcomeMissing());
+    validateOutcome(id, "outcomeDefault", nodes, node.getOutcomeDefault());
+  }
+
+  private void validateFields(ConfigBoolMultiNode node) {
+    List<String> fields = node.getFields();
+    for (ConfigBoolClause clause : node.getOutcomes()) {
+      for (ConfigBoolQuery query : clause.getQueries()) {
+        if (!fields.contains(query.getField())) {
+          throw new ConfigDecisionTreeValidationException(
+              format(
+                  "Field '%s' refers to a field that is no present in the 'fields' list of node '%s'",
+                  query.getField(), node.getId()));
+        }
+      }
+    }
+  }
+
+  private void validateOutcomes(String id, List<ConfigBoolClause> outcomes,
+      Map<String, ConfigNode> nodes,
+      Map<String, Path> files) {
+    for (ConfigBoolClause outcome : outcomes) {
+      if (outcome.getQueries().size() == 1) {
+        if (outcome.getOperator() != null) {
+          throw new ConfigDecisionTreeValidationException(String.format(
+              "MultiBool node '%s' contains an outcome with a single query but with an operator.",
+              id));
+        }
+      } else if (outcome.getQueries().size() > 1) {
+        if (outcome.getOperator() == null) {
+          throw new ConfigDecisionTreeValidationException(String.format(
+              "MultiBool node '%s' contains an outcome with multiple queries but without an operator.",
+              id));
+        }
+      } else {
+        throw new ConfigDecisionTreeValidationException(
+            String.format("MultiBool node '%s' contains an outcome without any queries.", id));
+      }
+
+      for (ConfigBoolQuery query : outcome.getQueries()) {
+        validateValue(id, query.getValue(), files);
+      }
+      validateOutcome(id, "outcomeTrue", nodes, outcome.getOutcomeTrue());
+    }
+  }
+
   private void validateValue(String id, Object value, Map<String, Path> files) {
     if (value instanceof String && value.toString().startsWith(FILE_PREFIX)) {
       String file = value.toString().substring(FILE_PREFIX.length());
-      if(!files.containsKey(file)){
+      if (!files.containsKey(file)) {
         throw new ConfigDecisionTreeValidationException(
-            format("Unknown file value '%s' for node %s",file, id));
+            format("Unknown file value '%s' for node %s", file, id));
       }
     }
   }

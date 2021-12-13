@@ -33,7 +33,8 @@ java -jar vcf-decision-tree.jar -v
 ## Decision Tree
 Each variant is classified using a decision tree which consists of decision nodes and leaf nodes.
 
-Decision nodes perform a test on the variant which determines the outcome consisting of the next node to process and optionally a label. Leaf nodes are terminal nodes that determine the class for a variant.
+Decision nodes perform a test on the variant which determines the outcome consisting of the next node to process and optionally a label. 
+Leaf nodes are terminal nodes that determine the class for a variant.
       
 ### Example
 see `src/test/resources/example.json`
