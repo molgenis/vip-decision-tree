@@ -4,9 +4,11 @@ import java.util.Collection;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
+import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 
-public class AbstractBoolNodeEvaluator {
+public abstract class AbstractBoolNodeEvaluator<T extends DecisionNode> implements
+    NodeEvaluator<T> {
 
   boolean isMissingValue(Object value) {
     return value == null || (value instanceof Collection<?> && ((Collection<?>) value).isEmpty());

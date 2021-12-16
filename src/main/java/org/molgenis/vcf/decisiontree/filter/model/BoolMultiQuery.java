@@ -9,7 +9,7 @@ import lombok.experimental.NonFinal;
 
 @Value
 @Builder
-public class BoolClause {
+public class BoolMultiQuery {
 
   public enum Operator {
     AND,

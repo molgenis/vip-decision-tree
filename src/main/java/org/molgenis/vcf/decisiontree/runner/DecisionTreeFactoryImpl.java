@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
-import org.molgenis.vcf.decisiontree.filter.model.BoolClause;
+import org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
@@ -192,7 +192,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   private BoolMultiNode toBoolMultiNode(VcfMetadata vcfMetadata, String id,
       ConfigBoolMultiNode nodeConfig,
       Map<String, Set<String>> files) {
-    List<BoolClause> boolClauses = nodeConfig.getOutcomes().stream()
+    List<BoolMultiQuery> boolMultiQueries = nodeConfig.getOutcomes().stream()
         .map(clause -> toBoolClause(vcfMetadata, clause, files)).collect(
             Collectors.toList());
     List<Field> fields = nodeConfig.getFields().stream().map(vcfMetadata::getField)
@@ -202,28 +202,28 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .id(id)
         .fields(fields)
         .description(nodeConfig.getDescription())
-        .clauses(boolClauses)
+        .clauses(boolMultiQueries)
         .build();
   }
 
-  private BoolClause toBoolClause(VcfMetadata vcfMetadata, ConfigBoolClause configBoolClause,
+  private BoolMultiQuery toBoolClause(VcfMetadata vcfMetadata, ConfigBoolClause configBoolClause,
       Map<String, Set<String>> files) {
     List<BoolQuery> queries = configBoolClause.getQueries().stream()
         .map(query -> toBoolQuery(vcfMetadata, query, files)).collect(
             Collectors.toList());
-    return BoolClause.builder().id(configBoolClause.getId()).queryList(queries)
+    return BoolMultiQuery.builder().id(configBoolClause.getId()).queryList(queries)
         .operator(toClauseOperator(configBoolClause.getOperator()))
         .build();
   }
 
-  private BoolClause.Operator toClauseOperator(ConfigClauseOperator configOperator) {
-    BoolClause.Operator operator;
+  private BoolMultiQuery.Operator toClauseOperator(ConfigClauseOperator configOperator) {
+    BoolMultiQuery.Operator operator;
     switch (configOperator) {
       case AND:
-        operator = BoolClause.Operator.AND;
+        operator = BoolMultiQuery.Operator.AND;
         break;
       case OR:
-        operator = BoolClause.Operator.OR;
+        operator = BoolMultiQuery.Operator.OR;
         break;
       default:
         throw new UnexpectedEnumException(configOperator);
@@ -370,7 +370,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     node.setOutcomeDefault(outcomeDefault);
   }
 
-  private BoolClause updateClause(BoolClause clause, ConfigBoolClause configBoolClause,
+  private BoolMultiQuery updateClause(BoolMultiQuery clause, ConfigBoolClause configBoolClause,
       Map<String, Node> nodeMap, Map<String, Label> labelMap) {
     NodeOutcome outcomeDefault = toNodeOutcome(configBoolClause.getOutcomeTrue(), nodeMap,
         labelMap);

@@ -21,7 +21,7 @@ public class BoolMultiNode implements DecisionNode {
   @NonNull
   @NonFinal
   @Setter
-  List<BoolClause> clauses;
+  List<BoolMultiQuery> clauses;
 
   @NonFinal
   @Setter
