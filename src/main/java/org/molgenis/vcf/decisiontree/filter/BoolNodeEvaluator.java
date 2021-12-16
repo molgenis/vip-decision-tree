@@ -7,7 +7,7 @@ import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BoolNodeEvaluator extends AbstractBoolNodeEvaluator<BoolNode> {
+public class BoolNodeEvaluator implements BaseBoolNodeEvaluator<BoolNode> {
 
   @Override
   public NodeOutcome evaluate(BoolNode node, Variant variant) {

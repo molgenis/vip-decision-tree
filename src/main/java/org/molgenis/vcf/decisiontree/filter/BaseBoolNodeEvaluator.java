@@ -6,15 +6,14 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
-
-public abstract class AbstractBoolNodeEvaluator<T extends DecisionNode> implements
+interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
     NodeEvaluator<T> {
 
-  boolean isMissingValue(Object value) {
+  default boolean isMissingValue(Object value) {
     return value == null || (value instanceof Collection<?> && ((Collection<?>) value).isEmpty());
   }
 
-  boolean executeQuery(BoolQuery boolQuery, Object value) {
+  default boolean executeQuery(BoolQuery boolQuery, Object value) {
     boolean matches;
 
     Field field = boolQuery.getField();
@@ -68,7 +67,7 @@ public abstract class AbstractBoolNodeEvaluator<T extends DecisionNode> implemen
   }
 
   @SuppressWarnings("DuplicatedCode")
-  boolean executeLessQuery(Field field, Object value, Object queryValue) {
+  default boolean executeLessQuery(Field field, Object value, Object queryValue) {
     boolean matches;
     switch (field.getValueType()) {
       case INTEGER:
@@ -84,7 +83,7 @@ public abstract class AbstractBoolNodeEvaluator<T extends DecisionNode> implemen
   }
 
   @SuppressWarnings("DuplicatedCode")
-  boolean executeGreaterQuery(Field field, Object value, Object queryValue) {
+  default boolean executeGreaterQuery(Field field, Object value, Object queryValue) {
     boolean matches;
     switch (field.getValueType()) {
       case INTEGER:
@@ -99,15 +98,15 @@ public abstract class AbstractBoolNodeEvaluator<T extends DecisionNode> implemen
     return matches;
   }
 
-  boolean executeContainsQuery(Collection<?> values, Object queryValue) {
+  default boolean executeContainsQuery(Collection<?> values, Object queryValue) {
     return values.contains(queryValue);
   }
 
-  boolean executeContainsAllQuery(Collection<?> values, Collection<?> queryValues) {
+  default boolean executeContainsAllQuery(Collection<?> values, Collection<?> queryValues) {
     return values.containsAll(queryValues);
   }
 
-  boolean executeContainsAnyQuery(Collection<?> values, Collection<?> queryValues) {
+  default boolean executeContainsAnyQuery(Collection<?> values, Collection<?> queryValues) {
     for (Object queryValue : queryValues) {
       if (values.contains(queryValue)) {
         return true;
@@ -116,11 +115,11 @@ public abstract class AbstractBoolNodeEvaluator<T extends DecisionNode> implemen
     return false;
   }
 
-  boolean executeContainsNoneQuery(Collection<?> values, Collection<?> queryValues) {
+  default boolean executeContainsNoneQuery(Collection<?> values, Collection<?> queryValues) {
     return !executeContainsAnyQuery(values, queryValues);
   }
 
-  boolean executeInQuery(Object value, Collection<?> queryValues) {
+  default boolean executeInQuery(Object value, Collection<?> queryValues) {
     return queryValues.contains(value);
   }
 }
