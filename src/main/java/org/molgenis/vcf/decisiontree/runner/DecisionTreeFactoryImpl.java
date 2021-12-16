@@ -32,7 +32,7 @@ import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
 import org.molgenis.vcf.decisiontree.filter.model.Node;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.NodeType;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolClause;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
@@ -206,13 +206,14 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .build();
   }
 
-  private BoolMultiQuery toBoolClause(VcfMetadata vcfMetadata, ConfigBoolClause configBoolClause,
+  private BoolMultiQuery toBoolClause(VcfMetadata vcfMetadata,
+      ConfigBoolMultiQuery configBoolMultiQuery,
       Map<String, Set<String>> files) {
-    List<BoolQuery> queries = configBoolClause.getQueries().stream()
+    List<BoolQuery> queries = configBoolMultiQuery.getQueries().stream()
         .map(query -> toBoolQuery(vcfMetadata, query, files)).collect(
             Collectors.toList());
-    return BoolMultiQuery.builder().id(configBoolClause.getId()).queryList(queries)
-        .operator(toClauseOperator(configBoolClause.getOperator()))
+    return BoolMultiQuery.builder().id(configBoolMultiQuery.getId()).queryList(queries)
+        .operator(toClauseOperator(configBoolMultiQuery.getOperator()))
         .build();
   }
 
@@ -357,8 +358,8 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       ConfigBoolMultiNode configNode,
       Map<String, Node> nodeMap,
       Map<String, Label> labelMap) {
-    Map<String, ConfigBoolClause> clauses = configNode.getOutcomes().stream()
-        .collect(Collectors.toMap(ConfigBoolClause::getId, clause -> clause));
+    Map<String, ConfigBoolMultiQuery> clauses = configNode.getOutcomes().stream()
+        .collect(Collectors.toMap(ConfigBoolMultiQuery::getId, clause -> clause));
     node.setClauses(node.getClauses().stream()
         .map(clause -> updateClause(clause, clauses.get(clause.getId()), nodeMap, labelMap))
         .collect(Collectors.toList()));
@@ -370,9 +371,10 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     node.setOutcomeDefault(outcomeDefault);
   }
 
-  private BoolMultiQuery updateClause(BoolMultiQuery clause, ConfigBoolClause configBoolClause,
+  private BoolMultiQuery updateClause(BoolMultiQuery clause,
+      ConfigBoolMultiQuery configBoolMultiQuery,
       Map<String, Node> nodeMap, Map<String, Label> labelMap) {
-    NodeOutcome outcomeDefault = toNodeOutcome(configBoolClause.getOutcomeTrue(), nodeMap,
+    NodeOutcome outcomeDefault = toNodeOutcome(configBoolMultiQuery.getOutcomeTrue(), nodeMap,
         labelMap);
     clause.setOutcomeTrue(outcomeDefault);
     return clause;

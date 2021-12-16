@@ -27,7 +27,7 @@ public class ConfigBoolMultiNode implements ConfigNode {
 
   @NonNull DecisionType decisionType = DecisionType.BOOL;
   @NonNull List<String> fields;
-  @NonNull List<ConfigBoolClause> outcomes;
+  @NonNull List<ConfigBoolMultiQuery> outcomes;
 
   @NonFinal
   @Setter

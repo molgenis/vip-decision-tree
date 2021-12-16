@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolClause;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
@@ -97,7 +97,7 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
 
   private void validateFields(ConfigBoolMultiNode node) {
     List<String> fields = node.getFields();
-    for (ConfigBoolClause clause : node.getOutcomes()) {
+    for (ConfigBoolMultiQuery clause : node.getOutcomes()) {
       for (ConfigBoolQuery query : clause.getQueries()) {
         if (!fields.contains(query.getField())) {
           throw new ConfigDecisionTreeValidationException(
@@ -109,10 +109,10 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
     }
   }
 
-  private void validateOutcomes(String id, List<ConfigBoolClause> outcomes,
+  private void validateOutcomes(String id, List<ConfigBoolMultiQuery> outcomes,
       Map<String, ConfigNode> nodes,
       Map<String, Path> files) {
-    for (ConfigBoolClause outcome : outcomes) {
+    for (ConfigBoolMultiQuery outcome : outcomes) {
       if (outcome.getQueries().size() == 1) {
         if (outcome.getOperator() != null) {
           throw new ConfigDecisionTreeValidationException(String.format(
