@@ -121,6 +121,14 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.FLOAT);
         break;
+      case "SpliceAI_pred_DS_AG":
+      case "SpliceAI_pred_DS_AL":
+      case "SpliceAI_pred_DS_DG":
+      case "SpliceAI_pred_DS_DL":
+        fieldBuilder
+            .valueCount(ValueCount.builder().type(FIXED).count(1).build())
+            .valueType(ValueType.FLOAT);
+        break;
       default:
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
