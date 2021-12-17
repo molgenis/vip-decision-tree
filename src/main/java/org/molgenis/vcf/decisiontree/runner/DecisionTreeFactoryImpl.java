@@ -213,12 +213,15 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .map(query -> toBoolQuery(vcfMetadata, query, files)).collect(
             Collectors.toList());
     return BoolMultiQuery.builder().id(configBoolMultiQuery.getId()).queryList(queries)
-        .operator(toClauseOperator(configBoolMultiQuery.getOperator()))
+        .operator(toMultiQueryOperator(configBoolMultiQuery.getOperator()))
         .build();
   }
 
-  private BoolMultiQuery.Operator toClauseOperator(ConfigClauseOperator configOperator) {
+  private BoolMultiQuery.Operator toMultiQueryOperator(ConfigClauseOperator configOperator) {
     BoolMultiQuery.Operator operator;
+    if (configOperator == null) {
+      return null;
+    }
     switch (configOperator) {
       case AND:
         operator = BoolMultiQuery.Operator.AND;
