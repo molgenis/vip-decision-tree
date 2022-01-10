@@ -3,7 +3,7 @@
 # Variant Interpretation Pipeline - VCF Decision Tree
 Command-line application to classify variants in any VCF (Variant Call Format) file based on a decision tree.
 ## Requirements
-- Java 11
+- Java 17
 
 ## Usage
 ```
