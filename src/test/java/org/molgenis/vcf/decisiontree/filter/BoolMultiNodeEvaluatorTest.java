@@ -250,4 +250,33 @@ class BoolMultiNodeEvaluatorTest {
     assertEquals(outcomeMissing, boolMultiNodeEvaluator.evaluate(node, variant));
   }
 
+  @Test
+  void evaluateSingleQueryMissingField() {
+    Field field1 = mock(MissingField.class);
+
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field1).operator(Operator.LESS).value(1).build();
+    NodeOutcome outcomeDefault = mock(NodeOutcome.class, "outcomeDefault");
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
+    NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
+
+    BoolMultiQuery boolMultiQuery1 = BoolMultiQuery.builder().id("123")
+        .operator(BoolMultiQuery.Operator.OR)
+        .queryList(List.of(boolQuery)).outcomeTrue(outcome1).build();
+    List<BoolMultiQuery> clauses = List.of(boolMultiQuery1);
+
+    BoolMultiNode node =
+        BoolMultiNode.builder()
+            .id("bool_node")
+            .fields(List.of(field1))
+            .clauses(clauses)
+            .outcomeDefault(outcomeDefault)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+
+    assertEquals(outcomeMissing, boolMultiNodeEvaluator.evaluate(node, variant));
+  }
+
 }
