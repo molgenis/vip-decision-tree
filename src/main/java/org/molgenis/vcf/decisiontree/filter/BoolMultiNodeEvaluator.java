@@ -16,7 +16,10 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
   @Override
   public NodeOutcome evaluate(BoolMultiNode node, Variant variant) {
     NodeOutcome outcome = node.getOutcomeDefault();
-    outcome = checkFields(node, variant, outcome);
+
+    if (containsMissingFields(node, variant)) {
+      return node.getOutcomeMissing();
+    }
 
     for (BoolMultiQuery clause : node.getClauses()) {
       outcome = evaluateClause(node, variant, outcome, clause);
@@ -24,17 +27,17 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
     return outcome;
   }
 
-  private NodeOutcome checkFields(BoolMultiNode node, Variant variant, NodeOutcome outcome) {
+  private boolean containsMissingFields(BoolMultiNode node, Variant variant) {
     for (Field field : node.getFields()) {
       if (field instanceof MissingField) {
         if (node.getOutcomeMissing() != null) {
-          outcome = node.getOutcomeMissing();
+          return true;
         } else {
           throw new EvaluationException(node, variant, "missing 'missingOutcome'");
         }
       }
     }
-    return outcome;
+    return false;
   }
 
   private NodeOutcome evaluateClause(BoolMultiNode node, Variant variant, NodeOutcome outcome,
