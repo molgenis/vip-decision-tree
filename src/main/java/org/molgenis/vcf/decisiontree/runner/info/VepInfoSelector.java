@@ -16,7 +16,7 @@ public class VepInfoSelector implements NestedInfoSelector {
   public boolean isMatch(String infoValue, Allele allele) {
     NestedField pickField = nestedInfoHeaderLine.getField(PICK);
     NestedField alleleNum = nestedInfoHeaderLine.getField(ALLELE_NUM);
-    String[] values = infoValue.split("\\|");
+    String[] values = infoValue.split("\\|", -1);
     boolean isAlleleMatch = (allele.getIndex() == Integer.parseInt(values[alleleNum.getIndex()]));
     boolean isPickMatch = true;
     if (pickField != null) {

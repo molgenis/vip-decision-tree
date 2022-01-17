@@ -54,6 +54,19 @@ class VepInfoSelectorTest {
     assertFalse(vepInfoSelector.isMatch("2|1|Y|Z", allele));
   }
 
+  // https://github.com/molgenis/vip-decision-tree/issues/40
+  @Test
+  void noMatchTrailingEmptyTokens() {
+    when(pickField.getIndex()).thenReturn(1);
+    Map<String, NestedField> nestedFields = new HashMap<>();
+    nestedFields.put(ALLELE_NUM, alleleField);
+    nestedFields.put(PICK, pickField);
+    Allele allele = Allele.builder().bases("A").index(1).build();
+    vepInfoSelector.setNestedInfoHeaderLine(
+        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build());
+    assertFalse(vepInfoSelector.isMatch("1|||", allele));
+  }
+
   @Test
   void isMatchMulti() {
     when(pickField.getIndex()).thenReturn(1);
