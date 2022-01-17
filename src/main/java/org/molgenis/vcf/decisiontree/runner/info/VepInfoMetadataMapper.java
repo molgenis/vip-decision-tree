@@ -117,14 +117,12 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
       case "gnomAD_NFE_AF":
       case "gnomAD_OTH_AF":
       case "gnomAD_SAS_AF":
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-            .valueType(ValueType.FLOAT);
-        break;
       case "SpliceAI_pred_DS_AG":
       case "SpliceAI_pred_DS_AL":
       case "SpliceAI_pred_DS_DG":
       case "SpliceAI_pred_DS_DL":
+      case "SIFT":
+      case "PolyPhen":
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.FLOAT);
