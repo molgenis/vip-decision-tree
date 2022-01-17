@@ -76,53 +76,29 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
             .fieldType(FieldType.INFO_NESTED)
             .nestedInfoSelector(infoSelector);
     switch (id) {
-      case "PICK":
-      case "ALLELE_NUM":
+      case "PICK", "ALLELE_NUM":
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.INTEGER);
         break;
-      case "Consequence":
-      case "Existing_variation":
-      case "CLIN_SIG":
-      case "FLAGS":
+      case "Consequence", "Existing_variation", "CLIN_SIG", "FLAGS":
         fieldBuilder
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
             .valueType(ValueType.STRING)
             .separator('&');
         break;
-      case "PHENO":
-      case "PUBMED":
-      case "SOMATIC":
+      case "PHENO", "PUBMED", "SOMATIC":
         fieldBuilder
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
             .valueType(ValueType.INTEGER)
             .separator('&');
         break;
-      case "STRAND":
-      case "HGNC_ID":
-      case "cDNA_position":
-      case "CDS_position":
-      case "Protein_position":
+      case "STRAND", "HGNC_ID", "cDNA_position", "CDS_position", "Protein_position":
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.INTEGER);
         break;
-      case "gnomAD_AF":
-      case "gnomAD_AFR_AF":
-      case "gnomAD_AMR_AF":
-      case "gnomAD_ASJ_AF":
-      case "gnomAD_EAS_AF":
-      case "gnomAD_FIN_AF":
-      case "gnomAD_NFE_AF":
-      case "gnomAD_OTH_AF":
-      case "gnomAD_SAS_AF":
-      case "SpliceAI_pred_DS_AG":
-      case "SpliceAI_pred_DS_AL":
-      case "SpliceAI_pred_DS_DG":
-      case "SpliceAI_pred_DS_DL":
-      case "SIFT":
-      case "PolyPhen":
+      case "gnomAD_AF", "gnomAD_AFR_AF", "gnomAD_AMR_AF", "gnomAD_ASJ_AF", "gnomAD_EAS_AF", "gnomAD_FIN_AF", "gnomAD_NFE_AF", "gnomAD_OTH_AF", "gnomAD_SAS_AF", "SpliceAI_pred_DS_AG", "SpliceAI_pred_DS_AL", "SpliceAI_pred_DS_DG", "SpliceAI_pred_DS_DL", "SIFT", "PolyPhen":
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.FLOAT);
