@@ -6,4 +6,5 @@ import org.molgenis.vcf.decisiontree.filter.Classifier;
 interface ClassifierFactory {
 
   Classifier create(Settings settings);
+
 }

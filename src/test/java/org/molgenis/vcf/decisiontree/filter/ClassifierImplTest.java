@@ -6,8 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.decisiontree.filter.Variant.builder;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
 
 @ExtendWith(MockitoExtension.class)
 class ClassifierImplTest {
@@ -64,10 +63,10 @@ class ClassifierImplTest {
     Decision decision2 = mock(Decision.class);
     doReturn(decision2).when(decisionTreeExecutor).execute(decisionTree, variant2);
 
-    DecisionWriter writer = mock(DecisionWriter.class);
-    classifier.classify(vcfReader, decisionTree, writer);
+    ConsequenceAnnotator writer = mock(ConsequenceAnnotator.class);
+    classifier.classify(vcfReader, decisionTree, null, writer);
 
-    verify(writer).write(Collections.singletonList(decision0), record0);
-    verify(writer).write(List.of(decision1, decision2), record1);
+    NestedInfoHeaderLine vepMetadata = null;
+    verify(writer).annotate(decision0, "record0");
   }
 }
