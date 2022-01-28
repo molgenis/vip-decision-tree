@@ -11,7 +11,7 @@ import org.molgenis.vcf.decisiontree.runner.info.NestedInfoSelector;
 
 @Value
 @NonFinal
-public class NestedField extends FieldImpl {
+public class NestedField extends FieldImpl implements Comparable<NestedField> {
 
   @NonNull
   final int index;
@@ -40,5 +40,11 @@ public class NestedField extends FieldImpl {
     this.index = requireNonNull(index);
     this.nestedInfoSelector = nestedInfoSelector;
     this.parent = requireNonNull(parent);
+  }
+
+  @Override
+  public int compareTo(NestedField o) {
+    Integer index = Integer.valueOf(getIndex());
+    return index.compareTo(o.getIndex());
   }
 }

@@ -7,6 +7,7 @@ import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedInfoValue;
 
 import htsjdk.variant.variantcontext.VariantContext;
+import htsjdk.variant.variantcontext.VariantContextBuilder;
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +30,14 @@ public class VcfRecord {
 
   private static final List<String> PASS_FILTER = singletonList(VCFConstants.PASSES_FILTERS_v4);
 
-  private final VariantContext variantContext;
+  private VariantContext variantContext;
 
   public VcfRecord(VariantContext variantContext) {
     this.variantContext = requireNonNull(variantContext);
+  }
+
+  public VariantContext getVariantContext() {
+    return variantContext;
   }
 
   public int getNrAltAlleles() {
@@ -212,6 +217,12 @@ public class VcfRecord {
         throw new UnexpectedEnumException(valueType);
     }
     return listValues;
+  }
+
+  public void setAttribute(String attribute, Object value) {
+    VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
+    variantContextBuilder.attribute(attribute, value);
+    variantContext = variantContextBuilder.make();
   }
 
   public VariantContext unwrap() {
