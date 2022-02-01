@@ -78,13 +78,6 @@ public class VcfMetadata {
       }
     }
 
-    if (vepHeaderLine == null) {
-      if (strict) {
-        throw new UnknownFieldException(field, INFO);
-      } else {
-        return new MissingField(field);
-      }
-    }
     Field nestedField = vepHeaderLine.getField(nestedFieldId);
     if (nestedField instanceof MissingField && strict) {
       throw new UnknownFieldException(nestedFieldId, INFO_VEP);

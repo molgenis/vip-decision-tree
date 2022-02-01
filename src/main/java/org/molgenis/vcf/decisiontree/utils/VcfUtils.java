@@ -2,22 +2,15 @@ package org.molgenis.vcf.decisiontree.utils;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.molgenis.vcf.decisiontree.runner.info.VepInfoMetadataMapper.ALLELE_NUM;
 
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.variantcontext.VariantContextBuilder;
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import org.apache.logging.log4j.util.Strings;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
-import org.molgenis.vcf.decisiontree.filter.VcfRecord;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
 import org.springframework.lang.Nullable;
 
 public class VcfUtils {
@@ -256,19 +249,4 @@ public class VcfUtils {
       }
       return typedValue;
     }
-
-  public static VcfRecord createEmptyCsqRecord(VcfRecord vcfRecord, VepHeaderLine vepMetadata,
-      Integer alleleIndex) {
-    Map<String, NestedField> fields = vepMetadata.getNestedFields();
-    List<String> values = new ArrayList<>();
-    for (int index = 0; index < fields.size(); index++) {
-      values.add("");
-    }
-    values.add(fields.get(ALLELE_NUM).getIndex(), alleleIndex.toString());
-    VariantContext variantContext = vcfRecord.getVariantContext();
-    VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
-    variantContextBuilder.attribute(vepMetadata.getParentField().getId(),
-        singletonList(Strings.join(values, '|')));
-    return new VcfRecord(variantContextBuilder.make());
-  }
 }

@@ -44,7 +44,7 @@ public class ConsequenceAnnotatorImpl implements ConsequenceAnnotator {
     String decisionLabel = "";
     Set<Label> labels = decision.getLabels();
     if (!labels.isEmpty()) {
-      decisionLabel = labels.stream().map(Label::getId).collect(joining("&"));
+      decisionLabel = labels.stream().map(Label::getId).sorted().collect(joining("&"));
     }
     return decisionLabel;
   }

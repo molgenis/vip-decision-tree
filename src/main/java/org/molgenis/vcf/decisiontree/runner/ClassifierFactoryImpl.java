@@ -22,6 +22,6 @@ class ClassifierFactoryImpl implements ClassifierFactory {
     DecisionTreeExecutor decisionTreeExecutor =
         decisionTreeExecutorFactory.create(settings.getWriterSettings());
 
-    return new ClassifierImpl(decisionTreeExecutor);
+    return new ClassifierImpl(decisionTreeExecutor, new VepHelper());
   }
 }

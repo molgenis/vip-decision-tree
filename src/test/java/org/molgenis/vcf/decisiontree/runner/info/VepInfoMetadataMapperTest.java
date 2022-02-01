@@ -80,7 +80,7 @@ class VepInfoMetadataMapperTest {
     expectedMap.put("PICK", getFixedIntegerField("PICK", 3));
     expectedMap.put("gnomAD_AF", getFixedFloatField("gnomAD_AF", 4));
     expectedMap.put("gnomAD_HN", getFixedFloatField("gnomAD_HN", 5));
-    expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 5));
+    expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 6));
     expectedMap.put("CAPICE_CL", getFixedStringField("CAPICE_CL", 7));
     expectedMap.put("CAPICE_SC", getVariableIntegerField("CAPICE_SC", 8));
     assertEquals(VepHeaderLine.builder().nestedFields(expectedMap).parentField(vepField).build(),
