@@ -6,6 +6,9 @@ import org.molgenis.vcf.decisiontree.filter.ConsequenceAnnotatorImpl;
 
 public class ConsequenceAnnotatorFactory {
 
+  private ConsequenceAnnotatorFactory() {
+  }
+
   public static ConsequenceAnnotator create(Settings settings) {
     return new ConsequenceAnnotatorImpl(settings.getWriterSettings().isWriteLabels(),
         settings.getWriterSettings().isWritePath());

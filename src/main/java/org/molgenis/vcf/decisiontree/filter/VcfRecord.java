@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import lombok.NonNull;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -60,8 +60,8 @@ public class VcfRecord {
       case INFO:
         value = getInfoValue(field, allele);
         break;
-      case INFO_NESTED:
-        value = getNestedValue(field, allele);
+      case INFO_VEP:
+        value = getNestedVepValue(field);
         break;
       case FORMAT:
         throw new UnsupportedOperationException("FORMAT values are not yet supported."); // TODO
@@ -71,7 +71,11 @@ public class VcfRecord {
     return value;
   }
 
-  private Object getNestedValue(Field field, Allele allele) {
+  public List<String> getVepValues(Field vepField) {
+    return getVariantContext().getAttributeAsStringList(vepField.getId(), "");
+  }
+
+  private Object getNestedVepValue(Field field) {
     Object value = null;
     NestedField nestedField = (NestedField) field;
     String separator = Pattern.quote(nestedField.getParent().getSeparator().toString());
@@ -79,22 +83,15 @@ public class VcfRecord {
     String parentId = nestedField.getParent().getId();
     List<String> infoValues = VcfUtils.getInfoAsStringList(variantContext, parentId);
     if (!infoValues.isEmpty()) {
-      List<String> filteredInfo =
-          infoValues.stream()
-              .filter(
-                  nestedValue -> nestedField.getNestedInfoSelector().isMatch(nestedValue, allele))
-              .collect(Collectors.toList());
-      if (!filteredInfo.isEmpty()) {
-        String singleValue = filteredInfo.get(0);
-        String[] split = singleValue.split(separator, -1);
-        String stringValue = split[index];
-        if (!stringValue.isEmpty()) {
-          if (field.getSeparator() != null) {
-            String nestedSeparator = Pattern.quote(nestedField.getSeparator().toString());
-            value = getTypedInfoValue(field, stringValue, nestedSeparator);
-          } else {
-            value = getTypedInfoValue(field, stringValue);
-          }
+      String singleValue = infoValues.get(0);
+      String[] split = singleValue.split(separator, -1);
+      String stringValue = split[index];
+      if (!stringValue.isEmpty()) {
+        if (field.getSeparator() != null) {
+          String nestedSeparator = Pattern.quote(nestedField.getSeparator().toString());
+          value = getTypedInfoValue(field, stringValue, nestedSeparator);
+        } else {
+          value = getTypedInfoValue(field, stringValue);
         }
       }
     }
@@ -187,8 +184,7 @@ public class VcfRecord {
       case FLOAT:
         value = VcfUtils.getInfoAsDouble(variantContext, field);
         break;
-      case CHARACTER:
-      case STRING:
+      case CHARACTER, STRING:
         value = VcfUtils.getInfoAsString(variantContext, field);
         break;
       default:
@@ -207,8 +203,7 @@ public class VcfRecord {
       case FLOAT:
         listValues = VcfUtils.getInfoAsDoubleList(variantContext, field);
         break;
-      case CHARACTER:
-      case STRING:
+      case CHARACTER, STRING:
         listValues = VcfUtils.getInfoAsStringList(variantContext, field);
         break;
       case FLAG:
@@ -219,9 +214,9 @@ public class VcfRecord {
     return listValues;
   }
 
-  public void setAttribute(String attribute, Object value) {
+  public void setAttribute(Field attribute, Object value) {
     VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
-    variantContextBuilder.attribute(attribute, value);
+    variantContextBuilder.attribute(attribute.getId(), value);
     variantContext = variantContextBuilder.make();
   }
 
@@ -235,5 +230,12 @@ public class VcfRecord {
         variantContext.getContig(),
         variantContext.getStart(),
         variantContext.getReference().getBaseString());
+  }
+
+  public VcfRecord getFilteredCopy(String consequence, Field vepField) {
+    VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
+    variantContextBuilder.attribute(vepField.getId(), singletonList(consequence));
+    VariantContext filterVariantContext = variantContextBuilder.make();
+    return new VcfRecord(filterVariantContext);
   }
 }

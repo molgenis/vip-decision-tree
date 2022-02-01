@@ -6,23 +6,23 @@ import htsjdk.variant.vcf.VCFFileReader;
 import java.nio.file.Path;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
-import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadataParser;
+import org.molgenis.vcf.decisiontree.runner.info.VepMetadataParser;
 import org.springframework.stereotype.Component;
 
 @Component
 class VcfReaderFactoryImpl implements VcfReaderFactory {
 
-  private VcfNestedMetadataParser vcfNestedMetadataParser;
+  private VepMetadataParser vepMetadataParser;
 
-  VcfReaderFactoryImpl(VcfNestedMetadataParser vcfNestedMetadataParser) {
-    this.vcfNestedMetadataParser = requireNonNull(vcfNestedMetadataParser);
+  VcfReaderFactoryImpl(VepMetadataParser vepMetadataParser) {
+    this.vepMetadataParser = requireNonNull(vepMetadataParser);
   }
 
   @Override
   public VcfReader create(Settings settings) {
     Path inputVcfPath = settings.getInputVcfPath();
     boolean strict = settings.isStrict();
-    return new VcfReader(new VCFFileReader(inputVcfPath.toFile(), false), vcfNestedMetadataParser,
+    return new VcfReader(new VCFFileReader(inputVcfPath.toFile(), false), vepMetadataParser,
         strict);
   }
 }
