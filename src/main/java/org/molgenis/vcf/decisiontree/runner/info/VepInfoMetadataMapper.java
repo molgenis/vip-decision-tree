@@ -93,7 +93,7 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
             .valueType(ValueType.INTEGER)
             .separator('&');
         break;
-      case "STRAND", "HGNC_ID", "cDNA_position", "CDS_position", "Protein_position":
+      case "STRAND", "HGNC_ID", "cDNA_position", "CDS_position", "Protein_position", "gnomAD_HN":
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.INTEGER);
