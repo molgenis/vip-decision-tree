@@ -20,6 +20,7 @@ import org.molgenis.vcf.decisiontree.WriterSettings;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.RecordWriterImpl;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
+import org.molgenis.vcf.decisiontree.runner.info.MissingVepException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -41,8 +42,7 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
     VariantContextWriter vcfWriter = createVcfWriter(writerSettings);
     VCFHeader vcfHeader = createHeader(vcfMetadata, settings);
     vcfWriter.writeHeader(vcfHeader);
-    RecordWriter recordWriter = new RecordWriterImpl(vcfWriter);
-    return recordWriter;
+    return new RecordWriterImpl(vcfWriter);
   }
 
   private static VariantContextWriter createVcfWriter(WriterSettings settings) {
@@ -78,7 +78,7 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
     Collection<VCFInfoHeaderLine> infoHeaderLines = vcfHeader.getInfoHeaderLines();
 
     for (VCFInfoHeaderLine infoHeaderLine : infoHeaderLines) {
-      if (infoHeaderLine.getID().equals("CSQ")) {
+      if (infoHeaderLine.getID().equals(vcfMetadata.getVepHeaderLine().getParentField().getId())) {
         vepHeader = infoHeaderLine;
         infoHeaderLines.remove(infoHeaderLine);
         break;
@@ -86,7 +86,7 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
     }
 
     if (vepHeader == null) {
-      throw new RuntimeException("FIXME");
+      throw new MissingVepException();
     }
 
     Set<VCFHeaderLine> additionalInfoLines = new HashSet<>();

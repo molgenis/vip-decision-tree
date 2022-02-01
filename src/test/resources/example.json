@@ -24,32 +24,32 @@
     "spliceAI": {
       "type": "BOOL_MULTI",
       "fields": [
-        "INFO/CSQ/SpliceAI_pred_DS_AG",
-        "INFO/CSQ/SpliceAI_pred_DS_AL",
-        "INFO/CSQ/SpliceAI_pred_DS_DG",
-        "INFO/CSQ/SpliceAI_pred_DS_DL"
+        "INFO/TEST/SpliceAI_pred_DS_AG",
+        "INFO/TEST/SpliceAI_pred_DS_AL",
+        "INFO/TEST/SpliceAI_pred_DS_DG",
+        "INFO/TEST/SpliceAI_pred_DS_DL"
       ],
       "outcomes": [
         {
           "operator": "OR",
           "queries": [
             {
-              "field": "INFO/CSQ/SpliceAI_pred_DS_AG",
+              "field": "INFO/TEST/SpliceAI_pred_DS_AG",
               "operator": ">",
               "value": 0.42
             },
             {
-              "field": "INFO/CSQ/SpliceAI_pred_DS_AL",
+              "field": "INFO/TEST/SpliceAI_pred_DS_AL",
               "operator": ">",
               "value": 0.42
             },
             {
-              "field": "INFO/CSQ/SpliceAI_pred_DS_DG",
+              "field": "INFO/TEST/SpliceAI_pred_DS_DG",
               "operator": ">",
               "value": 0.42
             },
             {
-              "field": "INFO/CSQ/SpliceAI_pred_DS_DL",
+              "field": "INFO/TEST/SpliceAI_pred_DS_DL",
               "operator": ">",
               "value": 0.42
             }
@@ -69,7 +69,7 @@
     "vkgl": {
       "type": "CATEGORICAL",
       "description": "VKGL classification",
-      "field": "INFO/CSQ/VKGL_CL",
+      "field": "INFO/TEST/VKGL_CL",
       "outcomeMap": {
         "P": {
           "nextNode": "exit_p"
@@ -94,7 +94,7 @@
     "annotSV": {
       "type": "CATEGORICAL",
       "description": "VKGL classification",
-      "field": "INFO/CSQ/ASV_ACMG_class",
+      "field": "INFO/TEST/ASV_ACMG_class",
       "outcomeMap": {
         "5": {
           "nextNode": "exit_p"
@@ -120,7 +120,7 @@
       "type": "BOOL",
       "description": "gnomAD_AF < 0.02",
       "query": {
-        "field": "INFO/CSQ/gnomAD_AF",
+        "field": "INFO/TEST/gnomAD_AF",
         "operator": "<",
         "value": 0.02
       },
@@ -138,7 +138,7 @@
       "type": "BOOL",
       "description": "Consequence contains 'missense'",
       "query": {
-        "field": "INFO/CSQ/Consequence",
+        "field": "INFO/TEST/Consequence",
         "operator": "contains",
         "value": "missense_variant"
       },
@@ -155,13 +155,13 @@
     "clinVar": {
       "type": "BOOL_MULTI",
       "fields": [
-        "INFO/CSQ/CLIN_SIG"
+        "INFO/CLINVAR"
       ],
       "outcomes": [
         {
           "queries": [
             {
-              "field": "INFO/CSQ/CLIN_SIG",
+              "field": "INFO/CLINVAR",
               "operator": "contains_any",
               "value": [
                 "conflicting_interpretations_of_pathogenicity",
@@ -177,7 +177,7 @@
         {
           "queries": [
             {
-              "field": "INFO/CSQ/CLIN_SIG",
+              "field": "INFO/CLINVAR",
               "operator": "contains_any",
               "value": [
                 "LB",
@@ -192,7 +192,7 @@
         {
           "queries": [
             {
-              "field": "INFO/CSQ/CLIN_SIG",
+              "field": "INFO/CLINVAR",
               "operator": "contains_any",
               "value": [
                 "LP",
@@ -216,7 +216,7 @@
       "description": "SIFT qualitative prediction",
       "type": "BOOL",
       "query": {
-        "field": "INFO/CSQ/SIFT",
+        "field": "INFO/TEST/SIFT",
         "operator": "<",
         "value": 0.05
       },
@@ -234,13 +234,13 @@
       "description": "PolyPhen qualitative prediction",
       "type": "BOOL_MULTI",
       "fields": [
-        "INFO/CSQ/PolyPhen"
+        "INFO/TEST/PolyPhen"
       ],
       "outcomes": [
         {
           "queries": [
             {
-              "field": "INFO/CSQ/PolyPhen",
+              "field": "INFO/TEST/PolyPhen",
               "operator": "<",
               "value": 0.15
             }
@@ -253,12 +253,12 @@
           "operator": "AND",
           "queries": [
             {
-              "field": "INFO/CSQ/PolyPhen",
+              "field": "INFO/TEST/PolyPhen",
               "operator": ">",
               "value": 0.15
             },
             {
-              "field": "INFO/CSQ/PolyPhen",
+              "field": "INFO/TEST/PolyPhen",
               "operator": "<",
               "value": 0.85
             }
@@ -270,7 +270,7 @@
         {
           "queries": [
             {
-              "field": "INFO/CSQ/PolyPhen",
+              "field": "INFO/TEST/PolyPhen",
               "operator": ">",
               "value": 0.85
             }
@@ -290,7 +290,7 @@
     "impact": {
       "type": "CATEGORICAL",
       "description": "IMPACT rating",
-      "field": "INFO/CSQ/IMPACT",
+      "field": "INFO/TEST/IMPACT",
       "outcomeMap": {
         "MODIFIER": {
           "nextNode": "exit_lb"

@@ -179,7 +179,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     Field field = vcfMetadata.getField(configBoolQuery.getField());
     queryValidator.validateBooleanNode(configBoolQuery, field);
     Object value = configBoolQuery.getValue();
-    if (value instanceof String && value.toString().startsWith(FILE_PREFIX)) {
+    if (value.toString().startsWith(FILE_PREFIX)) {
       value = files.get(((String) value).substring(FILE_PREFIX.length()));
     }
     return BoolQuery.builder()
@@ -193,11 +193,9 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       ConfigBoolMultiNode nodeConfig,
       Map<String, Set<String>> files) {
     List<BoolMultiQuery> boolMultiQueries = nodeConfig.getOutcomes().stream()
-        .map(clause -> toBoolClause(vcfMetadata, clause, files)).collect(
-            Collectors.toList());
+        .map(clause -> toBoolClause(vcfMetadata, clause, files)).toList();
     List<Field> fields = nodeConfig.getFields().stream().map(vcfMetadata::getField)
-        .collect(
-            Collectors.toList());
+        .toList();
     return BoolMultiNode.builder()
         .id(id)
         .fields(fields)
@@ -210,8 +208,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       ConfigBoolMultiQuery configBoolMultiQuery,
       Map<String, Set<String>> files) {
     List<BoolQuery> queries = configBoolMultiQuery.getQueries().stream()
-        .map(query -> toBoolQuery(vcfMetadata, query, files)).collect(
-            Collectors.toList());
+        .map(query -> toBoolQuery(vcfMetadata, query, files)).toList();
     return BoolMultiQuery.builder().id(configBoolMultiQuery.getId()).queryList(queries)
         .operator(toMultiQueryOperator(configBoolMultiQuery.getOperator()))
         .build();
@@ -365,7 +362,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .collect(Collectors.toMap(ConfigBoolMultiQuery::getId, clause -> clause));
     node.setClauses(node.getClauses().stream()
         .map(clause -> updateClause(clause, clauses.get(clause.getId()), nodeMap, labelMap))
-        .collect(Collectors.toList()));
+        .toList());
 
     NodeOutcome outcomeMissing = toNodeOutcome(configNode.getOutcomeMissing(), nodeMap, labelMap);
     node.setOutcomeMissing(outcomeMissing);

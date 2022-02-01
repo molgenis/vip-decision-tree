@@ -2,7 +2,6 @@ package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Objects.requireNonNull;
 
-import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import org.molgenis.vcf.decisiontree.filter.Classifier;
 import org.molgenis.vcf.decisiontree.filter.ConsequenceAnnotator;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;

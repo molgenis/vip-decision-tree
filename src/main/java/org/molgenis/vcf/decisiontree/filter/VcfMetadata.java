@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.COMMON;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.FORMAT;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_NESTED;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
 
 import htsjdk.variant.vcf.VCFCompoundHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
@@ -21,8 +21,7 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.ValueCountBuilder;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
-import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
+import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
 
 /**
  * {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields).
@@ -32,12 +31,12 @@ public class VcfMetadata {
   private static final String FIELD_TOKEN_SEPARATOR = "/";
 
   private final VCFHeader vcfHeader;
-  private final VcfNestedMetadata nestedMetadata;
+  private final VepHeaderLine vepHeaderLine;
   private final boolean strict;
 
-  public VcfMetadata(VCFHeader vcfHeader, VcfNestedMetadata nestedMetadata, boolean strict) {
+  public VcfMetadata(VCFHeader vcfHeader, VepHeaderLine vepHeaderLine, boolean strict) {
     this.vcfHeader = requireNonNull(vcfHeader);
-    this.nestedMetadata = requireNonNull(nestedMetadata);
+    this.vepHeaderLine = requireNonNull(vepHeaderLine);
     this.strict = requireNonNull(strict);
   }
 
@@ -50,11 +49,10 @@ public class VcfMetadata {
       case COMMON:
         field = toCommonField(fieldTokens);
         break;
-      case INFO:
-      case FORMAT:
+      case INFO, FORMAT:
         field = toCompoundField(fieldTokens, fieldType);
         break;
-      case INFO_NESTED:
+      case INFO_VEP:
         field = toNestedField(fieldTokens, fieldType);
         break;
       default:
@@ -68,26 +66,30 @@ public class VcfMetadata {
     if (fieldTokens.size() != 3) {
       throw new InvalidNumberOfTokensException(fieldTokens, fieldType, 2);
     }
-    String field = fieldTokens.get(1);
-    String nestedField = fieldTokens.get(2);
 
-    NestedInfoHeaderLine nestedFieldMetadata = nestedMetadata.getNestedInfoHeaderLine(field);
-    if (nestedFieldMetadata == null) {
+    String field = fieldTokens.get(1);
+    String nestedFieldId = fieldTokens.get(2);
+
+    if (!field.equals(vepHeaderLine.getParentField().getId())) {
+      if (strict) {
+        throw new UnsupportedNestedFieldException(field);
+      } else {
+        return new MissingField(field);
+      }
+    }
+
+    if (vepHeaderLine == null) {
       if (strict) {
         throw new UnknownFieldException(field, INFO);
       } else {
         return new MissingField(field);
       }
     }
-    if (nestedFieldMetadata.hasField(nestedField)) {
-      return nestedFieldMetadata.getField(nestedField);
-    } else {
-      if (strict) {
-        throw new UnknownFieldException(nestedField, INFO_NESTED);
-      } else {
-        return new MissingField(nestedField);
-      }
+    Field nestedField = vepHeaderLine.getField(nestedFieldId);
+    if (nestedField instanceof MissingField && strict) {
+      throw new UnknownFieldException(nestedFieldId, INFO_VEP);
     }
+    return nestedField;
   }
 
   private static FieldType toFieldType(List<String> fields) {
@@ -95,17 +97,11 @@ public class VcfMetadata {
 
     FieldType fieldType;
     switch (rootField) {
-      case "#CHROM":
-      case "POS":
-      case "ID":
-      case "REF":
-      case "ALT":
-      case "QUAL":
-      case "FILTER":
+      case "#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER":
         fieldType = COMMON;
         break;
       case "INFO":
-        fieldType = fields.size() > 2 ? INFO_NESTED : INFO;
+        fieldType = fields.size() > 2 ? INFO_VEP : INFO;
         break;
       case "FORMAT":
         fieldType = FORMAT;
@@ -125,8 +121,7 @@ public class VcfMetadata {
     ValueCount valueCount;
     String field = fieldTokens.get(0);
     switch (field) {
-      case "#CHROM":
-      case "REF":
+      case "#CHROM", "REF":
         valueType = ValueType.STRING;
         valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
         break;
@@ -134,9 +129,7 @@ public class VcfMetadata {
         valueType = ValueType.INTEGER;
         valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
         break;
-      case "ID":
-      case "FILTER":
-      case "ALT":
+      case "ID", "FILTER", "ALT":
         valueType = ValueType.STRING;
         valueCount = ValueCount.builder().type(Type.VARIABLE).nullable(true).build();
         break;
@@ -231,7 +224,7 @@ public class VcfMetadata {
       case INFO:
         vcfCompoundHeaderLine = vcfHeader.getInfoHeaderLine(field);
         if (vcfCompoundHeaderLine == null && strict) {
-          throw new UnknownFieldException(field, INFO_NESTED);
+          throw new UnknownFieldException(field, INFO_VEP);
         }
         break;
       default:
@@ -244,7 +237,7 @@ public class VcfMetadata {
     return vcfHeader;
   }
 
-  public VcfNestedMetadata getNestedMetadata() {
-    return nestedMetadata;
+  public VepHeaderLine getVepHeaderLine() {
+    return vepHeaderLine;
   }
 }

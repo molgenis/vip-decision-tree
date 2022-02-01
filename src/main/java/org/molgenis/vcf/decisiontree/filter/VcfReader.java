@@ -5,8 +5,8 @@ import static java.util.Objects.requireNonNull;
 import htsjdk.variant.vcf.VCFFileReader;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
-import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadataParser;
+import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.VepMetadataParser;
 
 /**
  * {@link VCFFileReader} wrapper that works with nested metadata and data (e.g. CSQ INFO fields).
@@ -14,21 +14,21 @@ import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadataParser;
 public class VcfReader implements AutoCloseable {
 
   private final VCFFileReader vcfFileReader;
-  private final VcfNestedMetadataParser vcfNestedMetadataParser;
+  private final VepMetadataParser vepMetadataParser;
   private final boolean strict;
-  private VcfNestedMetadata nestedMetadata;
   private boolean inited = false;
+  private VepHeaderLine vepHeaderLine = null;
 
-  public VcfReader(VCFFileReader vcfFileReader, VcfNestedMetadataParser vcfNestedMetadataParser,
+  public VcfReader(VCFFileReader vcfFileReader, VepMetadataParser vepMetadataParser,
       boolean strict) {
     this.vcfFileReader = requireNonNull(vcfFileReader);
-    this.vcfNestedMetadataParser = requireNonNull(vcfNestedMetadataParser);
+    this.vepMetadataParser = requireNonNull(vepMetadataParser);
     this.strict = strict;
   }
 
   private void initNestedMeta() {
     if (!inited) {
-      nestedMetadata = vcfNestedMetadataParser.map(vcfFileReader.getFileHeader());
+      vepHeaderLine = vepMetadataParser.map(vcfFileReader.getFileHeader());
       inited = true;
     }
   }
@@ -39,7 +39,7 @@ public class VcfReader implements AutoCloseable {
 
   public VcfMetadata getMetadata() {
     initNestedMeta();
-    return new VcfMetadata(vcfFileReader.getFileHeader(), nestedMetadata, strict);
+    return new VcfMetadata(vcfFileReader.getFileHeader(), vepHeaderLine, strict);
   }
 
   @Override

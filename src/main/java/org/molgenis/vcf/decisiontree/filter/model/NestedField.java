@@ -4,10 +4,8 @@ import static java.util.Objects.requireNonNull;
 
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.Setter;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-import org.molgenis.vcf.decisiontree.runner.info.NestedInfoSelector;
 
 @Value
 @NonFinal
@@ -16,9 +14,7 @@ public class NestedField extends FieldImpl implements Comparable<NestedField> {
   @NonNull
   final int index;
   @NonNull
-  final FieldImpl parent;
-  @Setter
-  NestedInfoSelector nestedInfoSelector;
+  final Field parent;
 
   // Suppress 'Methods should not have too many parameters'
   @SuppressWarnings("java:S107")
@@ -29,8 +25,7 @@ public class NestedField extends FieldImpl implements Comparable<NestedField> {
       ValueCount valueCount,
       Integer count,
       Character separator, int index,
-      NestedInfoSelector nestedInfoSelector,
-      FieldImpl parent) {
+      Field parent) {
     super(id,
         fieldType,
         valueType,
@@ -38,13 +33,11 @@ public class NestedField extends FieldImpl implements Comparable<NestedField> {
         count,
         separator);
     this.index = requireNonNull(index);
-    this.nestedInfoSelector = nestedInfoSelector;
     this.parent = requireNonNull(parent);
   }
 
   @Override
   public int compareTo(NestedField o) {
-    Integer index = Integer.valueOf(getIndex());
-    return index.compareTo(o.getIndex());
+    return Integer.valueOf(getIndex()).compareTo(o.getIndex());
   }
 }
