@@ -66,8 +66,9 @@ class VepInfoMetadataMapperTest {
     when(vepInfoSelectorFactory.create()).thenReturn(selector);
 
     when(headerLine.getID()).thenReturn("CSQ");
-    when(headerLine.getDescription()).thenReturn(
-        "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|PUBMED");
+    when(headerLine.getDescription())
+        .thenReturn(
+            "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|gnomAD_HN|PUBMED");
 
     NestedInfoHeaderLine actual = vepInfoMetadataMapper
         .map(headerLine);
@@ -78,7 +79,8 @@ class VepInfoMetadataMapperTest {
     expectedMap.put("FLAGS", getVariableIntegerField("FLAGS", 2));
     expectedMap.put("PICK", getFixedIntegerField("PICK", 3));
     expectedMap.put("gnomAD_AF", getFixedFloatField("gnomAD_AF", 4));
-    expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 5));
+    expectedMap.put("gnomAD_HN", getFixedFloatField("gnomAD_HN", 5));
+    expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 6));
     assertEquals(NestedInfoHeaderLine.builder().nestedFields(expectedMap).build(), actual);
   }
 
