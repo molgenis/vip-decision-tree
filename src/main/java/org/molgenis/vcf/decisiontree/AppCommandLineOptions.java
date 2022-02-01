@@ -38,7 +38,7 @@ class AppCommandLineOptions {
             .hasArg(true)
             .required()
             .longOpt(OPT_INPUT_LONG)
-            .desc("Input VCF file (.vcf or .vcf.gz).")
+            .desc("VEP* annotated input VCF file.")
             .build());
     appOptions.addOption(
         Option.builder(OPT_CONFIG)

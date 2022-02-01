@@ -9,7 +9,7 @@ Command-line application to classify variants in any VCF (Variant Call Format) f
 ```
 usage: java -jar vcf-decision-tree.jar -i <arg> -c <arg> [-o <arg>] [-f]
        [-l] [-p] [-d]
- -i,--input <arg>    Input VCF file (.vcf or .vcf.gz) that is annotated with VEP*.
+ -i,--input <arg>    VEP* annotated input VCF file (.vcf or .vcf.gz).
  -c,--config <arg>   Input decision tree file (.json).
  -o,--output <arg>   Output VCF file (.vcf or .vcf.gz).
  -f,--force          Override the output file if it already exists.
