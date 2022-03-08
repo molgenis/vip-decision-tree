@@ -1,7 +1,13 @@
 os: linux
 dist: focal
 language: java
-jdk: openjdk17
+# before_install is a workaround for travis problems with this line:
+# jdk: openjdk17
+before_install:
+  - curl -s "https://get.sdkman.io" | bash
+  - source "$HOME/.sdkman/bin/sdkman-init.sh"
+  - sdk install java 17.0.2-open
+  - sdk use java 17.0.2-open
 cache:
   directories:
     - "$HOME/.m2"
