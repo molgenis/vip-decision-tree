@@ -1,5 +1,8 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import static org.molgenis.vcf.decisiontree.filter.BoolMultiNodeEvaluator.TripleBoolean.FALSE;
+import static org.molgenis.vcf.decisiontree.filter.BoolMultiNodeEvaluator.TripleBoolean.MISSING;
+import static org.molgenis.vcf.decisiontree.filter.BoolMultiNodeEvaluator.TripleBoolean.TRUE;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery.Operator.AND;
 
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery;
@@ -13,18 +16,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNode> {
 
+  public enum TripleBoolean {TRUE, FALSE, MISSING}
+
   @Override
   public NodeOutcome evaluate(BoolMultiNode node, Variant variant) {
-    NodeOutcome outcome = node.getOutcomeDefault();
-
     if (containsMissingFields(node, variant)) {
       return node.getOutcomeMissing();
     }
-
     for (BoolMultiQuery clause : node.getClauses()) {
-      outcome = evaluateClause(node, variant, outcome, clause);
+      if (evaluateClause(variant, clause) == MISSING) {
+        return node.getOutcomeMissing();
+      } else if (evaluateClause(variant, clause) == TRUE) {
+        return clause.getOutcomeTrue();
+      }
     }
-    return outcome;
+    return node.getOutcomeDefault();
   }
 
   private boolean containsMissingFields(BoolMultiNode node, Variant variant) {
@@ -40,19 +46,20 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
     return false;
   }
 
-  private NodeOutcome evaluateClause(BoolMultiNode node, Variant variant, NodeOutcome outcome,
+  private TripleBoolean evaluateClause(Variant variant,
       BoolMultiQuery clause) {
+    TripleBoolean outcome = FALSE;
     if (clause.getQueryList().size() == 1) {
       BoolQuery query = clause.getQueryList().get(0);
       Object value = variant.getValue(query.getField());
       if (isMissingValue(value)) {
-        outcome = node.getOutcomeMissing();
+        outcome = MISSING;
       } else if (executeQuery(query, value)) {
-        outcome = clause.getOutcomeTrue();
+        outcome = TRUE;
       }
     } else {
       if (evaluateMultiQuery(clause, variant)) {
-        outcome = clause.getOutcomeTrue();
+        outcome = TRUE;
       }
     }
     return outcome;
