@@ -4,7 +4,8 @@ import static java.util.Objects.requireNonNull;
 
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.Classifier;
-import org.molgenis.vcf.decisiontree.filter.DecisionWriter;
+import org.molgenis.vcf.decisiontree.filter.ConsequenceAnnotator;
+import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
@@ -19,17 +20,17 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
 
   private final VcfReaderFactory vcfReaderFactory;
   private final ClassifierFactory classifierFactory;
-  private final DecisionWriterFactory decisionWriterFactory;
+  private final RecordWriterFactory recordWriterFactory;
   private final DecisionTreeFactory decisionTreeFactory;
 
   AppRunnerFactoryImpl(
       VcfReaderFactory vcfReaderFactory,
       ClassifierFactory classifierFactory,
-      DecisionWriterFactory decisionWriterFactory,
+      RecordWriterFactory recordWriterFactory,
       DecisionTreeFactory decisionTreeFactory) {
     this.vcfReaderFactory = requireNonNull(vcfReaderFactory);
     this.classifierFactory = requireNonNull(classifierFactory);
-    this.decisionWriterFactory = requireNonNull(decisionWriterFactory);
+    this.recordWriterFactory = requireNonNull(recordWriterFactory);
     this.decisionTreeFactory = requireNonNull(decisionTreeFactory);
   }
 
@@ -43,8 +44,10 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
 
       Classifier classifier = classifierFactory.create(settings);
       DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
-      DecisionWriter decisionWriter = decisionWriterFactory.create(vcfMetadata, settings);
-      return new AppRunnerImpl(classifier, vcfReader, decisionTree, decisionWriter);
+      RecordWriter recordWriter = recordWriterFactory.create(vcfMetadata, settings);
+      ConsequenceAnnotator consequenceAnnotator = ConsequenceAnnotatorFactory.create(settings);
+      return new AppRunnerImpl(classifier, vcfReader, decisionTree, consequenceAnnotator,
+          recordWriter);
     } catch (Exception e) {
       try {
         vcfReader.close();

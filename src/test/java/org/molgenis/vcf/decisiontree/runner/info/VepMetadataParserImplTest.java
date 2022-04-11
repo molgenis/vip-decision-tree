@@ -1,15 +1,12 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,21 +14,23 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class VcfNestedMetadataParserImplTest {
+class VepMetadataParserImplTest {
 
-  @Mock NestedMetadataMapper mapper;
-  @Mock VCFHeader vcfHeader;
-  @Mock VCFInfoHeaderLine headerLine;
+  @Mock
+  VepMetadataMapper mapper;
+  @Mock
+  VCFHeader vcfHeader;
+  @Mock
+  VCFInfoHeaderLine headerLine;
 
-  private VcfNestedMetadataParserImpl nestedMetadataServiceImpl;
+  private VepMetadataParserImpl nestedMetadataServiceImpl;
 
   @BeforeEach
   void setUp() {
     when(vcfHeader.getInfoHeaderLines()).thenReturn(Collections.singletonList(headerLine));
-    List<NestedMetadataMapper> mappers = new ArrayList<>();
-    mappers.add(mapper);
+
     nestedMetadataServiceImpl =
-        new VcfNestedMetadataParserImpl(mappers);
+        new VepMetadataParserImpl(mapper);
   }
 
   @Test
@@ -47,9 +46,8 @@ class VcfNestedMetadataParserImplTest {
   void mapNoMatchingHeader() {
     when(mapper.canMap(headerLine)).thenReturn(false);
 
-    nestedMetadataServiceImpl.map(vcfHeader);
-
-    verify(mapper).canMap(headerLine);
-    verifyNoMoreInteractions(mapper);
+    assertThrows(MissingVepException.class, () -> {
+      nestedMetadataServiceImpl.map(vcfHeader);
+    });
   }
 }

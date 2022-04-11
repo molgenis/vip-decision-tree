@@ -8,7 +8,6 @@ import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -30,8 +29,7 @@ public class VcfUtils {
     Object value = variantContext.getAttribute(field.getId());
     if (value == null) {
       integerValues = List.of();
-    } else if (value instanceof List<?>) {
-      List<?> objectValues = (List<?>) value;
+    } else if (value instanceof List<?> objectValues) {
       int size = objectValues.size();
       if (size == 0) {
         integerValues = emptyList();
@@ -43,8 +41,8 @@ public class VcfUtils {
           integerValues.add(getInfoValueAsInteger(objValue));
         }
       }
-    } else if (value instanceof String) {
-      integerValues = singletonList(getInfoStringValueAsInteger((String) value));
+    } else if (value instanceof String stringValue) {
+      integerValues = singletonList(getInfoStringValueAsInteger(stringValue));
     } else {
       throw new TypeConversionException(value, Integer.class);
     }
@@ -57,10 +55,10 @@ public class VcfUtils {
     Integer intValue;
     if (objValue == null) {
       intValue = null;
-    } else if (objValue instanceof Integer) {
-      intValue = (Integer) objValue;
-    } else if (objValue instanceof String) {
-      intValue = getInfoStringValueAsInteger((String) objValue);
+    } else if (objValue instanceof Integer integer) {
+      intValue = integer;
+    } else if (objValue instanceof String stringValue) {
+      intValue = getInfoStringValueAsInteger(stringValue);
     } else {
       throw new TypeConversionException(objValue, Integer.class);
     }
@@ -89,8 +87,7 @@ public class VcfUtils {
     Object value = variantContext.getAttribute(field.getId());
     if (value == null) {
       doubleValues = List.of();
-    } else if (value instanceof List<?>) {
-      List<?> objectValues = (List<?>) value;
+    } else if (value instanceof List<?> objectValues) {
       int size = objectValues.size();
       if (size == 0) {
         doubleValues = emptyList();
@@ -102,8 +99,8 @@ public class VcfUtils {
           doubleValues.add(getInfoValueAsDouble(objValue));
         }
       }
-    } else if (value instanceof String) {
-      doubleValues = singletonList(getInfoStringValueAsDouble((String) value));
+    } else if (value instanceof String string) {
+      doubleValues = singletonList(getInfoStringValueAsDouble(string));
     } else {
       throw new TypeConversionException(value, Double.class);
     }
@@ -116,10 +113,10 @@ public class VcfUtils {
     Double doubleValue;
     if (objValue == null) {
       doubleValue = null;
-    } else if (objValue instanceof Double) {
-      doubleValue = (Double) objValue;
-    } else if (objValue instanceof String) {
-      doubleValue = getInfoStringValueAsDouble((String) objValue);
+    } else if (objValue instanceof Double doubleVal) {
+      doubleValue = doubleVal;
+    } else if (objValue instanceof String string) {
+      doubleValue = getInfoStringValueAsDouble(string);
     } else {
       throw new TypeConversionException(objValue, Double.class);
     }
@@ -156,8 +153,7 @@ public class VcfUtils {
     Object value = variantContext.getAttribute(id);
     if (value == null) {
       strValues = List.of();
-    } else if (value instanceof List<?>) {
-      List<?> objectValues = (List<?>) value;
+    } else if (value instanceof List<?> objectValues) {
       int size = objectValues.size();
       if (size == 0) {
         strValues = emptyList();
@@ -169,8 +165,8 @@ public class VcfUtils {
           strValues.add(getInfoValueAsString(objValue));
         }
       }
-    } else if (value instanceof String) {
-      strValues = singletonList(getInfoStringValueAsString((String) value));
+    } else if (value instanceof String string) {
+      strValues = singletonList(getInfoStringValueAsString(string));
     } else {
       throw new TypeConversionException(value, String.class);
     }
@@ -183,8 +179,8 @@ public class VcfUtils {
     String strValue;
     if (objValue == null) {
       strValue = null;
-    } else if (objValue instanceof String) {
-      strValue = getInfoStringValueAsString((String) objValue);
+    } else if (objValue instanceof String string) {
+      strValue = getInfoStringValueAsString(string);
     } else {
       throw new TypeConversionException(objValue, String.class);
     }
@@ -212,8 +208,8 @@ public class VcfUtils {
 
     if (objValue == null) {
       bool = false;
-    } else if (objValue instanceof Boolean) {
-      bool = (Boolean) objValue;
+    } else if (objValue instanceof Boolean boolVal) {
+      bool = boolVal;
     } else {
       throw new TypeConversionException(objValue, Boolean.class);
     }
@@ -227,7 +223,7 @@ public class VcfUtils {
       value = getTypedInfoValue(field, stringValue);
     }else{
       List<String> values = Arrays.asList(stringValue.split(separator));
-      value = values.stream().map(singleValue -> getTypedInfoValue(field, singleValue)).collect(Collectors.toList());
+      value = values.stream().map(singleValue -> getTypedInfoValue(field, singleValue)).toList();
     }
     return value;
   }
@@ -245,8 +241,7 @@ public class VcfUtils {
         case FLOAT:
           typedValue = VcfUtils.getInfoValueAsDouble(stringValue);
           break;
-        case CHARACTER:
-        case STRING:
+        case CHARACTER, STRING:
           typedValue = VcfUtils.getInfoValueAsString(stringValue);
           break;
         default:

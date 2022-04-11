@@ -6,6 +6,6 @@ public enum FieldType {
   /**
    * INFO field with nested information (e.g. VEP CSQ or SnpEff ANN)
    */
-  INFO_NESTED,
+  INFO_VEP,
   FORMAT
 }

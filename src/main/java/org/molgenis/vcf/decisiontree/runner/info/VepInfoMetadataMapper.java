@@ -1,7 +1,6 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
 import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
 
@@ -19,16 +18,12 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.springframework.stereotype.Component;
 
 @Component
-public class VepInfoMetadataMapper implements NestedMetadataMapper {
+public class VepInfoMetadataMapper implements VepMetadataMapper {
+
+  public static final String ALLELE_NUM = "ALLELE_NUM";
 
   private static final String INFO_DESCRIPTION_PREFIX =
       "Consequence annotations from Ensembl VEP. Format: ";
-
-  private final VepInfoSelectorFactory vepInfoSelectorFactory;
-
-  public VepInfoMetadataMapper(VepInfoSelectorFactory vepInfoSelectorFactory) {
-    this.vepInfoSelectorFactory = requireNonNull(vepInfoSelectorFactory);
-  }
 
   @Override
   public boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -38,26 +33,23 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
   }
 
   @Override
-  public NestedInfoHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine) {
-    VepInfoSelector infoSelector = vepInfoSelectorFactory.create();
+  public VepHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine) {
     Map<String, NestedField> nestedFields = new HashMap<>();
     int index = 0;
+    FieldImpl vepField =
+        FieldImpl.builder()
+            .id(vcfInfoHeaderLine.getID())
+            .fieldType(FieldType.INFO)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(VARIABLE).build())
+            .separator('|')
+            .build();
     for (String id : getNestedInfoIds(vcfInfoHeaderLine)) {
-      FieldImpl vepField =
-          FieldImpl.builder()
-              .id(vcfInfoHeaderLine.getID())
-              .fieldType(FieldType.INFO)
-              .valueType(ValueType.STRING)
-              .valueCount(ValueCount.builder().type(VARIABLE).build())
-              .separator('|')
-              .build();
-      nestedFields.put(id, mapNestedMetadataToField(id, index, vepField, infoSelector));
+      nestedFields.put(id, mapNestedMetadataToField(id, index, vepField));
       index++;
     }
-    NestedInfoHeaderLine nestedInfoHeaderLine =
-        NestedInfoHeaderLine.builder().nestedFields(nestedFields).build();
-    infoSelector.setNestedInfoHeaderLine(nestedInfoHeaderLine);
-    return nestedInfoHeaderLine;
+    return VepHeaderLine.builder().parentField(vepField)
+        .nestedFields(nestedFields).build();
   }
 
   protected List<String> getNestedInfoIds(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -67,16 +59,15 @@ public class VepInfoMetadataMapper implements NestedMetadataMapper {
   }
 
   protected NestedField mapNestedMetadataToField(
-      String id, int index, FieldImpl vepField, VepInfoSelector infoSelector) {
+      String id, int index, FieldImpl vepField) {
     NestedFieldBuilder fieldBuilder =
         NestedField.nestedBuilder()
             .id(id)
             .index(index)
             .parent(vepField)
-            .fieldType(FieldType.INFO_NESTED)
-            .nestedInfoSelector(infoSelector);
+            .fieldType(FieldType.INFO_VEP);
     switch (id) {
-      case "PICK", "ALLELE_NUM":
+      case "PICK", ALLELE_NUM:
         fieldBuilder
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.INTEGER);

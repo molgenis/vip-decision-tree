@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
@@ -25,18 +26,16 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 @ExtendWith(MockitoExtension.class)
 class VepInfoMetadataMapperTest {
 
-  @Mock
-  private VepInfoSelectorFactory vepInfoSelectorFactory;
   private VepInfoMetadataMapper vepInfoMetadataMapper;
+
   @Mock
   VCFInfoHeaderLine headerLine;
   private FieldImpl vepField;
-  @Mock
-  private VepInfoSelector selector;
 
   @BeforeEach
   void setUp() {
-    vepInfoMetadataMapper = new VepInfoMetadataMapper(vepInfoSelectorFactory);
+
+    vepInfoMetadataMapper = new VepInfoMetadataMapper();
 
     vepField = FieldImpl.builder()
         .id("CSQ")
@@ -63,15 +62,16 @@ class VepInfoMetadataMapperTest {
 
   @Test
   void map() {
-    when(vepInfoSelectorFactory.create()).thenReturn(selector);
-
     when(headerLine.getID()).thenReturn("CSQ");
     when(headerLine.getDescription())
         .thenReturn(
             "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|gnomAD_HN|PUBMED|CAPICE_CL|CAPICE_SC");
 
-    NestedInfoHeaderLine actual = vepInfoMetadataMapper
+    VepHeaderLine actual = vepInfoMetadataMapper
         .map(headerLine);
+    Field vepField = FieldImpl.builder().id("CSQ").fieldType(FieldType.INFO)
+        .valueType(ValueType.STRING).valueCount(ValueCount.builder()
+            .type(VARIABLE).build()).separator('|').build();
 
     Map<String, NestedField> expectedMap = new HashMap<>();
     expectedMap.put("Allele", getFixedStringField("Allele", 0));
@@ -83,12 +83,13 @@ class VepInfoMetadataMapperTest {
     expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 6));
     expectedMap.put("CAPICE_CL", getFixedStringField("CAPICE_CL", 7));
     expectedMap.put("CAPICE_SC", getVariableIntegerField("CAPICE_SC", 8));
-    assertEquals(NestedInfoHeaderLine.builder().nestedFields(expectedMap).build(), actual);
+    assertEquals(VepHeaderLine.builder().nestedFields(expectedMap).parentField(vepField).build(),
+        actual);
   }
 
   private NestedField getVariableIntegerField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
+        .fieldType(FieldType.INFO_VEP)
         .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
         .valueType(ValueType.INTEGER)
         .separator('&').build();
@@ -96,21 +97,21 @@ class VepInfoMetadataMapperTest {
 
   private NestedField getFixedIntegerField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
+        .fieldType(FieldType.INFO_VEP)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
         .valueType(ValueType.INTEGER).build();
   }
 
   private NestedField getFixedFloatField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
+        .fieldType(FieldType.INFO_VEP)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
         .valueType(ValueType.FLOAT).build();
   }
 
   private NestedField getFixedStringField(String id, int index) {
     return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_NESTED).nestedInfoSelector(selector)
+        .fieldType(FieldType.INFO_VEP)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
         .valueType(ValueType.STRING).build();
   }
