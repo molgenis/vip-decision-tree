@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 public class BoolNodeEvaluator implements BaseBoolNodeEvaluator<BoolNode> {
 
   @Override
-  public NodeOutcome evaluate(BoolNode node, Variant variant) {
+  public NodeOutcome evaluate(BoolNode node,
+      Variant variant, String sampleName) {
     NodeOutcome nodeOutcome;
 
     BoolQuery query = node.getQuery();
@@ -21,7 +22,7 @@ public class BoolNodeEvaluator implements BaseBoolNodeEvaluator<BoolNode> {
         throw new EvaluationException(node, variant, "missing 'missingOutcome'");
       }
     }
-    Object value = variant.getValue(query.getField());
+    Object value = variant.getValue(query.getField(), sampleName);
     if (!isMissingValue(value)) {
       boolean matches = executeQuery(query, value);
       nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();

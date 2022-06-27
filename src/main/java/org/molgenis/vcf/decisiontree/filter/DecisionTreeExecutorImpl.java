@@ -36,7 +36,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
   }
 
   @Override
-  public Decision execute(DecisionTree tree, Variant variant) {
+  public String execute(DecisionTree tree, Variant variant, String sampleName) {
     List<Node> nodePath = storePaths ? new ArrayList<>() : List.of();
     Set<Label> labels = storeLabels ? new HashSet<>() : Set.of();
 
@@ -50,7 +50,8 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
         break;
       }
 
-      NodeOutcome nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant);
+      NodeOutcome nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant,
+          sampleName);
       if (storeLabels) {
         storeLabel(nodeOutcome, labels);
       }
@@ -58,7 +59,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
       currentNode = nodeOutcome.getNextNode();
     } while (true);
 
-    return new Decision(((LeafNode) currentNode).getClazz(), nodePath, labels);
+    return ((LeafNode) currentNode).getClazz();//FIXME new Decision(((LeafNode) currentNode).getClazz(), nodePath, labels);
   }
 
   private void storeLabel(NodeOutcome nodeOutcome, Set<Label> labels) {

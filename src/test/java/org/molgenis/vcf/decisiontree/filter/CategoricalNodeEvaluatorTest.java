@@ -34,7 +34,7 @@ class CategoricalNodeEvaluatorTest {
 
     Variant variant = mock(Variant.class);
     when(variant.getValue(field)).thenReturn(key);
-    assertEquals(nodeOutcome, categoricalNodeEvaluator.evaluate(node, variant));
+    assertEquals(nodeOutcome, categoricalNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -50,7 +50,7 @@ class CategoricalNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    assertEquals(outcomeMissing, categoricalNodeEvaluator.evaluate(node, variant));
+    assertEquals(outcomeMissing, categoricalNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -68,7 +68,7 @@ class CategoricalNodeEvaluatorTest {
 
     Variant variant = mock(Variant.class);
     when(variant.getValue(field)).thenReturn(key);
-    assertEquals(outcomeDefault, categoricalNodeEvaluator.evaluate(node, variant));
+    assertEquals(outcomeDefault, categoricalNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -84,7 +84,7 @@ class CategoricalNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    assertEquals(outcomeMissing, categoricalNodeEvaluator.evaluate(node, variant));
+    assertEquals(outcomeMissing, categoricalNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -96,7 +96,8 @@ class CategoricalNodeEvaluatorTest {
 
     Variant variant = mock(Variant.class);
     when(variant.getValue(field)).thenReturn(key);
-    assertThrows(EvaluationException.class, () -> categoricalNodeEvaluator.evaluate(node, variant));
+    assertThrows(EvaluationException.class, () -> categoricalNodeEvaluator.evaluate(node, variant,
+        null));
   }
 
   @Test
@@ -106,6 +107,7 @@ class CategoricalNodeEvaluatorTest {
         CategoricalNode.builder().id("cat_id").field(field).outcomeMap(Map.of()).build();
 
     Variant variant = mock(Variant.class);
-    assertThrows(EvaluationException.class, () -> categoricalNodeEvaluator.evaluate(node, variant));
+    assertThrows(EvaluationException.class, () -> categoricalNodeEvaluator.evaluate(node, variant,
+        null));
   }
 }

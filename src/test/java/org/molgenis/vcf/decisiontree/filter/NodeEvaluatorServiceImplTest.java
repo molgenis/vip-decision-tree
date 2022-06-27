@@ -42,8 +42,8 @@ class NodeEvaluatorServiceImplTest {
     BoolNode boolNode = when(mock(BoolNode.class).getDecisionType()).thenReturn(BOOL).getMock();
     Variant variant = mock(Variant.class);
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
-    when(boolNodeEvaluator.evaluate(boolNode, variant)).thenReturn(nodeOutcome);
-    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(boolNode, variant));
+    when(boolNodeEvaluator.evaluate(boolNode, variant, null)).thenReturn(nodeOutcome);
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(boolNode, variant, null));
   }
 
   @Test
@@ -52,8 +52,8 @@ class NodeEvaluatorServiceImplTest {
         .getMock();
     Variant variant = mock(Variant.class);
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
-    when(existsNodeEvaluator.evaluate(existsNode, variant)).thenReturn(nodeOutcome);
-    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(existsNode, variant));
+    when(existsNodeEvaluator.evaluate(existsNode, variant, null)).thenReturn(nodeOutcome);
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(existsNode, variant, null));
   }
 
   @Test
@@ -62,8 +62,8 @@ class NodeEvaluatorServiceImplTest {
         when(mock(CategoricalNode.class).getDecisionType()).thenReturn(CATEGORICAL).getMock();
     Variant variant = mock(Variant.class);
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
-    when(categoricalNodeEvaluator.evaluate(categoricalNode, variant)).thenReturn(nodeOutcome);
-    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant));
+    when(categoricalNodeEvaluator.evaluate(categoricalNode, variant, null)).thenReturn(nodeOutcome);
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant, null));
   }
 
   @Test
@@ -72,7 +72,7 @@ class NodeEvaluatorServiceImplTest {
         when(mock(CategoricalNode.class).getDecisionType()).thenReturn(CATEGORICAL).getMock();
     Variant variant = mock(Variant.class);
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
-    when(categoricalNodeEvaluator.evaluate(categoricalNode, variant)).thenReturn(nodeOutcome);
-    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant));
+    when(categoricalNodeEvaluator.evaluate(categoricalNode, variant, null)).thenReturn(nodeOutcome);
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant, null));
   }
 }

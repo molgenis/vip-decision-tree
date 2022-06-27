@@ -16,7 +16,11 @@ public class Variant {
   @NonNull Allele allele;
 
   public Object getValue(Field field) {
-    return vcfRecord.getValue(field, allele);
+    return vcfRecord.getValue(field, allele, null);
+  }
+
+  public Object getValue(Field field, String sampleName) {
+    return vcfRecord.getValue(field, allele, sampleName);
   }
 
   public String toDisplayString() {

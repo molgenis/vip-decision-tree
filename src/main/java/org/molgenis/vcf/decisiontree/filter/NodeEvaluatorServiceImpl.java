@@ -1,5 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import java.util.List;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
@@ -8,6 +9,8 @@ import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
+import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
+import org.molgenis.vcf.decisiontree.filter.model.SamplePhenotypeNode;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,21 +40,22 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
   }
 
   @Override
-  public NodeOutcome evaluate(DecisionNode node, Variant variant) {
+  public NodeOutcome evaluate(DecisionNode node, Variant variant, String sampleName) {
     NodeOutcome nodeOutcome;
     DecisionType decisionType = node.getDecisionType();
     switch (decisionType) {
       case EXISTS:
-        nodeOutcome = existsNodeEvaluator.evaluate((ExistsNode) node, variant);
+        nodeOutcome = existsNodeEvaluator.evaluate((ExistsNode) node, variant, sampleName);
         break;
       case BOOL:
-        nodeOutcome = boolNodeEvaluator.evaluate((BoolNode) node, variant);
+        nodeOutcome = boolNodeEvaluator.evaluate((BoolNode) node, variant, sampleName);
         break;
       case BOOL_MULTI:
-        nodeOutcome = boolMultiNodeEvaluator.evaluate((BoolMultiNode) node, variant);
+        nodeOutcome = boolMultiNodeEvaluator.evaluate((BoolMultiNode) node, variant, sampleName);
         break;
       case CATEGORICAL:
-        nodeOutcome = categoricalNodeEvaluator.evaluate((CategoricalNode) node, variant);
+        nodeOutcome = categoricalNodeEvaluator.evaluate((CategoricalNode) node, variant,
+            sampleName);
         break;
       default:
         throw new UnexpectedEnumException(decisionType);

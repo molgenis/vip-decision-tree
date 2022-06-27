@@ -138,12 +138,12 @@
       "type": "BOOL",
       "description": "Consequence contains 'missense'",
       "query": {
-        "field": "INFO/TEST/Consequence",
-        "operator": "contains",
-        "value": "missense_variant"
+        "field": "FORMAT/GT",
+        "operator": "==",
+        "value": "1/1"
       },
       "outcomeTrue": {
-        "nextNode": "sift"
+        "nextNode": "exit_hom_alt"
       },
       "outcomeFalse": {
         "nextNode": "spliceAI"
@@ -308,6 +308,10 @@
       "outcomeMissing": {
         "nextNode": "exit_vus"
       }
+    },
+    "exit_hom_alt": {
+      "type": "LEAF",
+      "class": "ha"
     },
     "exit_b": {
       "type": "LEAF",

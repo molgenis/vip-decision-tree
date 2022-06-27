@@ -106,14 +106,14 @@ class ClassifierImplTest {
     Decision decision2b = Decision.builder().clazz("test2b").path(Collections.emptyList())
         .labels(Collections.emptySet()).build();
 
-    doReturn(decision1a).when(decisionTreeExecutor)
+    /*doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1));
     doReturn(decision2a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1));
     doReturn(decision2b).when(decisionTreeExecutor)
-        .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2));
+        .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2));*/
 
-    classifier.classify(vcfReader, decisionTree, recordWriter, consequenceAnnotator);
+    //classifier.classify(vcfReader, decisionTree, recordWriter, consequenceAnnotator);
 
     verify(consequenceAnnotator).annotate(decision1a, "");
     verify(consequenceAnnotator).annotate(decision2a, "");

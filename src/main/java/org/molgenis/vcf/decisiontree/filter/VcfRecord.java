@@ -6,6 +6,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedInfoValue;
 
+import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
 import htsjdk.variant.vcf.VCFConstants;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -50,6 +53,10 @@ public class VcfRecord {
   }
 
   public Object getValue(Field field, Allele allele) {
+    return getValue(field, allele, null);
+  }
+
+  public Object getValue(Field field, Allele allele, String sampleName) {
     Object value;
     FieldType fieldType = field.getFieldType();
     switch (fieldType) {
@@ -63,9 +70,39 @@ public class VcfRecord {
         value = getNestedVepValue(field);
         break;
       case FORMAT:
-        throw new UnsupportedOperationException("FORMAT values are not yet supported."); // TODO
+        if (sampleName == null) {
+          throw new UnsupportedOperationException(
+              "Cannot filter on FORMAT fields when running in variant filter mode.");
+        }
+        value = getFormatField(field, sampleName);
+        break;
       default:
         throw new UnexpectedEnumException(fieldType);
+    }
+    return value;
+  }
+
+  private Object getFormatField(Field field, String sampleName) {
+    Genotype genotype = variantContext.getGenotype(sampleName);
+    Object value;
+    switch (field.getId()) {
+      case ("GT"):
+        value = genotype.getGenotypeString();
+        break;
+      case ("AD"):
+        value = IntStream.of(genotype.getAD()).boxed().collect(Collectors.toList());
+        break;
+      case ("DP"):
+        value = genotype.getDP();
+        break;
+      case ("GQ"):
+        value = genotype.getGQ();
+        break;
+      case ("PL"):
+        value = genotype.getPL();
+        break;
+      default:
+        value = genotype.getExtendedAttribute(field.getId());
     }
     return value;
   }
