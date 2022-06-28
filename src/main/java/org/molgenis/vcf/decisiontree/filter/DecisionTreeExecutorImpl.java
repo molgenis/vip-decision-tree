@@ -14,6 +14,7 @@ import org.molgenis.vcf.decisiontree.filter.model.Label;
 import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
 import org.molgenis.vcf.decisiontree.filter.model.Node;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
+import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 
 public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
 
@@ -36,7 +37,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
   }
 
   @Override
-  public String execute(DecisionTree tree, Variant variant, String sampleName) {
+  public Decision execute(DecisionTree tree, Variant variant, SampleMeta sampleMeta) {
     List<Node> nodePath = storePaths ? new ArrayList<>() : List.of();
     Set<Label> labels = storeLabels ? new HashSet<>() : Set.of();
 
@@ -50,8 +51,13 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
         break;
       }
 
-      NodeOutcome nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant,
-          sampleName);
+      NodeOutcome nodeOutcome;
+      if (sampleMeta != null) {
+        nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant,
+            sampleMeta);
+      } else {
+        nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant);
+      }
       if (storeLabels) {
         storeLabel(nodeOutcome, labels);
       }
@@ -59,7 +65,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
       currentNode = nodeOutcome.getNextNode();
     } while (true);
 
-    return ((LeafNode) currentNode).getClazz();//FIXME new Decision(((LeafNode) currentNode).getClazz(), nodePath, labels);
+    return new Decision(((LeafNode) currentNode).getClazz(), nodePath, labels);
   }
 
   private void storeLabel(NodeOutcome nodeOutcome, Set<Label> labels) {

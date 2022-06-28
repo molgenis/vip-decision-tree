@@ -33,6 +33,7 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigMode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
@@ -72,6 +73,7 @@ class DecisionTreeFactoryImplTest{
     when(decisionTree.getLabels()).thenReturn(Collections.emptyMap());
     when(decisionTree.getFiles()).thenReturn(files);
     when(decisionTree.getNodes()).thenReturn(nodes);
+    when(decisionTree.getMode()).thenReturn(ConfigMode.VARIANT);
     when(decisionTree.getRootNode()).thenReturn("test");
     when(vcfMetadata.getField("INFO/testField")).thenReturn(
         FieldImpl.builder().id("testField").fieldType(INFO).valueType(

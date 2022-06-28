@@ -13,5 +13,6 @@ public class Settings {
   ConfigDecisionTree configDecisionTree;
   AppSettings appSettings;
   WriterSettings writerSettings;
+  SampleInfo sampleInfo;
   boolean strict;
 }

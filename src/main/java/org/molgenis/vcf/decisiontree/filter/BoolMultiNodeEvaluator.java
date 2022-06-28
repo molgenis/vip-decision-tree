@@ -8,7 +8,6 @@ import static org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery.Operator
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
-import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
@@ -53,7 +52,12 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
     TripleBoolean outcome = FALSE;
     if (clause.getQueryList().size() == 1) {
       BoolQuery query = clause.getQueryList().get(0);
-      Object value = variant.getValue(query.getField(), sampleName);
+      Object value;
+      if (sampleName != null) {
+        value = variant.getValue(query.getField(), sampleName);
+      } else {
+        value = variant.getValue(query.getField());
+      }
       if (isMissingValue(value)) {
         outcome = MISSING;
       } else if (executeQuery(query, value)) {
@@ -74,7 +78,12 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
       }
     } else {
       for (BoolQuery query : clause.getQueryList()) {
-        Object value = variant.getValue(query.getField(), sampleName);
+        Object value;
+        if (sampleName != null) {
+          value = variant.getValue(query.getField(), sampleName);
+        } else {
+          value = variant.getValue(query.getField());
+        }
         if (!isMissingValue(value) && executeQuery(query, value)) {
           return true;
         }
@@ -85,7 +94,12 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
 
   private boolean allQueriesMatch(BoolMultiQuery clause, Variant variant, String sampleName) {
     for (BoolQuery query : clause.getQueryList()) {
-      Object value = variant.getValue(query.getField(), sampleName);
+      Object value;
+      if (sampleName != null) {
+        value = variant.getValue(query.getField(), sampleName);
+      } else {
+        value = variant.getValue(query.getField());
+      }
       if (isMissingValue(value) || !executeQuery(query, value)) {
         return false;
       }

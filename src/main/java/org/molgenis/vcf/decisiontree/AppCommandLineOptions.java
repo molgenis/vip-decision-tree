@@ -28,6 +28,10 @@ class AppCommandLineOptions {
   static final String OPT_VERSION_LONG = "version";
   static final String OPT_STRICT = "s";
   static final String OPT_STRICT_LONG = "strict";
+  static final String OPT_PROBANDS = "pb";
+  static final String OPT_PROBANDS_LONG = "probands";
+  static final String OPT_PHENOTYPES = "ph";
+  static final String OPT_PHENOTYPES_LONG = "phenotypes";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -78,6 +82,19 @@ class AppCommandLineOptions {
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging).")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_PROBANDS)
+            .hasArg(true)
+            .longOpt(OPT_PROBANDS_LONG)
+            .desc("Comma-separated list of proband names.")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_PHENOTYPES)
+            .hasArg(true)
+            .longOpt(OPT_PHENOTYPES_LONG)
+            .desc(
+                "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
             .build());
     APP_OPTIONS = appOptions;
     Options appVersionOptions = new Options();

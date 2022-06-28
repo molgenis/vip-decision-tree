@@ -1,0 +1,29 @@
+{
+  "rootNode": "pheno",
+  "mode": "SAMPLE",
+  "nodes": {
+    "pheno": {
+      "type": "SAMPLE_PHENOTYPE",
+      "description": "Pheno match",
+      "field": "INFO/CSQ/HPO",
+      "operator": "contains_any",
+      "outcomeTrue": {
+        "nextNode": "exit_k"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_f"
+      },
+      "outcomeMissing": {
+        "nextNode": "exit_k"
+      }
+    },
+    "exit_k": {
+      "type": "LEAF",
+      "class": "k"
+    },
+    "exit_f": {
+      "type": "LEAF",
+      "class": "f"
+    }
+  }
+}

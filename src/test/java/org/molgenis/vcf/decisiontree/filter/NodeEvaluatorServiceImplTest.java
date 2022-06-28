@@ -43,7 +43,7 @@ class NodeEvaluatorServiceImplTest {
     Variant variant = mock(Variant.class);
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
     when(boolNodeEvaluator.evaluate(boolNode, variant, null)).thenReturn(nodeOutcome);
-    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(boolNode, variant, null));
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(boolNode, variant));
   }
 
   @Test
@@ -53,7 +53,7 @@ class NodeEvaluatorServiceImplTest {
     Variant variant = mock(Variant.class);
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
     when(existsNodeEvaluator.evaluate(existsNode, variant, null)).thenReturn(nodeOutcome);
-    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(existsNode, variant, null));
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(existsNode, variant));
   }
 
   @Test
@@ -63,7 +63,7 @@ class NodeEvaluatorServiceImplTest {
     Variant variant = mock(Variant.class);
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
     when(categoricalNodeEvaluator.evaluate(categoricalNode, variant, null)).thenReturn(nodeOutcome);
-    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant, null));
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant));
   }
 
   @Test
@@ -73,6 +73,6 @@ class NodeEvaluatorServiceImplTest {
     Variant variant = mock(Variant.class);
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
     when(categoricalNodeEvaluator.evaluate(categoricalNode, variant, null)).thenReturn(nodeOutcome);
-    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant, null));
+    assertEquals(nodeOutcome, nodeEvaluatorService.evaluate(categoricalNode, variant));
   }
 }

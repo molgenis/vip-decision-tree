@@ -15,6 +15,7 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigPhenotypeNode;
 
 public class ConfigNodeDeserializer extends JsonDeserializer<ConfigNode> {
   @Override
@@ -38,6 +39,9 @@ public class ConfigNodeDeserializer extends JsonDeserializer<ConfigNode> {
       case "CATEGORICAL":
         configNode = objectCodec.treeToValue(root, ConfigCategoricalNode.class);
         break;
+      case "SAMPLE_PHENOTYPE":
+        configNode = objectCodec.treeToValue(root, ConfigPhenotypeNode.class);
+        break;
       case "EXISTS":
         configNode = objectCodec.treeToValue(root, ConfigExistsNode.class);
         break;
@@ -47,7 +51,8 @@ public class ConfigNodeDeserializer extends JsonDeserializer<ConfigNode> {
       default:
         throw new JsonMappingException(
             jp,
-            format("illegal 'type' value '%s' (allowed values: BOOL, CATEGORICAL, EXISTS, LEAF).",
+            format(
+                "illegal 'type' value '%s' (allowed values: BOOL, BOOL_MULTI, CATEGORICAL, EXISTS, SAMPLE_PHENOTYPE, LEAF).",
                 type));
     }
     return configNode;

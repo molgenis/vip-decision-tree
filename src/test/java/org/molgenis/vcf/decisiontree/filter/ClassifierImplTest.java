@@ -21,6 +21,7 @@ import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
+import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -33,7 +34,7 @@ class ClassifierImplTest {
   @Mock
   private DecisionTreeExecutor decisionTreeExecutor;
   @Mock
-  private ClassifierImpl classifier;
+  private VcfMetadata vcfMetadata;
   @Mock
   private VcfReader vcfReader;
   @Mock
@@ -45,17 +46,14 @@ class ClassifierImplTest {
   @Mock
   private VepHelper vepHelper;
 
+  private Classifier classifier;
+  private FieldImpl parent;
+  private VepHeaderLine vepHeaderLine;
+
   @BeforeEach
   void setUp() {
-    classifier = new ClassifierImpl(decisionTreeExecutor, vepHelper);
-  }
-
-  @Test
-  void classify() {
-
-    VcfMetadata vcfMetadata = mock(VcfMetadata.class);
     ValueCount valueCount = ValueCount.builder().type(Type.VARIABLE).build();
-    FieldImpl parent = FieldImpl.builder().id("VEP").fieldType(FieldType.INFO)
+    parent = FieldImpl.builder().id("VEP").fieldType(FieldType.INFO)
         .valueType(ValueType.STRING).valueCount(valueCount).separator('|').build();
     NestedField nestedField1 = NestedField.nestedBuilder().id("ALLELE_NUM").parent(parent)
         .fieldType(FieldType.INFO_VEP)
@@ -65,10 +63,15 @@ class ClassifierImplTest {
         .valueType(ValueType.STRING).valueCount(valueCount).build();
     Map<String, NestedField> nestedFields = Map.of("field1", nestedField1, "ALLELE_NUM",
         nestedField2);
-    VepHeaderLine vepHeaderLine = VepHeaderLine.builder().parentField(parent)
+    vepHeaderLine = VepHeaderLine.builder().parentField(parent)
         .nestedFields(nestedFields).build();
     when(vcfMetadata.getVepHeaderLine()).thenReturn(vepHeaderLine);
-    when(vcfReader.getMetadata()).thenReturn(vcfMetadata);
+    classifier = new ClassifierImpl(decisionTreeExecutor, vepHelper, decisionTree,
+        consequenceAnnotator, recordWriter, vcfMetadata);
+  }
+
+  @Test
+  void classify() {
     VcfRecord record0 = mock(VcfRecord.class, "record0");
     org.molgenis.vcf.decisiontree.filter.Allele allele0_1 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
         .bases("G").index(0).build();
@@ -106,14 +109,14 @@ class ClassifierImplTest {
     Decision decision2b = Decision.builder().clazz("test2b").path(Collections.emptyList())
         .labels(Collections.emptySet()).build();
 
-    /*doReturn(decision1a).when(decisionTreeExecutor)
+    doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1));
     doReturn(decision2a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1));
     doReturn(decision2b).when(decisionTreeExecutor)
-        .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2));*/
+        .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2));
 
-    //classifier.classify(vcfReader, decisionTree, recordWriter, consequenceAnnotator);
+    classifier.classify(vcfReader);
 
     verify(consequenceAnnotator).annotate(decision1a, "");
     verify(consequenceAnnotator).annotate(decision2a, "");

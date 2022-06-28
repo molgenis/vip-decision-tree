@@ -19,22 +19,28 @@ public class ClassifierImpl implements Classifier {
 
   private final DecisionTreeExecutor decisionTreeExecutor;
   private final VepHelper vepHelper;
+  private final DecisionTree decisionTree;
+  private final VcfMetadata vcfMetadata;
+  private final ConsequenceAnnotator consequenceAnnotator;
+  private final RecordWriter recordWriter;
 
-  public ClassifierImpl(DecisionTreeExecutor decisionTreeExecutor, VepHelper vepHelper) {
+  public ClassifierImpl(DecisionTreeExecutor decisionTreeExecutor, VepHelper vepHelper,
+      DecisionTree decisionTree, ConsequenceAnnotator consequenceAnnotator,
+      RecordWriter recordWriter, VcfMetadata vcfMetadata) {
     this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
     this.vepHelper = requireNonNull(vepHelper);
+    this.decisionTree = decisionTree;
+    this.consequenceAnnotator = consequenceAnnotator;
+    this.recordWriter = recordWriter;
+    this.vcfMetadata = vcfMetadata;
   }
 
   @Override
-  public void classify(VcfReader vcfReader, DecisionTree decisionTree,
-      RecordWriter recordWriter, ConsequenceAnnotator consequenceAnnotator) {
-    VcfMetadata vcfMetadata = vcfReader.getMetadata();
-
+  public void classify(VcfReader vcfReader) {
     AtomicInteger nrRecord = new AtomicInteger(0);
     vcfReader.stream()
         .map(
-            vcfRecord -> processRecord(vcfRecord, decisionTree,
-                vcfMetadata, consequenceAnnotator)).forEach(vcfRecord -> {
+            this::processRecord).forEach(vcfRecord -> {
           recordWriter.write(vcfRecord);
           if (nrRecord.incrementAndGet() % 25000 == 0) {
             LOGGER.debug("processed {} records", nrRecord);
@@ -43,8 +49,7 @@ public class ClassifierImpl implements Classifier {
   }
 
   private VcfRecord processRecord(
-      VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
-      ConsequenceAnnotator consequenceAnnotator) {
+      VcfRecord vcfRecord) {
     VepHeaderLine vepHeaderLine = vcfMetadata.getVepHeaderLine();
     Map<Integer, List<VcfRecord>> alleleCsqMap = vepHelper.getRecordPerConsequence(vcfRecord,
         vepHeaderLine);

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -90,7 +89,7 @@ public class VcfRecord {
         value = genotype.getGenotypeString();
         break;
       case ("AD"):
-        value = IntStream.of(genotype.getAD()).boxed().collect(Collectors.toList());
+        value = IntStream.of(genotype.getAD()).boxed().toList();
         break;
       case ("DP"):
         value = genotype.getDP();

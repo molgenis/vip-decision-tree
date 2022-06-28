@@ -8,10 +8,21 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_LABELS;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PATH;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PHENOTYPES;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PROBANDS;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_STRICT;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
+import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +34,9 @@ class AppCommandLineToSettingsMapper {
   private final String appName;
   private final String appVersion;
   private final ConfigDecisionTreeLoader configDecisionTreeLoader;
+  public static final String SAMPLE_PHENOTYPE_SEPARATOR = "/";
+  public static final String PHENOTYPE_SEPARATOR = ";";
+
 
   AppCommandLineToSettingsMapper(
       @Value("${app.name}") String appName,
@@ -39,13 +53,31 @@ class AppCommandLineToSettingsMapper {
     ConfigDecisionTree configDecisionTree = createDecisionTree(commandLine);
     WriterSettings writerSettings = createWriterSettings(commandLine);
     boolean strict = commandLine.hasOption(OPT_STRICT);
+    SampleInfo sampleInfo = createSampleInfo(commandLine);
     return Settings.builder()
         .inputVcfPath(inputPath)
         .configDecisionTree(configDecisionTree)
         .appSettings(appSettings)
         .writerSettings(writerSettings)
+        .sampleInfo(sampleInfo)
         .strict(strict)
         .build();
+  }
+
+  private SampleInfo createSampleInfo(CommandLine commandLine) {
+    String phenotypes;
+    if (commandLine.hasOption(OPT_PROBANDS)) {
+      phenotypes = commandLine.getOptionValue(OPT_PHENOTYPES);
+    } else {
+      phenotypes = "";
+    }
+    List<String> probandNames;
+    if (commandLine.hasOption(OPT_PROBANDS)) {
+      probandNames = Arrays.asList(commandLine.getOptionValue(OPT_PROBANDS).split(","));
+    } else {
+      probandNames = List.of();
+    }
+    return mapPhenotypes(phenotypes, probandNames);
   }
 
   private ConfigDecisionTree createDecisionTree(CommandLine commandLine) {
@@ -75,5 +107,64 @@ class AppCommandLineToSettingsMapper {
         .writeLabels(writeLabels)
         .writePath(writePath)
         .build();
+  }
+
+  public static void checkPhenotype(String phenotype) {
+    Pattern p = Pattern.compile(".+:.+");
+    Matcher m = p.matcher(phenotype);
+    if (!m.matches()) {
+      throw new IllegalPhenotypeArgumentException(phenotype);
+    }
+  }
+
+  public SampleInfo mapPhenotypes(String phenotypes, List<String> probands) {
+    List<SamplePhenotype> phenotypeList = parse(phenotypes);
+    Map<String, SampleMeta> sampleMetaMap = new HashMap<>();
+    for (SamplePhenotype samplePhenotype : phenotypeList) {
+      PhenotypeMode mode = samplePhenotype.getMode();
+      switch (mode) {
+        case STRING:
+          return SampleInfo.builder().probands(probands).samplePhenotypes(List.of(
+              samplePhenotype.getPhenotypes())).build();
+        case PER_SAMPLE_STRING:
+          sampleMetaMap.put(samplePhenotype.getSubjectId(), mapPhenotypes(samplePhenotype));
+          break;
+        default:
+          throw new UnexpectedEnumException(mode);
+      }
+    }
+    return SampleInfo.builder().probands(probands).sampleMetaMap(sampleMetaMap).build();
+  }
+
+  private SampleMeta mapPhenotypes(SamplePhenotype samplePhenotype) {
+    return SampleMeta.builder().samplePhenotypes(List.of(samplePhenotype.getPhenotypes())).build();
+  }
+
+  private List<SamplePhenotype> parse(String phenotypesString) {
+    if (phenotypesString.contains(SAMPLE_PHENOTYPE_SEPARATOR)) {
+      return parseSamplePhenotypes(phenotypesString);
+    } else {
+      String[] phenotypes = phenotypesString.split(PHENOTYPE_SEPARATOR);
+      return Collections.singletonList(new SamplePhenotype(PhenotypeMode.STRING, null, phenotypes));
+    }
+  }
+
+  private List<SamplePhenotype> parseSamplePhenotypes(String phenotypesString) {
+    List<SamplePhenotype> result = new ArrayList<>();
+    for (String samplePhenotypes : phenotypesString.split(",")) {
+      if (samplePhenotypes.contains("/")) {
+        String[] split = samplePhenotypes.split("/");
+        if (split.length == 2) {
+          String sampleId = split[0];
+          String[] phenotypes = split[1].split(";");
+          result.add(new SamplePhenotype(PhenotypeMode.PER_SAMPLE_STRING, sampleId, phenotypes));
+        } else {
+          throw new InvalidSamplePhenotypesException(samplePhenotypes);
+        }
+      } else {
+        throw new MixedPhenotypesException();
+      }
+    }
+    return result;
   }
 }

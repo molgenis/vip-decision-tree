@@ -29,13 +29,17 @@ import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.Label;
 import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
+import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.filter.model.Node;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.NodeType;
+import org.molgenis.vcf.decisiontree.filter.model.SamplePhenotypeNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigMode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigPhenotypeNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigClauseOperator;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
@@ -66,7 +70,23 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     Map<String, Node> nodeMap = mapNodes(vcfMetadata, configDecisionTree.getNodes(), labelMap,
         filesMap);
     Node rootNode = nodeMap.get(configDecisionTree.getRootNode());
-    return DecisionTree.builder().rootNode(rootNode).build();
+    Mode mode = toMode(configDecisionTree.getMode());
+    return DecisionTree.builder().rootNode(rootNode).mode(mode).build();
+  }
+
+  private Mode toMode(ConfigMode configMode) {
+    Mode mode;
+    switch (configMode) {
+      case VARIANT:
+        mode = Mode.VARIANT;
+        break;
+      case SAMPLE:
+        mode = Mode.SAMPLE;
+        break;
+      default:
+        throw new UnexpectedEnumException(configMode);
+    }
+    return mode;
   }
 
   private Map<String, Set<String>> mapFiles(Map<String, Path> files) {
@@ -143,6 +163,9 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         break;
       case CATEGORICAL:
         node = toCategoricalNode(vcfMetadata, id, (ConfigCategoricalNode) configNode);
+        break;
+      case SAMPLE_PHENOTYPE:
+        node = toPhenotypeNode(vcfMetadata, id, (ConfigPhenotypeNode) configNode);
         break;
       case LEAF:
         node = toLeafNode(id, (ConfigLeafNode) configNode);
@@ -291,6 +314,18 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .build();
   }
 
+  private SamplePhenotypeNode toPhenotypeNode(
+      VcfMetadata vcfMetadata, String id, ConfigPhenotypeNode nodeConfig) {
+    Field field = vcfMetadata.getField(nodeConfig.getField());
+    queryValidator.validatePhenotypeNode(field, nodeConfig.getOperator());
+    return SamplePhenotypeNode.builder()
+        .id(id)
+        .description(nodeConfig.getDescription())
+        .field(field)
+        .operator(toOperator(nodeConfig.getOperator()))
+        .build();
+  }
+
   private LeafNode toLeafNode(String id, ConfigLeafNode nodeConfig) {
     return LeafNode.builder()
         .id(id)
@@ -320,6 +355,10 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         updateEnumNode(
             (CategoricalNode) node, (ConfigCategoricalNode) configNode, nodeMap, labelMap);
         break;
+      case SAMPLE_PHENOTYPE:
+        updatePhenotypeNode(
+            (SamplePhenotypeNode) node, (ConfigPhenotypeNode) configNode, nodeMap, labelMap);
+        break;
       default:
         throw new IllegalArgumentException(
             String.format("unexpected enum '%s'", configNode.getType().toString()));
@@ -336,6 +375,21 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
 
     NodeOutcome outcomeFalse = toNodeOutcome(configNode.getOutcomeFalse(), nodeMap, labelMap);
     node.setOutcomeFalse(outcomeFalse);
+  }
+
+  private void updatePhenotypeNode(
+      SamplePhenotypeNode node,
+      ConfigPhenotypeNode configNode,
+      Map<String, Node> nodeMap,
+      Map<String, Label> labelMap) {
+    NodeOutcome outcomeTrue = toNodeOutcome(configNode.getOutcomeTrue(), nodeMap, labelMap);
+    node.setOutcomeTrue(outcomeTrue);
+
+    NodeOutcome outcomeFalse = toNodeOutcome(configNode.getOutcomeFalse(), nodeMap, labelMap);
+    node.setOutcomeFalse(outcomeFalse);
+
+    NodeOutcome outcomeMissing = toNodeOutcome(configNode.getOutcomeMissing(), nodeMap, labelMap);
+    node.setOutcomeMissing(outcomeMissing);
   }
 
   private void updateBoolNode(

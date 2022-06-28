@@ -64,9 +64,9 @@ class BoolMultiNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    //when(variant.getValue(field1)).thenReturn(2);
-    //when(variant.getValue(field2)).thenReturn(2);
-    //assertEquals(outcome2, boolMultiNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field1)).thenReturn(2);
+    when(variant.getValue(field2)).thenReturn(2);
+    assertEquals(outcome2, boolMultiNodeEvaluator.evaluate(node, variant));
   }
 
   @Test
@@ -107,9 +107,9 @@ class BoolMultiNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    //when(variant.getValue(field1)).thenReturn(2);
-    //when(variant.getValue(field2)).thenReturn(2);
-    //assertEquals(outcome1, boolMultiNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field1)).thenReturn(2);
+    when(variant.getValue(field2)).thenReturn(2);
+    assertEquals(outcome1, boolMultiNodeEvaluator.evaluate(node, variant));
   }
 
 
@@ -151,9 +151,9 @@ class BoolMultiNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    //when(variant.getValue(field1)).thenReturn(2);
-    //when(variant.getValue(field2)).thenReturn(2);
-    //assertEquals(outcomeDefault, boolMultiNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field1)).thenReturn(2);
+    when(variant.getValue(field2)).thenReturn(2);
+    assertEquals(outcomeDefault, boolMultiNodeEvaluator.evaluate(node, variant));
   }
 
   @Test
@@ -231,7 +231,7 @@ class BoolMultiNodeEvaluatorTest {
     Variant variant = mock(Variant.class);
     when(variant.getValue(field1)).thenReturn(2);
     when(variant.getValue(field2)).thenReturn(2);
-    assertEquals(outcome1, boolMultiNodeEvaluator.evaluate(node, variant, null));
+    assertEquals(outcome1, boolMultiNodeEvaluator.evaluate(node, variant));
   }
 
   @Test
@@ -261,7 +261,7 @@ class BoolMultiNodeEvaluatorTest {
 
     Variant variant = mock(Variant.class);
     when(variant.getValue(field1)).thenReturn(2);
-    assertEquals(outcome1, boolMultiNodeEvaluator.evaluate(node, variant, null));
+    assertEquals(outcome1, boolMultiNodeEvaluator.evaluate(node, variant));
   }
 
   @Test

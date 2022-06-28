@@ -14,11 +14,6 @@ public class ConsequenceAnnotatorImpl implements ConsequenceAnnotator {
   private final boolean writeLabels;
   private final boolean writePaths;
 
-  public static final String INFO_CLASS_ID = "VIPC";
-  public static final String INFO_PATH_ID = "VIPP";
-  public static final String INFO_LABELS_ID = "VIPL";
-
-
   public ConsequenceAnnotatorImpl(boolean writeLabels, boolean writePaths) {
     this.writeLabels = writeLabels;
     this.writePaths = writePaths;

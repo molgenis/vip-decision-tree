@@ -4,8 +4,11 @@ import static java.lang.String.format;
 
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
+import htsjdk.variant.vcf.VCFFormatHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLine;
+import htsjdk.variant.vcf.VCFHeaderLineCount;
+import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -20,6 +23,7 @@ import org.molgenis.vcf.decisiontree.WriterSettings;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.RecordWriterImpl;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigMode;
 import org.molgenis.vcf.decisiontree.runner.info.MissingVepException;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +38,8 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
   public static final String INFO_CLASS_ID = "VIPC";
   public static final String INFO_PATH_ID = "VIPP";
   public static final String INFO_LABELS_ID = "VIPL";
+  public static final String VISD = "VISD";
+  public static final String VISD_DESC = "VIP sample decision tree classification.";
 
   @Override
   public RecordWriter create(VcfMetadata vcfMetadata, Settings settings) {
@@ -73,6 +79,24 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
     vcfHeader.addMetaDataLine(
         new VCFHeaderLine(HEADER_VIP_ARGS, String.join(" ", appSettings.getArgs())));
 
+    if (settings.getConfigDecisionTree().getMode() == ConfigMode.VARIANT) {
+      vcfHeader = addVariantHeaders(vcfMetadata, writerSettings, vcfHeader);
+    } else {
+      vcfHeader.addMetaDataLine(new VCFInfoHeaderLine(
+          VISD,
+          VCFHeaderLineCount.UNBOUNDED,
+          VCFHeaderLineType.String,
+          VISD_DESC));
+      vcfHeader.addMetaDataLine(new VCFFormatHeaderLine(VISD, 1,
+          VCFHeaderLineType.String,
+          VISD_DESC));
+    }
+
+    return vcfHeader;
+  }
+
+  private static VCFHeader addVariantHeaders(VcfMetadata vcfMetadata, WriterSettings writerSettings,
+      VCFHeader vcfHeader) {
     VCFInfoHeaderLine vepHeader = null;
 
     Collection<VCFInfoHeaderLine> infoHeaderLines = vcfHeader.getInfoHeaderLines();
@@ -115,7 +139,7 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
     headerLines.addAll(vcfHeader.getContigLines());
     headerLines.addAll(infoHeaderLines);
     headerLines.addAll(additionalInfoLines);
-
-    return new VCFHeader(headerLines, vcfHeader.getGenotypeSamples());
+    vcfHeader = new VCFHeader(headerLines, vcfHeader.getGenotypeSamples());
+    return vcfHeader;
   }
 }
