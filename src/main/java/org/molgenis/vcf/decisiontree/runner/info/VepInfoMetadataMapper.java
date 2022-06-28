@@ -72,13 +72,19 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.INTEGER);
         break;
-      case "Consequence", "Existing_variation", "CLIN_SIG", "FLAGS":
+      case "Consequence", "Existing_variation", "CLIN_SIG", "FLAGS", "clinVar_CLNSIGINCL", "clinVar_CLNREVSTAT":
         fieldBuilder
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
             .valueType(ValueType.STRING)
             .separator('&');
         break;
-      case "PHENO", "PUBMED", "SOMATIC":
+      case "clinVar_CLNSIG":
+        fieldBuilder
+            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
+            .valueType(ValueType.STRING)
+            .separator('/');
+        break;
+      case "PHENO", "PUBMED", "SOMATIC", "clinVar":
         fieldBuilder
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
             .valueType(ValueType.INTEGER)

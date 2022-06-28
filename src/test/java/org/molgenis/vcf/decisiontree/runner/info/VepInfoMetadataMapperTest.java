@@ -65,7 +65,7 @@ class VepInfoMetadataMapperTest {
     when(headerLine.getID()).thenReturn("CSQ");
     when(headerLine.getDescription())
         .thenReturn(
-            "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|gnomAD_HN|PUBMED|CAPICE_CL|CAPICE_SC");
+            "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|gnomAD_HN|PUBMED|CAPICE_CL|CAPICE_SC|clinVar|clinVar_CLNSIG|clinVar_CLNSIGINCL|clinVar_CLNREVSTAT");
 
     VepHeaderLine actual = vepInfoMetadataMapper
         .map(headerLine);
@@ -83,6 +83,10 @@ class VepInfoMetadataMapperTest {
     expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 6));
     expectedMap.put("CAPICE_CL", getFixedStringField("CAPICE_CL", 7));
     expectedMap.put("CAPICE_SC", getVariableIntegerField("CAPICE_SC", 8));
+    expectedMap.put("clinVar", getVariableIntegerField("clinVar", 9));
+    expectedMap.put("clinVar_CLNSIG", getVariableIntegerField("clinVar_CLNSIG", 10));
+    expectedMap.put("clinVar_CLNSIGINCL", getVariableIntegerField("clinVar_CLNSIGINCL", 11));
+    expectedMap.put("clinVar_CLNREVSTAT", getVariableIntegerField("clinVar_CLNREVSTAT", 12));
     assertEquals(VepHeaderLine.builder().nestedFields(expectedMap).parentField(vepField).build(),
         actual);
   }
