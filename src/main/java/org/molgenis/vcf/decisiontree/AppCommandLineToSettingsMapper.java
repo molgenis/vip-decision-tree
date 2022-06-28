@@ -109,14 +109,6 @@ class AppCommandLineToSettingsMapper {
         .build();
   }
 
-  public static void checkPhenotype(String phenotype) {
-    Pattern p = Pattern.compile(".+:.+");
-    Matcher m = p.matcher(phenotype);
-    if (!m.matches()) {
-      throw new IllegalPhenotypeArgumentException(phenotype);
-    }
-  }
-
   public SampleInfo mapPhenotypes(String phenotypes, List<String> probands) {
     List<SamplePhenotype> phenotypeList = parse(phenotypes);
     Map<String, SampleMeta> sampleMetaMap = new HashMap<>();
