@@ -16,7 +16,7 @@ usage: java -jar vcf-decision-tree.jar -i <arg> -c <arg> [-o <arg>] [-f]
  -l,--labels         Write decision tree outcome labels to output VCF
                      file.
  -p,--path           Write decision tree node path to output VCF file.
- -d,--debug          Enable debug configMode (additional logging).
+ -d,--debug          Enable debug mode (additional logging).
 
 usage: java -jar vcf-decision-tree.jar -v
  -v,--version   Print version.
