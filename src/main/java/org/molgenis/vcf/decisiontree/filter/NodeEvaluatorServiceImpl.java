@@ -64,6 +64,9 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
           throw new UnsupportedOperationException(
               "Cannot filter on phenotypes when running in variant filter mode.");
         }
+        if (sampleMeta.getSamplePhenotypes().isEmpty()) {
+          throw new MissingPhenotypesException(sampleName);
+        }
         BoolNode boolNode = injectPhenotypes((SamplePhenotypeNode) node,
             sampleMeta.getSamplePhenotypes());
         nodeOutcome = boolNodeEvaluator.evaluate(boolNode, variant, sampleName);

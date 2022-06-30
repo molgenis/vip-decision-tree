@@ -14,7 +14,7 @@
         "nextNode": "exit_f"
       },
       "outcomeMissing": {
-        "nextNode": "exit_k"
+        "nextNode": "exit_f"
       }
     },
     "exit_k": {
