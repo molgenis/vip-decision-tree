@@ -2,8 +2,6 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import static java.lang.String.format;
 
-import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-
 public class MissingPhenotypesException extends
     RuntimeException {
 
