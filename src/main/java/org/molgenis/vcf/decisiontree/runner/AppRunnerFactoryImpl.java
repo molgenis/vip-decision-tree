@@ -10,7 +10,6 @@ import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
-import org.molgenis.vcf.decisiontree.filter.sample.SampleAnnotator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -51,8 +50,7 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
         classifier = classifierFactory.create(settings, decisionTree, consequenceAnnotator,
             recordWriter, vcfMetadata);
       } else {
-        SampleAnnotator sampleAnnotator = SampleAnnotatorFactory.create();
-        classifier = classifierFactory.create(settings, decisionTree, sampleAnnotator,
+        classifier = classifierFactory.create(settings, decisionTree,
             recordWriter);
       }
 

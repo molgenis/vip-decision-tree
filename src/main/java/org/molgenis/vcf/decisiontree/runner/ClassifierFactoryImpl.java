@@ -10,8 +10,8 @@ import org.molgenis.vcf.decisiontree.filter.DecisionTreeExecutor;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
-import org.molgenis.vcf.decisiontree.filter.sample.SampleAnnotator;
-import org.molgenis.vcf.decisiontree.filter.sample.SampleClassifierImpl;
+import org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl;
+import org.molgenis.vcf.decisiontree.filter.SampleClassifierImpl;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -36,12 +36,11 @@ class ClassifierFactoryImpl implements ClassifierFactory {
 
   @Override
   public Classifier create(Settings settings, DecisionTree decisionTree,
-      SampleAnnotator sampleAnnotator, RecordWriter recordWriter) {
+      RecordWriter recordWriter) {
     DecisionTreeExecutor decisionTreeExecutor =
         decisionTreeExecutorFactory.create(settings.getWriterSettings());
 
     return new SampleClassifierImpl(decisionTreeExecutor, new VepHelper(), decisionTree,
-        recordWriter,
-        sampleAnnotator, settings.getSampleInfo());
+        recordWriter, settings.getSampleInfo(), new SampleAnnotatorImpl());
   }
 }

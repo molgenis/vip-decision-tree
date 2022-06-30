@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VISD;
 
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
@@ -38,7 +39,6 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
   public static final String INFO_CLASS_ID = "VIPC";
   public static final String INFO_PATH_ID = "VIPP";
   public static final String INFO_LABELS_ID = "VIPL";
-  public static final String VISD = "VISD";
   public static final String VISD_DESC = "VIP sample decision tree classification.";
 
   @Override

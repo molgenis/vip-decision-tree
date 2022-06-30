@@ -1,8 +1,8 @@
-package org.molgenis.vcf.decisiontree.filter.sample;
+package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.decisiontree.filter.sample.SampleAnnotatorImpl.VISD;
+import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VISD;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
@@ -13,14 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.molgenis.vcf.decisiontree.SampleInfo;
-import org.molgenis.vcf.decisiontree.filter.Allele;
-import org.molgenis.vcf.decisiontree.filter.Classifier;
-import org.molgenis.vcf.decisiontree.filter.DecisionTreeExecutor;
-import org.molgenis.vcf.decisiontree.filter.RecordWriter;
-import org.molgenis.vcf.decisiontree.filter.Variant;
-import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
-import org.molgenis.vcf.decisiontree.filter.VcfReader;
-import org.molgenis.vcf.decisiontree.filter.VcfRecord;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
@@ -36,19 +28,18 @@ public class SampleClassifierImpl implements Classifier {
   private final VepHelper vepHelper;
   private final DecisionTree decisionTree;
   private final RecordWriter recordWriter;
-  private final SampleAnnotator sampleAnnotator;
   private final SampleInfo sampleInfo;
+  private final SampleAnnotator sampleAnnotator;
 
   public SampleClassifierImpl(DecisionTreeExecutor decisionTreeExecutor, VepHelper vepHelper,
       DecisionTree decisionTree,
-      RecordWriter recordWriter,
-      SampleAnnotator sampleAnnotator, SampleInfo sampleInfo) {
+      RecordWriter recordWriter, SampleInfo sampleInfo, SampleAnnotator sampleAnnotator) {
     this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
     this.vepHelper = requireNonNull(vepHelper);
     this.decisionTree = decisionTree;
     this.recordWriter = recordWriter;
-    this.sampleAnnotator = sampleAnnotator;
     this.sampleInfo = sampleInfo;
+    this.sampleAnnotator = sampleAnnotator;
   }
 
   @Override
@@ -59,7 +50,7 @@ public class SampleClassifierImpl implements Classifier {
     vcfReader.stream()
         .map(
             vcfRecord -> processRecordSample(vcfRecord, decisionTree,
-                vcfMetadata, sampleAnnotator, sampleInfo)).forEach(vcfRecord -> {
+                vcfMetadata, sampleInfo, sampleAnnotator)).forEach(vcfRecord -> {
           recordWriter.write(vcfRecord);
           if (nrRecord.incrementAndGet() % 25000 == 0) {
             LOGGER.debug("processed {} records", nrRecord);
@@ -69,7 +60,7 @@ public class SampleClassifierImpl implements Classifier {
 
   private VcfRecord processRecordSample(
       VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
-      SampleAnnotator sampleAnnotator, SampleInfo sampleInfo) {
+      SampleInfo sampleInfo, SampleAnnotator sampleAnnotator) {
     VepHeaderLine vepHeaderLine = vcfMetadata.getVepHeaderLine();
     Map<Integer, List<VcfRecord>> alleleCsqMap = vepHelper.getRecordPerConsequence(vcfRecord,
         vepHeaderLine);
@@ -97,8 +88,13 @@ public class SampleClassifierImpl implements Classifier {
       sampleMeta = sampleMetaMap.get(sampleName);
     }
     if (sampleMeta == null) {
-      sampleMeta = SampleMeta.builder().samplePhenotypes(sampleInfo.getSamplePhenotypes())
-          .sampleName(sampleName).proband(sampleInfo.getProbands().contains(sampleName)).build();
+      SampleMeta.SampleMetaBuilder sampleMetaBuilder = SampleMeta.builder()
+          .samplePhenotypes(sampleInfo.getSamplePhenotypes())
+          .sampleName(sampleName);
+      if (sampleInfo.getProbands() != null) {
+        sampleMetaBuilder.proband(sampleInfo.getProbands().contains(sampleName));
+      }
+      sampleMeta = sampleMetaBuilder.build();
     }
     return sampleMeta;
   }

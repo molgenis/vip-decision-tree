@@ -1,4 +1,4 @@
-package org.molgenis.vcf.decisiontree.filter.sample;
+package org.molgenis.vcf.decisiontree.filter;
 
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.GenotypeBuilder;

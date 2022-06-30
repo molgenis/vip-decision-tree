@@ -19,8 +19,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
