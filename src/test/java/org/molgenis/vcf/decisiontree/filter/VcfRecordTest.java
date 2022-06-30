@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -322,6 +323,98 @@ class VcfRecordTest {
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn("str0");
     assertEquals("str0", vcfRecord.getValue(field, createAllele()));
+  }
+
+  @Test
+  void getValueFormatAD() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("AD")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getAD()).thenReturn(new int[]{10, 10});
+    when(variantContext.getGenotype("sample1")).thenReturn(gt);
+    assertEquals(List.of(Integer.valueOf(10), Integer.valueOf(10)),
+        vcfRecord.getValue(field, createAllele(), "sample1"));
+  }
+
+  @Test
+  void getValueFormatDP() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("DP")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getDP()).thenReturn(10);
+    when(variantContext.getGenotype("sample1")).thenReturn(gt);
+    assertEquals(10, vcfRecord.getValue(field, createAllele(), "sample1"));
+  }
+
+  @Test
+  void getValueFormatGT() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("GT")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getGenotypeString()).thenReturn("1|1");
+    when(variantContext.getGenotype("sample1")).thenReturn(gt);
+    assertEquals("1|1", vcfRecord.getValue(field, createAllele(), "sample1"));
+  }
+
+  @Test
+  void getValueFormatGQ() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("GQ")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getGQ()).thenReturn(10);
+    when(variantContext.getGenotype("sample1")).thenReturn(gt);
+    assertEquals(10, vcfRecord.getValue(field, createAllele(), "sample1"));
+  }
+
+  @Test
+  void getValueFormatPL() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("PL")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getPL()).thenReturn(new int[]{10, 10});
+    when(variantContext.getGenotype("sample1")).thenReturn(gt);
+    assertTrue(java.util.Arrays.equals(new int[]{10, 10},
+        (int[]) vcfRecord.getValue(field, createAllele(), "sample1")));
+  }
+
+  @Test
+  void getValueFormatCustom() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("test")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getExtendedAttribute("test")).thenReturn("testValue");
+    when(variantContext.getGenotype("sample1")).thenReturn(gt);
+    assertEquals("testValue", vcfRecord.getValue(field, createAllele(), "sample1"));
   }
 
   private Allele createAllele() {
