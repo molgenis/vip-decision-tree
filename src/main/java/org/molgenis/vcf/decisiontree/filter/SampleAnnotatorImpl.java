@@ -10,9 +10,9 @@ import org.molgenis.vcf.decisiontree.filter.model.Decision;
 
 public class SampleAnnotatorImpl implements SampleAnnotator {
 
-  public static final String VISD = "VISD";
-  public static final String VISDP = "VISDP";
-  public static final String VISDL = "VISDL";
+  public static final String VIPC_S = "VIPC_S";
+  public static final String VIPP_S = "VIPP_S";
+  public static final String VIPL_S = "VIPL_S";
   private final boolean writeLabels;
   private final boolean writePaths;
 
@@ -27,14 +27,14 @@ public class SampleAnnotatorImpl implements SampleAnnotator {
     GenotypesContext genotypeContext = GenotypesContext.copy(vc.getGenotypes());
     Genotype genotype = genotypeContext.get(sampleIndex);
     GenotypeBuilder gtBuilder = new GenotypeBuilder(genotype);
-    gtBuilder.attribute(VISD,
+    gtBuilder.attribute(VIPC_S,
         decisions.stream().map(DecisionUtils::getDecisionClass).toList());
     if (writePaths) {
-      gtBuilder.attribute(VISDP,
+      gtBuilder.attribute(VIPP_S,
           decisions.stream().map(DecisionUtils::getDecisionsPath).toList());
     }
     if (writeLabels) {
-      gtBuilder.attribute(VISDL,
+      gtBuilder.attribute(VIPL_S,
           decisions.stream().map(DecisionUtils::getDecisionLabelsString).toList());
     }
     genotypeContext.replace(gtBuilder.make());

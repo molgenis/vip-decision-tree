@@ -8,6 +8,7 @@ import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -37,7 +38,7 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
   }
 
   @Override
-  public NodeOutcome evaluate(DecisionNode node, Variant variant, Integer sampleIndex) {
+  public NodeOutcome evaluate(DecisionNode node, Variant variant, @Nullable Integer sampleIndex) {
     NodeOutcome nodeOutcome;
     DecisionType decisionType = node.getDecisionType();
     switch (decisionType) {

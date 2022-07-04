@@ -1,7 +1,7 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VISD;
+import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPC_S;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
@@ -78,7 +78,7 @@ public class SampleClassifierImpl implements Classifier {
     }
     VariantContextBuilder vcBuilder = new VariantContextBuilder(vc);
     if (!decisions.isEmpty()) {
-      vcBuilder.attribute(VISD, String.join(",", decisions));
+      vcBuilder.attribute(VIPC_S, String.join(",", decisions));
     }
     return new VcfRecord(vcBuilder.make());
 

@@ -1,9 +1,9 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import static java.lang.String.format;
-import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VISD;
-import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VISDP;
-import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VISDL;
+import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPC_S;
+import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPP_S;
+import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPL_S;
 
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
@@ -41,9 +41,10 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
   public static final String INFO_CLASS_ID = "VIPC";
   public static final String INFO_PATH_ID = "VIPP";
   public static final String INFO_LABELS_ID = "VIPL";
-  public static final String VISD_DESC = "VIP sample decision tree classification.";
-  public static final String VISDP_DESC = "VIP sample decision tree path.";
-  public static final String VISDL_DESC = "VIP sample decision tree labels.";
+  public static final String VIPC_S_DESC = "VIP decision tree classification.";
+  public static final String VIPC_S_INFO = "VIP decision tree classification (samples).";
+  public static final String VIPP_S_DESC = "VIP decision tree path.";
+  public static final String VIPL_S_DESC = "VIP decision tree labels.";
 
   @Override
   public RecordWriter create(VcfMetadata vcfMetadata, Settings settings) {
@@ -87,22 +88,22 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
       vcfHeader = addVariantHeaders(vcfMetadata, writerSettings, vcfHeader);
     } else {
       vcfHeader.addMetaDataLine(new VCFInfoHeaderLine(
-          VISD,
+          VIPC_S,
           VCFHeaderLineCount.UNBOUNDED,
           VCFHeaderLineType.String,
-          VISD_DESC));
-      vcfHeader.addMetaDataLine(new VCFFormatHeaderLine(VISD, VCFHeaderLineCount.UNBOUNDED,
+          VIPC_S_INFO));
+      vcfHeader.addMetaDataLine(new VCFFormatHeaderLine(VIPC_S, VCFHeaderLineCount.UNBOUNDED,
           VCFHeaderLineType.String,
-          VISD_DESC));
+          VIPC_S_DESC));
       if (writerSettings.isWritePath()) {
-        vcfHeader.addMetaDataLine(new VCFFormatHeaderLine(VISDP, VCFHeaderLineCount.UNBOUNDED,
+        vcfHeader.addMetaDataLine(new VCFFormatHeaderLine(VIPP_S, VCFHeaderLineCount.UNBOUNDED,
             VCFHeaderLineType.String,
-            VISDP_DESC));
+            VIPP_S_DESC));
       }
       if (writerSettings.isWriteLabels()) {
-        vcfHeader.addMetaDataLine(new VCFFormatHeaderLine(VISDL, VCFHeaderLineCount.UNBOUNDED,
+        vcfHeader.addMetaDataLine(new VCFFormatHeaderLine(VIPL_S, VCFHeaderLineCount.UNBOUNDED,
             VCFHeaderLineType.String,
-            VISDL_DESC));
+            VIPL_S_DESC));
       }
     }
 
