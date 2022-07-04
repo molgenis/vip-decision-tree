@@ -28,10 +28,10 @@ public class ClassifierImpl implements Classifier {
       RecordWriter recordWriter, VcfMetadata vcfMetadata) {
     this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
     this.vepHelper = requireNonNull(vepHelper);
-    this.decisionTree = decisionTree;
-    this.consequenceAnnotator = consequenceAnnotator;
-    this.recordWriter = recordWriter;
-    this.vcfMetadata = vcfMetadata;
+    this.decisionTree = requireNonNull(decisionTree);
+    this.consequenceAnnotator = requireNonNull(consequenceAnnotator);
+    this.recordWriter = requireNonNull(recordWriter);
+    this.vcfMetadata = requireNonNull(vcfMetadata);
   }
 
   @Override

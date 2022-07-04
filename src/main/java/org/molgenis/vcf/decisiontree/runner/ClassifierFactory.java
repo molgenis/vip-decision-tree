@@ -10,7 +10,7 @@ import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 
 interface ClassifierFactory {
 
-  Classifier create(Settings settings, DecisionTree deisionTree,
+  Classifier create(Settings settings, DecisionTree decisionTree,
       ConsequenceAnnotator consequenceAnnotator, RecordWriter recordWriter,
       VcfMetadata vcfMetadata);
 

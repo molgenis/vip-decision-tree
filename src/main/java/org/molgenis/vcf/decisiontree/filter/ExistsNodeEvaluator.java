@@ -16,12 +16,7 @@ public class ExistsNodeEvaluator implements NodeEvaluator<ExistsNode> {
     if (node.getField() instanceof MissingField) {
       nodeOutcome = node.getOutcomeFalse();
     } else {
-      Object value;
-      if (sampleName != null) {
-        value = variant.getValue(node.getField(), sampleName);
-      } else {
-        value = variant.getValue(node.getField());
-      }
+      Object value = variant.getValue(node.getField(), sampleName);
       boolean matches = !isMissingValue(value);
       nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();
     }

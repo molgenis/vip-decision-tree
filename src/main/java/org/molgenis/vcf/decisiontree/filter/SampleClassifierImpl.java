@@ -35,10 +35,10 @@ public class SampleClassifierImpl implements Classifier {
       RecordWriter recordWriter, SampleAnnotator sampleAnnotator, Set<String> probands) {
     this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
     this.vepHelper = requireNonNull(vepHelper);
-    this.decisionTree = decisionTree;
-    this.recordWriter = recordWriter;
-    this.sampleAnnotator = sampleAnnotator;
-    this.probands = probands;
+    this.decisionTree = requireNonNull(decisionTree);
+    this.recordWriter = requireNonNull(recordWriter);
+    this.sampleAnnotator = requireNonNull(sampleAnnotator);
+    this.probands = requireNonNull(probands);
   }
 
   @Override

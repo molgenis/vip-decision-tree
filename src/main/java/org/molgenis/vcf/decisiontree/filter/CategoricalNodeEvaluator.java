@@ -16,12 +16,7 @@ public class CategoricalNodeEvaluator implements NodeEvaluator<CategoricalNode> 
         throw new EvaluationException(node, variant, "missing 'missingOutcome'");
       }
     }
-    String value;
-    if (sampleName != null) {
-      value = (String) variant.getValue(node.getField(), sampleName);
-    } else {
-      value = (String) variant.getValue(node.getField());
-    }
+    Object value = variant.getValue(node.getField(), sampleName);
     if (value != null) {
       nodeOutcome = node.getOutcomeMap().get(value);
       if (nodeOutcome == null) {

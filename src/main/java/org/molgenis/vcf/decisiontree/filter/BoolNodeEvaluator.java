@@ -22,12 +22,7 @@ public class BoolNodeEvaluator implements BaseBoolNodeEvaluator<BoolNode> {
         throw new EvaluationException(node, variant, "missing 'missingOutcome'");
       }
     }
-    Object value;
-    if (sampleName != null) {
-      value = variant.getValue(query.getField(), sampleName);
-    } else {
-      value = variant.getValue(query.getField());
-    }
+    Object value = variant.getValue(query.getField(), sampleName);
     if (!isMissingValue(value)) {
       boolean matches = executeQuery(query, value);
       nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();
