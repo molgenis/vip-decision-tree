@@ -27,7 +27,6 @@ import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.RecordWriterImpl;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigMode;
 import org.molgenis.vcf.decisiontree.runner.info.MissingVepException;
 import org.springframework.stereotype.Component;
 

@@ -11,7 +11,6 @@ import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.SampleAnnotator;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
-import org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl;
 import org.molgenis.vcf.decisiontree.filter.SampleClassifierImpl;
 import org.springframework.stereotype.Component;
 

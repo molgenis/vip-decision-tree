@@ -33,17 +33,14 @@ public class SampleAnnotatorImpl implements SampleAnnotator {
     Genotype genotype = genotypeContext.get(sampleName);
     GenotypeBuilder gtBuilder = new GenotypeBuilder(genotype);
     gtBuilder.attribute(VISD,
-        decisions.stream().map(decision -> getDecisionClass(decision)).collect(
-            Collectors.toList()));
+        decisions.stream().map(DecisionUtils::getDecisionClass).toList());
     if (writePaths) {
       gtBuilder.attribute(VISDP,
-          decisions.stream().map(decision -> getDecisionsPath(decision)).collect(
-              Collectors.toList()));
+          decisions.stream().map(DecisionUtils::getDecisionsPath).toList());
     }
     if (writeLabels) {
       gtBuilder.attribute(VISDL,
-          decisions.stream().map(decision -> getDecisionLabelsString(decision)).collect(
-              Collectors.toList()));
+          decisions.stream().map(DecisionUtils::getDecisionLabelsString).toList());
     }
     genotypeContext.replace(gtBuilder.make());
     vcBuilder.genotypes(genotypeContext);

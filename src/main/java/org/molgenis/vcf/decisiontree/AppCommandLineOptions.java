@@ -196,7 +196,7 @@ class AppCommandLineOptions {
     }
 
     String mode = commandLine.getOptionValue(OPT_MODE);
-    List<String> modes = Arrays.stream(Mode.values()).map(value -> value.toString())
+    List<String> modes = Arrays.stream(Mode.values()).map(Mode::toString)
         .toList();
 
     if (!modes.contains(mode.toUpperCase())) {

@@ -1,16 +1,10 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import static java.util.stream.Collectors.joining;
 import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionClass;
 import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionLabelsString;
 import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionsPath;
 
-import htsjdk.variant.vcf.VCFConstants;
-import java.util.List;
-import java.util.Set;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
-import org.molgenis.vcf.decisiontree.filter.model.Label;
-import org.molgenis.vcf.decisiontree.filter.model.Node;
 
 public class ConsequenceAnnotatorImpl implements ConsequenceAnnotator {
 

@@ -74,7 +74,7 @@ public class SampleClassifierImpl implements Classifier {
           sampleDecisions);
       vc = sampleAnnotator.annotate(sampleDecisions, sampleName, vc);
       decisions.addAll(
-          sampleDecisions.stream().map(sampleDecision -> sampleDecision.getClazz()).toList());
+          sampleDecisions.stream().map(Decision::getClazz).toList());
     }
     VariantContextBuilder vcBuilder = new VariantContextBuilder(vc);
     if (!decisions.isEmpty()) {

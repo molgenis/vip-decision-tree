@@ -73,21 +73,6 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     return DecisionTree.builder().rootNode(rootNode).build();
   }
 
-  private Mode toMode(ConfigMode configMode) {
-    Mode mode;
-    switch (configMode) {
-      case VARIANT:
-        mode = Mode.VARIANT;
-        break;
-      case SAMPLE:
-        mode = Mode.SAMPLE;
-        break;
-      default:
-        throw new UnexpectedEnumException(configMode);
-    }
-    return mode;
-  }
-
   private Map<String, Set<String>> mapFiles(Map<String, Path> files) {
     Map<String, Set<String>> filesMap;
     if (files == null) {
