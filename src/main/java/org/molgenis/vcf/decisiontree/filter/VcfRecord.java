@@ -2,10 +2,10 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedInfoValue;
 
+import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
 import htsjdk.variant.vcf.VCFConstants;
@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -27,7 +28,7 @@ import org.molgenis.vcf.decisiontree.utils.VcfUtils;
  */
 public class VcfRecord {
 
-  private static final List<String> PASS_FILTER = singletonList(VCFConstants.PASSES_FILTERS_v4);
+  private static final List<String> PASS_FILTER = List.of(VCFConstants.PASSES_FILTERS_v4);
 
   private VariantContext variantContext;
 
@@ -50,6 +51,10 @@ public class VcfRecord {
   }
 
   public Object getValue(Field field, Allele allele) {
+    return getValue(field, allele, null);
+  }
+
+  public Object getValue(Field field, Allele allele, Integer sampleIndex) {
     Object value;
     FieldType fieldType = field.getFieldType();
     switch (fieldType) {
@@ -63,9 +68,39 @@ public class VcfRecord {
         value = getNestedVepValue(field);
         break;
       case FORMAT:
-        throw new UnsupportedOperationException("FORMAT values are not yet supported."); // TODO
+        if (sampleIndex == null) {
+          throw new UnsupportedOperationException(
+              "Cannot filter on FORMAT fields when running in variant filter mode.");
+        }
+        value = getFormatField(field, sampleIndex);
+        break;
       default:
         throw new UnexpectedEnumException(fieldType);
+    }
+    return value;
+  }
+
+  private Object getFormatField(Field field, Integer sampleIndex) {
+    Genotype genotype = variantContext.getGenotype(sampleIndex);
+    Object value;
+    switch (field.getId()) {
+      case ("GT"):
+        value = genotype.getGenotypeString();
+        break;
+      case ("AD"):
+        value = IntStream.of(genotype.getAD()).boxed().toList();
+        break;
+      case ("DP"):
+        value = genotype.getDP();
+        break;
+      case ("GQ"):
+        value = genotype.getGQ();
+        break;
+      case ("PL"):
+        value = genotype.getPL();
+        break;
+      default:
+        value = genotype.getExtendedAttribute(field.getId());
     }
     return value;
   }
@@ -136,7 +171,7 @@ public class VcfRecord {
       value = PASS_FILTER;
     } else {
       if (filters.size() == 1) {
-        value = singletonList(filters.iterator().next());
+        value = List.of(filters.iterator().next());
       } else {
         value = new ArrayList<>(filters);
       }
@@ -233,7 +268,7 @@ public class VcfRecord {
 
   public VcfRecord getFilteredCopy(String consequence, Field vepField) {
     VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
-    variantContextBuilder.attribute(vepField.getId(), singletonList(consequence));
+    variantContextBuilder.attribute(vepField.getId(), List.of(consequence));
     VariantContext filterVariantContext = variantContextBuilder.make();
     return new VcfRecord(filterVariantContext);
   }

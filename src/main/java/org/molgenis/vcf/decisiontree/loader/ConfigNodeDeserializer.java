@@ -47,7 +47,8 @@ public class ConfigNodeDeserializer extends JsonDeserializer<ConfigNode> {
       default:
         throw new JsonMappingException(
             jp,
-            format("illegal 'type' value '%s' (allowed values: BOOL, CATEGORICAL, EXISTS, LEAF).",
+            format(
+                "illegal 'type' value '%s' (allowed values: BOOL, BOOL_MULTI, CATEGORICAL, EXISTS, SAMPLE_PHENOTYPE, LEAF).",
                 type));
     }
     return configNode;

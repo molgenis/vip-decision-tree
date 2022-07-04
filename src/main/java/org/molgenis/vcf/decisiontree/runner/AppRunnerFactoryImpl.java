@@ -6,9 +6,11 @@ import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.Classifier;
 import org.molgenis.vcf.decisiontree.filter.ConsequenceAnnotator;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
+import org.molgenis.vcf.decisiontree.filter.SampleAnnotator;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -41,13 +43,20 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
     VcfReader vcfReader = vcfReaderFactory.create(settings);
     try {
       VcfMetadata vcfMetadata = vcfReader.getMetadata();
-
-      Classifier classifier = classifierFactory.create(settings);
-      DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
       RecordWriter recordWriter = recordWriterFactory.create(vcfMetadata, settings);
-      ConsequenceAnnotator consequenceAnnotator = ConsequenceAnnotatorFactory.create(settings);
-      return new AppRunnerImpl(classifier, vcfReader, decisionTree, consequenceAnnotator,
-          recordWriter);
+      DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
+      Classifier classifier;
+      if (settings.getMode() == Mode.VARIANT) {
+        ConsequenceAnnotator consequenceAnnotator = ConsequenceAnnotatorFactory.create(settings);
+        classifier = classifierFactory.create(settings, decisionTree, consequenceAnnotator,
+            recordWriter, vcfMetadata);
+      } else {
+        SampleAnnotator sampleAnnotator = SampleAnnotatorFactory.create(settings);
+        classifier = classifierFactory.create(settings, decisionTree,
+            recordWriter, sampleAnnotator);
+      }
+
+      return new AppRunnerImpl(classifier, vcfReader, recordWriter);
     } catch (Exception e) {
       try {
         vcfReader.close();

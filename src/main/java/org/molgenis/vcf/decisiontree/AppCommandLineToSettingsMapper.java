@@ -6,12 +6,16 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_CONFIG;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_LABELS;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_MODE;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PATH;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PROBANDS;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_STRICT;
 
 import java.nio.file.Path;
+import java.util.Set;
 import org.apache.commons.cli.CommandLine;
+import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,13 +43,37 @@ class AppCommandLineToSettingsMapper {
     ConfigDecisionTree configDecisionTree = createDecisionTree(commandLine);
     WriterSettings writerSettings = createWriterSettings(commandLine);
     boolean strict = commandLine.hasOption(OPT_STRICT);
+    Mode mode = getMode(commandLine);
+    Set<String> probands = getProbands(commandLine);
     return Settings.builder()
+        .mode(mode)
         .inputVcfPath(inputPath)
         .configDecisionTree(configDecisionTree)
         .appSettings(appSettings)
         .writerSettings(writerSettings)
         .strict(strict)
+        .probands(probands)
         .build();
+  }
+
+  private Set<String> getProbands(CommandLine commandLine) {
+    Set<String> probands;
+    if (commandLine.hasOption(OPT_PROBANDS)) {
+      probands = Set.of(commandLine.getOptionValue(OPT_PROBANDS).split(","));
+    } else {
+      probands = Set.of();
+    }
+    return probands;
+  }
+
+  private Mode getMode(CommandLine commandLine) {
+    Mode mode;
+    if (commandLine.hasOption(OPT_MODE)) {
+      mode = Mode.valueOf(commandLine.getOptionValue(OPT_MODE).toUpperCase());
+    } else {
+      mode = Mode.VARIANT;
+    }
+    return mode;
   }
 
   private ConfigDecisionTree createDecisionTree(CommandLine commandLine) {

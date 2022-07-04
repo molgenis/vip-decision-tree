@@ -1,0 +1,31 @@
+{
+  "rootNode": "GT",
+  "nodes": {
+    "GT": {
+      "type": "BOOL",
+      "description": "GT non HOMREF match (test purpose only)",
+      "query": {
+        "field": "FORMAT/GT",
+        "operator": "!=",
+        "value": "0/0"
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_k"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_f"
+      },
+      "outcomeMissing": {
+        "nextNode": "exit_k"
+      }
+    },
+    "exit_k": {
+      "type": "LEAF",
+      "class": "k"
+    },
+    "exit_f": {
+      "type": "LEAF",
+      "class": "f"
+    }
+  }
+}

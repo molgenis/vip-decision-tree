@@ -5,8 +5,9 @@ import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 
 public class CategoricalNodeEvaluator implements NodeEvaluator<CategoricalNode> {
+
   @Override
-  public NodeOutcome evaluate(CategoricalNode node, Variant variant) {
+  public NodeOutcome evaluate(CategoricalNode node, Variant variant, Integer sampleIndex) {
     NodeOutcome nodeOutcome;
     if (node.getField() instanceof MissingField) {
       if (node.getOutcomeMissing() != null) {
@@ -15,7 +16,7 @@ public class CategoricalNodeEvaluator implements NodeEvaluator<CategoricalNode> 
         throw new EvaluationException(node, variant, "missing 'missingOutcome'");
       }
     }
-    String value = (String) variant.getValue(node.getField());
+    Object value = variant.getValue(node.getField(), sampleIndex);
     if (value != null) {
       nodeOutcome = node.getOutcomeMap().get(value);
       if (nodeOutcome == null) {

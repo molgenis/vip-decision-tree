@@ -72,7 +72,7 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
             .valueCount(ValueCount.builder().type(FIXED).count(1).build())
             .valueType(ValueType.INTEGER);
         break;
-      case "Consequence", "Existing_variation", "CLIN_SIG", "FLAGS", "clinVar_CLNSIGINCL", "clinVar_CLNREVSTAT":
+      case "Consequence", "Existing_variation", "CLIN_SIG", "FLAGS", "clinVar_CLNSIGINCL", "clinVar_CLNREVSTAT", "HPO":
         fieldBuilder
             .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
             .valueType(ValueType.STRING)

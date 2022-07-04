@@ -10,12 +10,13 @@ import org.springframework.stereotype.Component;
 public class ExistsNodeEvaluator implements NodeEvaluator<ExistsNode> {
 
   @Override
-  public NodeOutcome evaluate(ExistsNode node, Variant variant) {
+  public NodeOutcome evaluate(ExistsNode node,
+      Variant variant, Integer sampleIndex) {
     NodeOutcome nodeOutcome;
     if (node.getField() instanceof MissingField) {
       nodeOutcome = node.getOutcomeFalse();
     } else {
-      Object value = variant.getValue(node.getField());
+      Object value = variant.getValue(node.getField(), sampleIndex);
       boolean matches = !isMissingValue(value);
       nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();
     }
