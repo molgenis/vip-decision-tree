@@ -1,16 +1,11 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionClass;
-import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionLabelsString;
-import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionsPath;
-
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.GenotypeBuilder;
 import htsjdk.variant.variantcontext.GenotypesContext;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 
 public class SampleAnnotatorImpl implements SampleAnnotator {
