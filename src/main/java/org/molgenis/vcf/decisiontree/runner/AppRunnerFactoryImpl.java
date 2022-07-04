@@ -6,6 +6,7 @@ import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.Classifier;
 import org.molgenis.vcf.decisiontree.filter.ConsequenceAnnotator;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
+import org.molgenis.vcf.decisiontree.filter.SampleAnnotator;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
@@ -50,8 +51,9 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
         classifier = classifierFactory.create(settings, decisionTree, consequenceAnnotator,
             recordWriter, vcfMetadata);
       } else {
+        SampleAnnotator sampleAnnotator = SampleAnnotatorFactory.create(settings);
         classifier = classifierFactory.create(settings, decisionTree,
-            recordWriter);
+            recordWriter, sampleAnnotator);
       }
 
       return new AppRunnerImpl(classifier, vcfReader, recordWriter);

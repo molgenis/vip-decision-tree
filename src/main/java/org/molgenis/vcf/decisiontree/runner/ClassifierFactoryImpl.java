@@ -8,6 +8,7 @@ import org.molgenis.vcf.decisiontree.filter.ClassifierImpl;
 import org.molgenis.vcf.decisiontree.filter.ConsequenceAnnotator;
 import org.molgenis.vcf.decisiontree.filter.DecisionTreeExecutor;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
+import org.molgenis.vcf.decisiontree.filter.SampleAnnotator;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl;
@@ -36,11 +37,11 @@ class ClassifierFactoryImpl implements ClassifierFactory {
 
   @Override
   public Classifier create(Settings settings, DecisionTree decisionTree,
-      RecordWriter recordWriter) {
+      RecordWriter recordWriter, SampleAnnotator sampleAnnotator) {
     DecisionTreeExecutor decisionTreeExecutor =
         decisionTreeExecutorFactory.create(settings.getWriterSettings());
 
     return new SampleClassifierImpl(decisionTreeExecutor, new VepHelper(), decisionTree,
-        recordWriter, settings.getSampleInfo(), new SampleAnnotatorImpl());
+        recordWriter, settings.getSampleInfo(), sampleAnnotator);
   }
 }

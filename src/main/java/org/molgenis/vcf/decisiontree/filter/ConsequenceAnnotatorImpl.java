@@ -1,6 +1,9 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.stream.Collectors.joining;
+import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionClass;
+import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionLabelsString;
+import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionsPath;
 
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.List;
@@ -33,35 +36,5 @@ public class ConsequenceAnnotatorImpl implements ConsequenceAnnotator {
       csqBuilder.append(getDecisionLabelsString(decision));
     }
     return csqBuilder.toString();
-  }
-
-  private static String getDecisionLabelsString(Decision decision) {
-    String decisionLabel = "";
-    Set<Label> labels = decision.getLabels();
-    if (!labels.isEmpty()) {
-      decisionLabel = labels.stream().map(Label::getId).sorted().collect(joining("&"));
-    }
-    return decisionLabel;
-  }
-
-  private static String getDecisionsPath(Decision decision) {
-    String decisionPath;
-    List<Node> path = decision.getPath();
-    if (!path.isEmpty()) {
-      decisionPath = path.stream().map(Node::getId).collect(joining("&"));
-    } else {
-      decisionPath = VCFConstants.MISSING_VALUE_v4;
-    }
-    return decisionPath;
-  }
-
-  private static String getDecisionClass(Decision decision) {
-    String infoClassValue;
-    if (decision == null) {
-      infoClassValue = "";
-    } else {
-      infoClassValue = decision.getClazz();
-    }
-    return infoClassValue;
   }
 }

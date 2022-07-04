@@ -165,16 +165,36 @@ class SampleClassifierImplTest {
         .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2),
             SampleMeta.builder().sampleName("Patient2").build());
 
-    doReturn(vc0).when(sampleAnnotator).annotate("test1a", "Patient", vc0);
-    doReturn(vc0).when(sampleAnnotator).annotate("test1a", "Patient2", vc0);
-    doReturn(vc1).when(sampleAnnotator).annotate("test2a,test2b", "Patient", vc1);
-    doReturn(vc1).when(sampleAnnotator).annotate("test2a,test2b", "Patient2", vc1);
+    doReturn(vc0).when(sampleAnnotator)
+        .annotate(List.of(new Decision("test1a", Collections.emptyList(), Collections.emptySet())),
+            "Patient", vc0);
+    doReturn(vc0).when(sampleAnnotator)
+        .annotate(List.of(new Decision("test1a", Collections.emptyList(), Collections.emptySet())),
+            "Patient2", vc0);
+    doReturn(vc1).when(sampleAnnotator).annotate(
+        List.of(new Decision("test2a", Collections.emptyList(), Collections.emptySet()),
+            new Decision("test2b", Collections.emptyList(), Collections.emptySet())), "Patient",
+        vc1);
+    doReturn(vc1).when(sampleAnnotator).annotate(
+        List.of(new Decision("test2a", Collections.emptyList(), Collections.emptySet()),
+            new Decision("test2b", Collections.emptyList(), Collections.emptySet())), "Patient2",
+        vc1);
 
     classifier.classify(vcfReader);
 
-    verify(sampleAnnotator).annotate("test1a", "Patient", vc0);
-    verify(sampleAnnotator).annotate("test1a", "Patient2", vc0);
-    verify(sampleAnnotator).annotate("test2a,test2b", "Patient", vc1);
-    verify(sampleAnnotator).annotate("test2a,test2b", "Patient2", vc1);
+    verify(sampleAnnotator).annotate(
+        List.of(new Decision("test1a", Collections.emptyList(), Collections.emptySet())), "Patient",
+        vc0);
+    verify(sampleAnnotator).annotate(
+        List.of(new Decision("test1a", Collections.emptyList(), Collections.emptySet())),
+        "Patient2", vc0);
+    verify(sampleAnnotator).annotate(
+        List.of(new Decision("test2a", Collections.emptyList(), Collections.emptySet()),
+            new Decision("test2b", Collections.emptyList(), Collections.emptySet())), "Patient",
+        vc1);
+    verify(sampleAnnotator).annotate(
+        List.of(new Decision("test2a", Collections.emptyList(), Collections.emptySet()),
+            new Decision("test2b", Collections.emptyList(), Collections.emptySet())), "Patient2",
+        vc1);
   }
 }

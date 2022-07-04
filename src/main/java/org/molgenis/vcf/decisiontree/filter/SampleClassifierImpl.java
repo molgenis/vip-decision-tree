@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.molgenis.vcf.decisiontree.SampleInfo;
+import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
@@ -67,12 +68,13 @@ public class SampleClassifierImpl implements Classifier {
     Set<String> decisions = new HashSet<>();
     VariantContext vc = vcfRecord.getVariantContext();
     for (String sampleName : vc.getSampleNames()) {
-      List<String> sampleDecisions = new ArrayList<>();
+      List<Decision> sampleDecisions = new ArrayList<>();
       processRecord(vcfRecord, decisionTree, vcfMetadata, vepHeaderLine, alleleCsqMap,
           getSampleMeta(sampleName, sampleInfo),
           sampleDecisions);
-      vc = sampleAnnotator.annotate(String.join(",", sampleDecisions), sampleName, vc);
-      decisions.addAll(sampleDecisions);
+      vc = sampleAnnotator.annotate(sampleDecisions, sampleName, vc);
+      decisions.addAll(
+          sampleDecisions.stream().map(sampleDecision -> sampleDecision.getClazz()).toList());
     }
     VariantContextBuilder vcBuilder = new VariantContextBuilder(vc);
     if (!decisions.isEmpty()) {
@@ -102,7 +104,7 @@ public class SampleClassifierImpl implements Classifier {
   private void processRecord
       (VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
           VepHeaderLine vepHeaderLine, Map<Integer, List<VcfRecord>> alleleCsqMap,
-          SampleMeta sampleMeta, List<String> sampleDecisions) {
+          SampleMeta sampleMeta, List<Decision> sampleDecisions) {
     for (int alleleIndex = 0; alleleIndex < vcfRecord.getNrAltAlleles(); alleleIndex++) {
       Integer vepAlleleIndex = alleleIndex + 1;
       Allele allele = vcfRecord.getAltAllele(alleleIndex);
@@ -115,7 +117,7 @@ public class SampleClassifierImpl implements Classifier {
         Variant variant = Variant.builder().vcfMetadata(vcfMetadata).vcfRecord(singleCsqRecord)
             .allele(allele).build();
         sampleDecisions.add(
-            decisionTreeExecutor.execute(decisionTree, variant, sampleMeta).getClazz());
+            decisionTreeExecutor.execute(decisionTree, variant, sampleMeta));
       }
     }
   }

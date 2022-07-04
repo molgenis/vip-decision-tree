@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VISD;
 
@@ -10,11 +11,15 @@ import htsjdk.variant.variantcontext.GenotypeBuilder;
 import htsjdk.variant.variantcontext.GenotypesContext;
 import htsjdk.variant.variantcontext.VariantContext;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.molgenis.vcf.decisiontree.filter.model.Decision;
+import org.molgenis.vcf.decisiontree.filter.model.Label;
+import org.molgenis.vcf.decisiontree.filter.model.Node;
 
 @ExtendWith(MockitoExtension.class)
 class SampleAnnotatorImplTest {
@@ -22,7 +27,7 @@ class SampleAnnotatorImplTest {
   @Mock
   VariantContext vc;
 
-  SampleAnnotator sampleAnnotator = new SampleAnnotatorImpl();
+  SampleAnnotator sampleAnnotator = new SampleAnnotatorImpl(false, false);
 
   @BeforeEach
   void setUp() {
@@ -44,11 +49,14 @@ class SampleAnnotatorImplTest {
     when(vc.getAlleles()).thenReturn(List.of(Allele.REF_A, Allele.ALT_T));
 
     GenotypeBuilder expectedGt = new GenotypeBuilder(gt);
-    expectedGt.attribute(VISD, "TEST");
+    expectedGt.attribute(VISD, List.of("TEST"));
     Genotype expected = expectedGt.make();
 
-    VariantContext result = sampleAnnotator.annotate("TEST", "Patient", vc);
-    assertEquals(result.getGenotype("Patient").getExtendedAttribute(VISD),
-        expected.getExtendedAttribute(VISD));
+    Node node1 = mock(Node.class);
+    Label label1 = mock(Label.class);
+    VariantContext result = sampleAnnotator.annotate(
+        List.of(new Decision("TEST", List.of(node1), Set.of(label1))), "Patient", vc);
+    assertEquals(expected.getExtendedAttribute(VISD),
+        result.getGenotype("Patient").getExtendedAttribute(VISD));
   }
 }
