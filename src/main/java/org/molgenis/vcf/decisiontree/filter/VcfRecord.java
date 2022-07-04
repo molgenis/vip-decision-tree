@@ -2,7 +2,6 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedInfoValue;
 
@@ -29,7 +28,7 @@ import org.molgenis.vcf.decisiontree.utils.VcfUtils;
  */
 public class VcfRecord {
 
-  private static final List<String> PASS_FILTER = singletonList(VCFConstants.PASSES_FILTERS_v4);
+  private static final List<String> PASS_FILTER = List.of(VCFConstants.PASSES_FILTERS_v4);
 
   private VariantContext variantContext;
 
@@ -172,7 +171,7 @@ public class VcfRecord {
       value = PASS_FILTER;
     } else {
       if (filters.size() == 1) {
-        value = singletonList(filters.iterator().next());
+        value = List.of(filters.iterator().next());
       } else {
         value = new ArrayList<>(filters);
       }
@@ -269,7 +268,7 @@ public class VcfRecord {
 
   public VcfRecord getFilteredCopy(String consequence, Field vepField) {
     VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
-    variantContextBuilder.attribute(vepField.getId(), singletonList(consequence));
+    variantContextBuilder.attribute(vepField.getId(), List.of(consequence));
     VariantContext filterVariantContext = variantContextBuilder.make();
     return new VcfRecord(filterVariantContext);
   }

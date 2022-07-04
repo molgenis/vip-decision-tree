@@ -1,13 +1,12 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VISD;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -64,7 +63,7 @@ public class SampleClassifierImpl implements Classifier {
     VepHeaderLine vepHeaderLine = vcfMetadata.getVepHeaderLine();
     Map<Integer, List<VcfRecord>> alleleCsqMap = vepHelper.getRecordPerConsequence(vcfRecord,
         vepHeaderLine);
-    Set<String> decisions = new HashSet<>();
+    Set<String> decisions = new LinkedHashSet<>();
     VariantContext vc = vcfRecord.getVariantContext();
     Set<String> samples = vc.getSampleNames().stream()
         .filter(sample -> probands.contains(sample) || probands.isEmpty()).collect(
@@ -95,7 +94,7 @@ public class SampleClassifierImpl implements Classifier {
       Allele allele = vcfRecord.getAltAllele(alleleIndex);
       List<VcfRecord> singleCsqRecords = alleleCsqMap.get(vepAlleleIndex);
       if (singleCsqRecords == null || singleCsqRecords.isEmpty()) {
-        singleCsqRecords = singletonList(
+        singleCsqRecords = List.of(
             vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, vepHeaderLine));
       }
       for (VcfRecord singleCsqRecord : singleCsqRecords) {

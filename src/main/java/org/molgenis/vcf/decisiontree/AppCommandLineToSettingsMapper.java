@@ -13,7 +13,6 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PROBANDS;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_STRICT;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
@@ -62,7 +61,7 @@ class AppCommandLineToSettingsMapper {
     if (commandLine.hasOption(OPT_PROBANDS)) {
       probands = Set.of(commandLine.getOptionValue(OPT_PROBANDS).split(","));
     } else {
-      probands = Collections.emptySet();
+      probands = Set.of();
     }
     return probands;
   }

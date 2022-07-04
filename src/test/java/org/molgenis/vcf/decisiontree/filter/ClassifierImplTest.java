@@ -5,11 +5,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import htsjdk.variant.variantcontext.Allele;
-import htsjdk.variant.variantcontext.VariantContext;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,19 +92,19 @@ class ClassifierImplTest {
     when(record1a.getVepValues(parent)).thenReturn(List.of(""));
     VcfRecord record1b = mock(VcfRecord.class, "record1b");
     when(record1b.getVepValues(parent)).thenReturn(List.of(""));
-    Map<Integer, List<VcfRecord>> recordMap0 = Map.of(1, Collections.singletonList(record0a));
-    Map<Integer, List<VcfRecord>> recordMap1 = Map.of(1, Collections.singletonList(record1a), 2,
-        Collections.singletonList(record1b));
+    Map<Integer, List<VcfRecord>> recordMap0 = Map.of(1, List.of(record0a));
+    Map<Integer, List<VcfRecord>> recordMap1 = Map.of(1, List.of(record1a), 2,
+        List.of(record1b));
     when(vepHelper.getRecordPerConsequence(record0,
         vepHeaderLine)).thenReturn(recordMap0);
     when(vepHelper.getRecordPerConsequence(record1,
         vepHeaderLine)).thenReturn(recordMap1);
-    Decision decision1a = Decision.builder().clazz("test1a").path(Collections.emptyList())
-        .labels(Collections.emptySet()).build();
-    Decision decision2a = Decision.builder().clazz("test2a").path(Collections.emptyList())
-        .labels(Collections.emptySet()).build();
-    Decision decision2b = Decision.builder().clazz("test2b").path(Collections.emptyList())
-        .labels(Collections.emptySet()).build();
+    Decision decision1a = Decision.builder().clazz("test1a").path(List.of())
+        .labels(Set.of()).build();
+    Decision decision2a = Decision.builder().clazz("test2a").path(List.of())
+        .labels(Set.of()).build();
+    Decision decision2b = Decision.builder().clazz("test2b").path(List.of())
+        .labels(Set.of()).build();
 
     doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1));

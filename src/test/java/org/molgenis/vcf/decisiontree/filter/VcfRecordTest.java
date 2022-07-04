@@ -3,7 +3,6 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -175,7 +174,7 @@ class VcfRecordTest {
     FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
         .getMock();
     when(field.getId()).thenReturn("FILTER");
-    assertEquals(singletonList("PASS"), vcfRecord.getValue(field, createAllele()));
+    assertEquals(List.of("PASS"), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test

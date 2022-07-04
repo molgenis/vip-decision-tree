@@ -1,6 +1,5 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +58,7 @@ public class ClassifierImpl implements Classifier {
       Allele allele = vcfRecord.getAltAllele(alleleIndex);
       List<VcfRecord> singleCsqRecords = alleleCsqMap.get(vepAlleleIndex);
       if (singleCsqRecords == null || singleCsqRecords.isEmpty()) {
-        singleCsqRecords = singletonList(
+        singleCsqRecords = List.of(
             vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, vepHeaderLine));
       }
       for (VcfRecord singleCsqRecord : singleCsqRecords) {

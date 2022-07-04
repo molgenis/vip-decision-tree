@@ -70,7 +70,7 @@ class SampleClassifierImplTest {
         .nestedFields(nestedFields).build();
     when(vcfMetadata.getVepHeaderLine()).thenReturn(vepHeaderLine);
     classifier = new SampleClassifierImpl(decisionTreeExecutor, vepHelper, decisionTree,
-        recordWriter, sampleAnnotator, Collections.emptySet());
+        recordWriter, sampleAnnotator, Set.of());
   }
 
   @Test
@@ -130,19 +130,19 @@ class SampleClassifierImplTest {
     VcfRecord record0a = mock(VcfRecord.class, "record0a");
     VcfRecord record1a = mock(VcfRecord.class, "record1a");
     VcfRecord record1b = mock(VcfRecord.class, "record1b");
-    Map<Integer, List<VcfRecord>> recordMap0 = Map.of(1, Collections.singletonList(record0a));
-    Map<Integer, List<VcfRecord>> recordMap1 = Map.of(1, Collections.singletonList(record1a), 2,
-        Collections.singletonList(record1b));
+    Map<Integer, List<VcfRecord>> recordMap0 = Map.of(1, List.of(record0a));
+    Map<Integer, List<VcfRecord>> recordMap1 = Map.of(1, List.of(record1a), 2,
+        List.of(record1b));
     when(vepHelper.getRecordPerConsequence(record0,
         vepHeaderLine)).thenReturn(recordMap0);
     when(vepHelper.getRecordPerConsequence(record1,
         vepHeaderLine)).thenReturn(recordMap1);
-    Decision decision1a = Decision.builder().clazz("test1a").path(Collections.emptyList())
-        .labels(Collections.emptySet()).build();
-    Decision decision2a = Decision.builder().clazz("test2a").path(Collections.emptyList())
-        .labels(Collections.emptySet()).build();
-    Decision decision2b = Decision.builder().clazz("test2b").path(Collections.emptyList())
-        .labels(Collections.emptySet()).build();
+    Decision decision1a = Decision.builder().clazz("test1a").path(List.of())
+        .labels(Set.of()).build();
+    Decision decision2a = Decision.builder().clazz("test2a").path(List.of())
+        .labels(Set.of()).build();
+    Decision decision2b = Decision.builder().clazz("test2b").path(List.of())
+        .labels(Set.of()).build();
 
     doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1),
@@ -164,35 +164,35 @@ class SampleClassifierImplTest {
             "Patient2");
 
     doReturn(vc0).when(sampleAnnotator)
-        .annotate(List.of(new Decision("test1a", Collections.emptyList(), Collections.emptySet())),
+        .annotate(List.of(new Decision("test1a", List.of(), Set.of())),
             "Patient", vc0);
     doReturn(vc0).when(sampleAnnotator)
-        .annotate(List.of(new Decision("test1a", Collections.emptyList(), Collections.emptySet())),
+        .annotate(List.of(new Decision("test1a", List.of(), Set.of())),
             "Patient2", vc0);
     doReturn(vc1).when(sampleAnnotator).annotate(
-        List.of(new Decision("test2a", Collections.emptyList(), Collections.emptySet()),
-            new Decision("test2b", Collections.emptyList(), Collections.emptySet())), "Patient",
+        List.of(new Decision("test2a", List.of(), Set.of()),
+            new Decision("test2b", List.of(), Set.of())), "Patient",
         vc1);
     doReturn(vc1).when(sampleAnnotator).annotate(
-        List.of(new Decision("test2a", Collections.emptyList(), Collections.emptySet()),
-            new Decision("test2b", Collections.emptyList(), Collections.emptySet())), "Patient2",
+        List.of(new Decision("test2a", List.of(), Set.of()),
+            new Decision("test2b", List.of(), Set.of())), "Patient2",
         vc1);
 
     classifier.classify(vcfReader);
 
     verify(sampleAnnotator).annotate(
-        List.of(new Decision("test1a", Collections.emptyList(), Collections.emptySet())), "Patient",
+        List.of(new Decision("test1a", List.of(), Set.of())), "Patient",
         vc0);
     verify(sampleAnnotator).annotate(
-        List.of(new Decision("test1a", Collections.emptyList(), Collections.emptySet())),
+        List.of(new Decision("test1a", List.of(), Set.of())),
         "Patient2", vc0);
     verify(sampleAnnotator).annotate(
-        List.of(new Decision("test2a", Collections.emptyList(), Collections.emptySet()),
-            new Decision("test2b", Collections.emptyList(), Collections.emptySet())), "Patient",
+        List.of(new Decision("test2a", List.of(), Set.of()),
+            new Decision("test2b", List.of(), Set.of())), "Patient",
         vc1);
     verify(sampleAnnotator).annotate(
-        List.of(new Decision("test2a", Collections.emptyList(), Collections.emptySet()),
-            new Decision("test2b", Collections.emptyList(), Collections.emptySet())), "Patient2",
+        List.of(new Decision("test2a", List.of(), Set.of()),
+            new Decision("test2b", List.of(), Set.of())), "Patient2",
         vc1);
   }
 }
