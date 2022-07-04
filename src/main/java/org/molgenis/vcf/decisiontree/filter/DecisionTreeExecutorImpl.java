@@ -14,7 +14,6 @@ import org.molgenis.vcf.decisiontree.filter.model.Label;
 import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
 import org.molgenis.vcf.decisiontree.filter.model.Node;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
-import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 
 public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
 
@@ -37,7 +36,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
   }
 
   @Override
-  public Decision execute(DecisionTree tree, Variant variant, SampleMeta sampleMeta) {
+  public Decision execute(DecisionTree tree, Variant variant, String sampleName) {
     List<Node> nodePath = storePaths ? new ArrayList<>() : List.of();
     Set<Label> labels = storeLabels ? new HashSet<>() : Set.of();
 
@@ -52,12 +51,8 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
       }
 
       NodeOutcome nodeOutcome;
-      if (sampleMeta != null) {
-        nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant,
-            sampleMeta);
-      } else {
-        nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant);
-      }
+      nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant,
+          sampleName);
       if (storeLabels) {
         storeLabel(nodeOutcome, labels);
       }

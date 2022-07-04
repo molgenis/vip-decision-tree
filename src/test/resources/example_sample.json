@@ -1,11 +1,14 @@
 {
-  "rootNode": "pheno",
+  "rootNode": "GT",
   "nodes": {
-    "pheno": {
-      "type": "SAMPLE_PHENOTYPE",
-      "description": "Pheno match",
-      "field": "INFO/CSQ/HPO",
-      "operator": "contains_any",
+    "GT": {
+      "type": "BOOL",
+      "description": "GT non HOMREF match (test purpose only)",
+      "query": {
+        "field": "FORMAT/GT",
+        "operator": "!=",
+        "value": "0/0"
+      },
       "outcomeTrue": {
         "nextNode": "exit_k"
       },
@@ -13,7 +16,7 @@
         "nextNode": "exit_f"
       },
       "outcomeMissing": {
-        "nextNode": "exit_f"
+        "nextNode": "exit_k"
       }
     },
     "exit_k": {

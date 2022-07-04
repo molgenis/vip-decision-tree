@@ -41,6 +41,6 @@ class ClassifierFactoryImpl implements ClassifierFactory {
         decisionTreeExecutorFactory.create(settings.getWriterSettings());
 
     return new SampleClassifierImpl(decisionTreeExecutor, new VepHelper(), decisionTree,
-        recordWriter, settings.getSampleInfo(), sampleAnnotator);
+        recordWriter, sampleAnnotator, settings.getProbands());
   }
 }

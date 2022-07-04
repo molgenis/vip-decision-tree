@@ -72,7 +72,7 @@ class AppIT {
     String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
 
     String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
-        "-ph", "HP:0000951", "-m", "samPlE"};
+        "-m", "samPlE"};
     SpringApplication.run(App.class, args);
 
     String outputVcf = Files.readString(Path.of(outputFile));
@@ -95,7 +95,7 @@ class AppIT {
     String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
 
     String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
-        "-ph", "HP:0000951", "-l", "-p", "-m", "sAMPlE"};
+        "-l", "-p", "-m", "sAMPlE"};
     SpringApplication.run(App.class, args);
 
     String outputVcf = Files.readString(Path.of(outputFile));

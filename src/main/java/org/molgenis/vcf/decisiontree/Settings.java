@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree;
 
 import java.nio.file.Path;
+import java.util.Set;
 import lombok.Builder;
 import lombok.Value;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
@@ -15,6 +16,6 @@ public class Settings {
   ConfigDecisionTree configDecisionTree;
   AppSettings appSettings;
   WriterSettings writerSettings;
-  SampleInfo sampleInfo;
+  Set<String> probands;
   boolean strict;
 }

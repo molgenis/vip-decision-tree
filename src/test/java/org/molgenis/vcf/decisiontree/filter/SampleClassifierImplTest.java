@@ -19,13 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.decisiontree.SampleInfo;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -72,7 +70,7 @@ class SampleClassifierImplTest {
         .nestedFields(nestedFields).build();
     when(vcfMetadata.getVepHeaderLine()).thenReturn(vepHeaderLine);
     classifier = new SampleClassifierImpl(decisionTreeExecutor, vepHelper, decisionTree,
-        recordWriter, SampleInfo.builder().build(), sampleAnnotator);
+        recordWriter, sampleAnnotator, Collections.emptySet());
   }
 
   @Test
@@ -148,22 +146,22 @@ class SampleClassifierImplTest {
 
     doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1),
-            SampleMeta.builder().sampleName("Patient").build());
+            "Patient");
     doReturn(decision2a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1),
-            SampleMeta.builder().sampleName("Patient").build());
+            "Patient");
     doReturn(decision2b).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2),
-            SampleMeta.builder().sampleName("Patient").build());
+            "Patient");
     doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1),
-            SampleMeta.builder().sampleName("Patient2").build());
+            "Patient2");
     doReturn(decision2a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1),
-            SampleMeta.builder().sampleName("Patient2").build());
+            "Patient2");
     doReturn(decision2b).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2),
-            SampleMeta.builder().sampleName("Patient2").build());
+            "Patient2");
 
     doReturn(vc0).when(sampleAnnotator)
         .annotate(List.of(new Decision("test1a", Collections.emptyList(), Collections.emptySet())),

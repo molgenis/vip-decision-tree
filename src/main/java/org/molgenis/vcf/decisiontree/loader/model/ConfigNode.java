@@ -8,7 +8,6 @@ public interface ConfigNode {
     BOOL,
     BOOL_MULTI,
     CATEGORICAL,
-    SAMPLE_PHENOTYPE,
     EXISTS,
     LEAF
   }

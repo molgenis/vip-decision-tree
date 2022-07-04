@@ -33,8 +33,6 @@ class AppCommandLineOptions {
   static final String OPT_STRICT_LONG = "strict";
   static final String OPT_PROBANDS = "pb";
   static final String OPT_PROBANDS_LONG = "probands";
-  static final String OPT_PHENOTYPES = "ph";
-  static final String OPT_PHENOTYPES_LONG = "phenotypes";
   static final String OPT_MODE = "m";
   static final String OPT_MODE_LONG = "mode";
   private static final Options APP_OPTIONS;
@@ -95,17 +93,11 @@ class AppCommandLineOptions {
             .desc("Comma-separated list of proband names.")
             .build());
     appOptions.addOption(
-        Option.builder(OPT_PHENOTYPES)
-            .hasArg(true)
-            .longOpt(OPT_PHENOTYPES_LONG)
-            .desc(
-                "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
-            .build());
-    appOptions.addOption(
         Option.builder(OPT_MODE)
             .hasArg(true)
             .longOpt(OPT_MODE_LONG)
-            .desc("Run mode: 'variant' or 'sample'.")
+            .desc(
+                "Run mode: 'variant' (default) or 'sample', 'sample' mode classifies provided probands, or all samples if no probands given.")
             .build());
     APP_OPTIONS = appOptions;
     Options appVersionOptions = new Options();
@@ -201,7 +193,7 @@ class AppCommandLineOptions {
 
     if (!modes.contains(mode.toUpperCase())) {
       throw new IllegalArgumentException(
-          format("Illegal 'mode' argument '%s', only 'variant' and 'sample' ar allowed.", mode));
+          "Illegal 'mode' argument '%s', only 'variant' and 'sample' are allowed.".formatted(mode));
     }
   }
 }

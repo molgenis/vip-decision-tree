@@ -12,10 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.molgenis.vcf.decisiontree.SampleInfo;
+import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
-import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
 import org.slf4j.Logger;
@@ -29,18 +28,18 @@ public class SampleClassifierImpl implements Classifier {
   private final VepHelper vepHelper;
   private final DecisionTree decisionTree;
   private final RecordWriter recordWriter;
-  private final SampleInfo sampleInfo;
   private final SampleAnnotator sampleAnnotator;
+  private final Set<String> probands;
 
   public SampleClassifierImpl(DecisionTreeExecutor decisionTreeExecutor, VepHelper vepHelper,
       DecisionTree decisionTree,
-      RecordWriter recordWriter, SampleInfo sampleInfo, SampleAnnotator sampleAnnotator) {
+      RecordWriter recordWriter, SampleAnnotator sampleAnnotator, Set<String> probands) {
     this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
     this.vepHelper = requireNonNull(vepHelper);
     this.decisionTree = decisionTree;
     this.recordWriter = recordWriter;
-    this.sampleInfo = sampleInfo;
     this.sampleAnnotator = sampleAnnotator;
+    this.probands = probands;
   }
 
   @Override
@@ -51,7 +50,7 @@ public class SampleClassifierImpl implements Classifier {
     vcfReader.stream()
         .map(
             vcfRecord -> processRecordSample(vcfRecord, decisionTree,
-                vcfMetadata, sampleInfo, sampleAnnotator)).forEach(vcfRecord -> {
+                vcfMetadata, sampleAnnotator)).forEach(vcfRecord -> {
           recordWriter.write(vcfRecord);
           if (nrRecord.incrementAndGet() % 25000 == 0) {
             LOGGER.debug("processed {} records", nrRecord);
@@ -61,16 +60,19 @@ public class SampleClassifierImpl implements Classifier {
 
   private VcfRecord processRecordSample(
       VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
-      SampleInfo sampleInfo, SampleAnnotator sampleAnnotator) {
+      SampleAnnotator sampleAnnotator) {
     VepHeaderLine vepHeaderLine = vcfMetadata.getVepHeaderLine();
     Map<Integer, List<VcfRecord>> alleleCsqMap = vepHelper.getRecordPerConsequence(vcfRecord,
         vepHeaderLine);
     Set<String> decisions = new HashSet<>();
     VariantContext vc = vcfRecord.getVariantContext();
-    for (String sampleName : vc.getSampleNames()) {
+    Set<String> samples = vc.getSampleNames().stream()
+        .filter(sample -> probands.contains(sample) || probands.isEmpty()).collect(
+            Collectors.toSet());
+    for (String sampleName : samples) {
       List<Decision> sampleDecisions = new ArrayList<>();
       processRecord(vcfRecord, decisionTree, vcfMetadata, vepHeaderLine, alleleCsqMap,
-          getSampleMeta(sampleName, sampleInfo),
+          sampleName,
           sampleDecisions);
       vc = sampleAnnotator.annotate(sampleDecisions, sampleName, vc);
       decisions.addAll(
@@ -83,28 +85,11 @@ public class SampleClassifierImpl implements Classifier {
     return new VcfRecord(vcBuilder.make());
   }
 
-  private SampleMeta getSampleMeta(String sampleName, SampleInfo sampleInfo) {
-    Map<String, SampleMeta> sampleMetaMap = sampleInfo.getSampleMetaMap();
-    SampleMeta sampleMeta = null;
-    if (sampleMetaMap != null) {
-      sampleMeta = sampleMetaMap.get(sampleName);
-    }
-    if (sampleMeta == null) {
-      SampleMeta.SampleMetaBuilder sampleMetaBuilder = SampleMeta.builder()
-          .samplePhenotypes(sampleInfo.getSamplePhenotypes())
-          .sampleName(sampleName);
-      if (sampleInfo.getProbands() != null) {
-        sampleMetaBuilder.proband(sampleInfo.getProbands().contains(sampleName));
-      }
-      sampleMeta = sampleMetaBuilder.build();
-    }
-    return sampleMeta;
-  }
-
   private void processRecord
       (VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
           VepHeaderLine vepHeaderLine, Map<Integer, List<VcfRecord>> alleleCsqMap,
-          SampleMeta sampleMeta, List<Decision> sampleDecisions) {
+          String sampleName,
+          List<Decision> sampleDecisions) {
     for (int alleleIndex = 0; alleleIndex < vcfRecord.getNrAltAlleles(); alleleIndex++) {
       Integer vepAlleleIndex = alleleIndex + 1;
       Allele allele = vcfRecord.getAltAllele(alleleIndex);
@@ -117,7 +102,7 @@ public class SampleClassifierImpl implements Classifier {
         Variant variant = Variant.builder().vcfMetadata(vcfMetadata).vcfRecord(singleCsqRecord)
             .allele(allele).build();
         sampleDecisions.add(
-            decisionTreeExecutor.execute(decisionTree, variant, sampleMeta));
+            decisionTreeExecutor.execute(decisionTree, variant, sampleName));
       }
     }
   }

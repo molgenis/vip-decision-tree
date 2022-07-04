@@ -18,7 +18,6 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigPhenotypeNode;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -66,9 +65,6 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
       case CATEGORICAL:
         validateCategoricalNode(id, (ConfigCategoricalNode) node, nodes);
         break;
-      case SAMPLE_PHENOTYPE:
-        validatePhenotypeNode(id, (ConfigPhenotypeNode) node, nodes);
-        break;
       case LEAF:
         validateLeafNode(id, (ConfigLeafNode) node);
         break;
@@ -78,12 +74,6 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
   }
 
   private void validateExistsNode(String id, ConfigExistsNode node, Map<String, ConfigNode> nodes) {
-    validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
-    validateOutcome(id, OUTCOME_FALSE, nodes, node.getOutcomeFalse());
-  }
-
-  private void validatePhenotypeNode(String id, ConfigPhenotypeNode node,
-      Map<String, ConfigNode> nodes) {
     validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
     validateOutcome(id, OUTCOME_FALSE, nodes, node.getOutcomeFalse());
   }

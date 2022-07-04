@@ -1,11 +1,6 @@
 package org.molgenis.vcf.decisiontree.runner;
 
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_ALL;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_ANY;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_NONE;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.NOT_CONTAINS;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.NOT_IN;
 
 import java.util.Collection;
@@ -108,17 +103,6 @@ public class QueryValidatorImpl implements QueryValidator {
         throw new UnsupportedValueTypeException(field, DecisionType.CATEGORICAL);
       }
       validateSingleOrPerAlleleCount(field, DecisionType.CATEGORICAL);
-    }
-  }
-
-  @Override
-  public void validatePhenotypeNode(Field field, ConfigOperator operator) {
-    if (!(field instanceof MissingField) && field.getValueType() != ValueType.STRING) {
-      throw new UnsupportedValueTypeException(field, DecisionType.SAMPLE_PHENOTYPE);
-    }
-    if (!Set.of(CONTAINS, NOT_CONTAINS, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_NONE)
-        .contains(operator)) {
-      throw new UnsupportedOperatorException(operator, field, DecisionType.SAMPLE_PHENOTYPE);
     }
   }
 }
