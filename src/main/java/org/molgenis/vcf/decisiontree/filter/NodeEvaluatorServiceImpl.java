@@ -37,22 +37,22 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
   }
 
   @Override
-  public NodeOutcome evaluate(DecisionNode node, Variant variant, String sampleName) {
+  public NodeOutcome evaluate(DecisionNode node, Variant variant, Integer sampleIndex) {
     NodeOutcome nodeOutcome;
     DecisionType decisionType = node.getDecisionType();
     switch (decisionType) {
       case EXISTS:
-        nodeOutcome = existsNodeEvaluator.evaluate((ExistsNode) node, variant, sampleName);
+        nodeOutcome = existsNodeEvaluator.evaluate((ExistsNode) node, variant, sampleIndex);
         break;
       case BOOL:
-        nodeOutcome = boolNodeEvaluator.evaluate((BoolNode) node, variant, sampleName);
+        nodeOutcome = boolNodeEvaluator.evaluate((BoolNode) node, variant, sampleIndex);
         break;
       case BOOL_MULTI:
-        nodeOutcome = boolMultiNodeEvaluator.evaluate((BoolMultiNode) node, variant, sampleName);
+        nodeOutcome = boolMultiNodeEvaluator.evaluate((BoolMultiNode) node, variant, sampleIndex);
         break;
       case CATEGORICAL:
         nodeOutcome = categoricalNodeEvaluator.evaluate((CategoricalNode) node, variant,
-            sampleName);
+            sampleIndex);
         break;
       default:
         throw new UnexpectedEnumException(decisionType);

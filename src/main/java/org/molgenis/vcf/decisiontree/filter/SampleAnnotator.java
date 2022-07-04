@@ -6,5 +6,5 @@ import org.molgenis.vcf.decisiontree.filter.model.Decision;
 
 public interface SampleAnnotator {
 
-  VariantContext annotate(List<Decision> decisions, String sampleName, VariantContext vc);
+  VariantContext annotate(List<Decision> decisions, Integer sampleIndex, VariantContext vc);
 }

@@ -65,29 +65,30 @@ public class SampleClassifierImpl implements Classifier {
         vepHeaderLine);
     Set<String> decisions = new LinkedHashSet<>();
     VariantContext vc = vcfRecord.getVariantContext();
-    Set<String> samples = vc.getSampleNames().stream()
-        .filter(sample -> probands.contains(sample) || probands.isEmpty()).collect(
-            Collectors.toSet());
-    for (String sampleName : samples) {
-      List<Decision> sampleDecisions = new ArrayList<>();
-      processRecord(vcfRecord, decisionTree, vcfMetadata, vepHeaderLine, alleleCsqMap,
-          sampleName,
-          sampleDecisions);
-      vc = sampleAnnotator.annotate(sampleDecisions, sampleName, vc);
-      decisions.addAll(
-          sampleDecisions.stream().map(Decision::getClazz).toList());
+    for (int sampleIndex = 0; sampleIndex < vc.getNSamples(); sampleIndex++) {
+      String sampleName = vc.getGenotype(sampleIndex).getSampleName();
+      if (probands.isEmpty() || probands.contains(sampleName)) {
+        List<Decision> sampleDecisions = new ArrayList<>();
+        processRecord(vcfRecord, decisionTree, vcfMetadata, vepHeaderLine, alleleCsqMap,
+            sampleIndex,
+            sampleDecisions);
+        vc = sampleAnnotator.annotate(sampleDecisions, sampleIndex, vc);
+        decisions.addAll(
+            sampleDecisions.stream().map(Decision::getClazz).toList());
+      }
     }
     VariantContextBuilder vcBuilder = new VariantContextBuilder(vc);
     if (!decisions.isEmpty()) {
       vcBuilder.attribute(VISD, String.join(",", decisions));
     }
     return new VcfRecord(vcBuilder.make());
+
   }
 
   private void processRecord
       (VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
           VepHeaderLine vepHeaderLine, Map<Integer, List<VcfRecord>> alleleCsqMap,
-          String sampleName,
+          Integer sampleIndex,
           List<Decision> sampleDecisions) {
     for (int alleleIndex = 0; alleleIndex < vcfRecord.getNrAltAlleles(); alleleIndex++) {
       Integer vepAlleleIndex = alleleIndex + 1;
@@ -101,7 +102,7 @@ public class SampleClassifierImpl implements Classifier {
         Variant variant = Variant.builder().vcfMetadata(vcfMetadata).vcfRecord(singleCsqRecord)
             .allele(allele).build();
         sampleDecisions.add(
-            decisionTreeExecutor.execute(decisionTree, variant, sampleName));
+            decisionTreeExecutor.execute(decisionTree, variant, sampleIndex));
       }
     }
   }

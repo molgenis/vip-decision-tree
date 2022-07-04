@@ -335,9 +335,9 @@ class VcfRecordTest {
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getAD()).thenReturn(new int[]{10, 10});
-    when(variantContext.getGenotype("sample1")).thenReturn(gt);
+    when(variantContext.getGenotype(0)).thenReturn(gt);
     assertEquals(List.of(Integer.valueOf(10), Integer.valueOf(10)),
-        vcfRecord.getValue(field, createAllele(), "sample1"));
+        vcfRecord.getValue(field, createAllele(), 0));
   }
 
   @Test
@@ -351,8 +351,8 @@ class VcfRecordTest {
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getDP()).thenReturn(10);
-    when(variantContext.getGenotype("sample1")).thenReturn(gt);
-    assertEquals(10, vcfRecord.getValue(field, createAllele(), "sample1"));
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals(10, vcfRecord.getValue(field, createAllele(), 0));
   }
 
   @Test
@@ -366,8 +366,8 @@ class VcfRecordTest {
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getGenotypeString()).thenReturn("1|1");
-    when(variantContext.getGenotype("sample1")).thenReturn(gt);
-    assertEquals("1|1", vcfRecord.getValue(field, createAllele(), "sample1"));
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals("1|1", vcfRecord.getValue(field, createAllele(), 0));
   }
 
   @Test
@@ -381,8 +381,8 @@ class VcfRecordTest {
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getGQ()).thenReturn(10);
-    when(variantContext.getGenotype("sample1")).thenReturn(gt);
-    assertEquals(10, vcfRecord.getValue(field, createAllele(), "sample1"));
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals(10, vcfRecord.getValue(field, createAllele(), 0));
   }
 
   @Test
@@ -396,9 +396,9 @@ class VcfRecordTest {
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getPL()).thenReturn(new int[]{10, 10});
-    when(variantContext.getGenotype("sample1")).thenReturn(gt);
+    when(variantContext.getGenotype(0)).thenReturn(gt);
     assertTrue(java.util.Arrays.equals(new int[]{10, 10},
-        (int[]) vcfRecord.getValue(field, createAllele(), "sample1")));
+        (int[]) vcfRecord.getValue(field, createAllele(), 0)));
   }
 
   @Test
@@ -412,8 +412,8 @@ class VcfRecordTest {
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getExtendedAttribute("test")).thenReturn("testValue");
-    when(variantContext.getGenotype("sample1")).thenReturn(gt);
-    assertEquals("testValue", vcfRecord.getValue(field, createAllele(), "sample1"));
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals("testValue", vcfRecord.getValue(field, createAllele(), 0));
   }
 
   private Allele createAllele() {

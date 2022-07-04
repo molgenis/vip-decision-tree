@@ -22,10 +22,10 @@ public class SampleAnnotatorImpl implements SampleAnnotator {
   }
 
   @Override
-  public VariantContext annotate(List<Decision> decisions, String sampleName, VariantContext vc) {
+  public VariantContext annotate(List<Decision> decisions, Integer sampleIndex, VariantContext vc) {
     VariantContextBuilder vcBuilder = new VariantContextBuilder(vc);
     GenotypesContext genotypeContext = GenotypesContext.copy(vc.getGenotypes());
-    Genotype genotype = genotypeContext.get(sampleName);
+    Genotype genotype = genotypeContext.get(sampleIndex);
     GenotypeBuilder gtBuilder = new GenotypeBuilder(genotype);
     gtBuilder.attribute(VISD,
         decisions.stream().map(DecisionUtils::getDecisionClass).toList());

@@ -55,7 +55,7 @@ class SampleAnnotatorImplTest {
     Node node1 = mock(Node.class);
     Label label1 = mock(Label.class);
     VariantContext result = sampleAnnotator.annotate(
-        List.of(new Decision("TEST", List.of(node1), Set.of(label1))), "Patient", vc);
+        List.of(new Decision("TEST", List.of(node1), Set.of(label1))), 0, vc);
     assertEquals(expected.getExtendedAttribute(VISD),
         result.getGenotype("Patient").getExtendedAttribute(VISD));
   }

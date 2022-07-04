@@ -37,7 +37,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
   }
 
   @Override
-  public Decision execute(DecisionTree tree, Variant variant, @Nullable String sampleName) {
+  public Decision execute(DecisionTree tree, Variant variant, @Nullable Integer sampleIndex) {
     List<Node> nodePath = storePaths ? new ArrayList<>() : List.of();
     Set<Label> labels = storeLabels ? new HashSet<>() : Set.of();
 
@@ -52,7 +52,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
       }
 
       NodeOutcome nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant,
-          sampleName);
+          sampleIndex);
       if (storeLabels) {
         storeLabel(nodeOutcome, labels);
       }

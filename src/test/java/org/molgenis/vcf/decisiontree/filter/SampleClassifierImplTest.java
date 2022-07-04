@@ -88,7 +88,9 @@ class SampleClassifierImplTest {
     when(vc0.getID()).thenReturn("1");
     when(vc0.getStart()).thenReturn(1);
     when(vc0.getEnd()).thenReturn(1);
-    when(vc0.getSampleNames()).thenReturn(Set.of("Patient", "Patient2"));
+    when(vc0.getNSamples()).thenReturn(2);
+    when(vc0.getGenotype(0)).thenReturn(gt0a);
+    when(vc0.getGenotype(1)).thenReturn(gt0b);
     when(vc0.getAlleles()).thenReturn(List.of(
         htsjdk.variant.variantcontext.Allele.REF_A, htsjdk.variant.variantcontext.Allele.ALT_T));
 
@@ -103,7 +105,9 @@ class SampleClassifierImplTest {
     when(vc1.getID()).thenReturn("1");
     when(vc1.getStart()).thenReturn(1);
     when(vc1.getEnd()).thenReturn(1);
-    when(vc1.getSampleNames()).thenReturn(Set.of("Patient", "Patient2"));
+    when(vc1.getNSamples()).thenReturn(2);
+    when(vc1.getGenotype(0)).thenReturn(gt1a);
+    when(vc1.getGenotype(1)).thenReturn(gt1b);
     when(vc1.getAlleles()).thenReturn(List.of(
         htsjdk.variant.variantcontext.Allele.REF_A, htsjdk.variant.variantcontext.Allele.ALT_T));
 
@@ -146,53 +150,53 @@ class SampleClassifierImplTest {
 
     doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1),
-            "Patient");
+            0);
     doReturn(decision2a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1),
-            "Patient");
+            0);
     doReturn(decision2b).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2),
-            "Patient");
+            0);
     doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1),
-            "Patient2");
+            1);
     doReturn(decision2a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1),
-            "Patient2");
+            1);
     doReturn(decision2b).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2),
-            "Patient2");
+            1);
 
     doReturn(vc0).when(sampleAnnotator)
         .annotate(List.of(new Decision("test1a", List.of(), Set.of())),
-            "Patient", vc0);
+            0, vc0);
     doReturn(vc0).when(sampleAnnotator)
         .annotate(List.of(new Decision("test1a", List.of(), Set.of())),
-            "Patient2", vc0);
+            1, vc0);
     doReturn(vc1).when(sampleAnnotator).annotate(
         List.of(new Decision("test2a", List.of(), Set.of()),
-            new Decision("test2b", List.of(), Set.of())), "Patient",
+            new Decision("test2b", List.of(), Set.of())), 0,
         vc1);
     doReturn(vc1).when(sampleAnnotator).annotate(
         List.of(new Decision("test2a", List.of(), Set.of()),
-            new Decision("test2b", List.of(), Set.of())), "Patient2",
+            new Decision("test2b", List.of(), Set.of())), 1,
         vc1);
 
     classifier.classify(vcfReader);
 
     verify(sampleAnnotator).annotate(
-        List.of(new Decision("test1a", List.of(), Set.of())), "Patient",
+        List.of(new Decision("test1a", List.of(), Set.of())), 0,
         vc0);
     verify(sampleAnnotator).annotate(
         List.of(new Decision("test1a", List.of(), Set.of())),
-        "Patient2", vc0);
+        1, vc0);
     verify(sampleAnnotator).annotate(
         List.of(new Decision("test2a", List.of(), Set.of()),
-            new Decision("test2b", List.of(), Set.of())), "Patient",
+            new Decision("test2b", List.of(), Set.of())), 0,
         vc1);
     verify(sampleAnnotator).annotate(
         List.of(new Decision("test2a", List.of(), Set.of()),
-            new Decision("test2b", List.of(), Set.of())), "Patient2",
+            new Decision("test2b", List.of(), Set.of())), 1,
         vc1);
   }
 }

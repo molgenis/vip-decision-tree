@@ -54,7 +54,7 @@ public class VcfRecord {
     return getValue(field, allele, null);
   }
 
-  public Object getValue(Field field, Allele allele, String sampleName) {
+  public Object getValue(Field field, Allele allele, Integer sampleIndex) {
     Object value;
     FieldType fieldType = field.getFieldType();
     switch (fieldType) {
@@ -68,11 +68,11 @@ public class VcfRecord {
         value = getNestedVepValue(field);
         break;
       case FORMAT:
-        if (sampleName == null) {
+        if (sampleIndex == null) {
           throw new UnsupportedOperationException(
               "Cannot filter on FORMAT fields when running in variant filter mode.");
         }
-        value = getFormatField(field, sampleName);
+        value = getFormatField(field, sampleIndex);
         break;
       default:
         throw new UnexpectedEnumException(fieldType);
@@ -80,8 +80,8 @@ public class VcfRecord {
     return value;
   }
 
-  private Object getFormatField(Field field, String sampleName) {
-    Genotype genotype = variantContext.getGenotype(sampleName);
+  private Object getFormatField(Field field, Integer sampleIndex) {
+    Genotype genotype = variantContext.getGenotype(sampleIndex);
     Object value;
     switch (field.getId()) {
       case ("GT"):

@@ -11,12 +11,12 @@ public class ExistsNodeEvaluator implements NodeEvaluator<ExistsNode> {
 
   @Override
   public NodeOutcome evaluate(ExistsNode node,
-      Variant variant, String sampleName) {
+      Variant variant, Integer sampleIndex) {
     NodeOutcome nodeOutcome;
     if (node.getField() instanceof MissingField) {
       nodeOutcome = node.getOutcomeFalse();
     } else {
-      Object value = variant.getValue(node.getField(), sampleName);
+      Object value = variant.getValue(node.getField(), sampleIndex);
       boolean matches = !isMissingValue(value);
       nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();
     }

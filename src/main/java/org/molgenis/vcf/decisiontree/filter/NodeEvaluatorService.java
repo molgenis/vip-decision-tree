@@ -5,7 +5,7 @@ import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 
 public interface NodeEvaluatorService {
 
-  NodeOutcome evaluate(DecisionNode node, Variant variant, String sampleName);
+  NodeOutcome evaluate(DecisionNode node, Variant variant, Integer sampleIndex);
 
   default NodeOutcome evaluate(DecisionNode node, Variant variant) {
     return evaluate(node, variant, null);

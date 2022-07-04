@@ -21,14 +21,14 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
 
   @Override
   public NodeOutcome evaluate(BoolMultiNode node,
-      Variant variant, String sampleName) {
+      Variant variant, Integer sampleIndex) {
     if (containsMissingFields(node, variant)) {
       return node.getOutcomeMissing();
     }
     for (BoolMultiQuery clause : node.getClauses()) {
-      if (evaluateClause(variant, clause, sampleName) == MISSING) {
+      if (evaluateClause(variant, clause, sampleIndex) == MISSING) {
         return node.getOutcomeMissing();
-      } else if (evaluateClause(variant, clause, sampleName) == TRUE) {
+      } else if (evaluateClause(variant, clause, sampleIndex) == TRUE) {
         return clause.getOutcomeTrue();
       }
     }
@@ -49,32 +49,32 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
   }
 
   private TripleBoolean evaluateClause(Variant variant,
-      BoolMultiQuery clause, @Nullable String sampleName) {
+      BoolMultiQuery clause, @Nullable Integer sampleIndex) {
     TripleBoolean outcome = FALSE;
     if (clause.getQueryList().size() == 1) {
       BoolQuery query = clause.getQueryList().get(0);
-      Object value = variant.getValue(query.getField(), sampleName);
+      Object value = variant.getValue(query.getField(), sampleIndex);
       if (isMissingValue(value)) {
         outcome = MISSING;
       } else if (executeQuery(query, value)) {
         outcome = TRUE;
       }
     } else {
-      if (evaluateMultiQuery(clause, variant, sampleName)) {
+      if (evaluateMultiQuery(clause, variant, sampleIndex)) {
         outcome = TRUE;
       }
     }
     return outcome;
   }
 
-  private boolean evaluateMultiQuery(BoolMultiQuery clause, Variant variant, String sampleName) {
+  private boolean evaluateMultiQuery(BoolMultiQuery clause, Variant variant, Integer sampleIndex) {
     if (clause.getOperator() == AND) {
-      if (allQueriesMatch(clause, variant, sampleName)) {
+      if (allQueriesMatch(clause, variant, sampleIndex)) {
         return true;
       }
     } else {
       for (BoolQuery query : clause.getQueryList()) {
-        Object value = variant.getValue(query.getField(), sampleName);
+        Object value = variant.getValue(query.getField(), sampleIndex);
         if (!isMissingValue(value) && executeQuery(query, value)) {
           return true;
         }
@@ -83,9 +83,9 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
     return false;
   }
 
-  private boolean allQueriesMatch(BoolMultiQuery clause, Variant variant, String sampleName) {
+  private boolean allQueriesMatch(BoolMultiQuery clause, Variant variant, Integer sampleIndex) {
     for (BoolQuery query : clause.getQueryList()) {
-      Object value = variant.getValue(query.getField(), sampleName);
+      Object value = variant.getValue(query.getField(), sampleIndex);
       if (isMissingValue(value) || !executeQuery(query, value)) {
         return false;
       }

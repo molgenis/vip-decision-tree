@@ -10,5 +10,5 @@ public interface DecisionTreeExecutor {
     return execute(tree, variant, null);
   }
 
-  Decision execute(DecisionTree tree, Variant variant, @Nullable String sampleName);
+  Decision execute(DecisionTree tree, Variant variant, @Nullable Integer sampleIndex);
 }

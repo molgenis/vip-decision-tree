@@ -19,8 +19,8 @@ public class Variant {
     return vcfRecord.getValue(field, allele, null);
   }
 
-  public Object getValue(Field field, String sampleName) {
-    return vcfRecord.getValue(field, allele, sampleName);
+  public Object getValue(Field field, Integer sampleIndex) {
+    return vcfRecord.getValue(field, allele, sampleIndex);
   }
 
   public String toDisplayString() {
