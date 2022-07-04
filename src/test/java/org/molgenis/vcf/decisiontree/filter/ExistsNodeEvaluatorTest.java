@@ -37,7 +37,7 @@ class ExistsNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn("test");
+    when(variant.getValue(field, null)).thenReturn("test");
     assertEquals(outcomeTrue, existsNodeEvaluator.evaluate(node, variant));
   }
 

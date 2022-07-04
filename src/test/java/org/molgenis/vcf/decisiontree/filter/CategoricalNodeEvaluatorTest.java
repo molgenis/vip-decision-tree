@@ -33,7 +33,7 @@ class CategoricalNodeEvaluatorTest {
         CategoricalNode.builder().id("cat_id").field(field).outcomeMap(outcomeMap).build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(key);
+    when(variant.getValue(field, null)).thenReturn(key);
     assertEquals(nodeOutcome, categoricalNodeEvaluator.evaluate(node, variant, null));
   }
 
@@ -67,7 +67,7 @@ class CategoricalNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(key);
+    when(variant.getValue(field, null)).thenReturn(key);
     assertEquals(outcomeDefault, categoricalNodeEvaluator.evaluate(node, variant, null));
   }
 
