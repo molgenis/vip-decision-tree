@@ -4,9 +4,12 @@ import static java.lang.String.format;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.molgenis.vcf.decisiontree.filter.model.Mode;
 
 class AppCommandLineOptions {
 
@@ -32,6 +35,8 @@ class AppCommandLineOptions {
   static final String OPT_PROBANDS_LONG = "probands";
   static final String OPT_PHENOTYPES = "ph";
   static final String OPT_PHENOTYPES_LONG = "phenotypes";
+  static final String OPT_MODE = "m";
+  static final String OPT_MODE_LONG = "mode";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -96,6 +101,12 @@ class AppCommandLineOptions {
             .desc(
                 "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
             .build());
+    appOptions.addOption(
+        Option.builder(OPT_MODE)
+            .hasArg(true)
+            .longOpt(OPT_MODE_LONG)
+            .desc("Run mode: 'variant' or 'sample'.")
+            .build());
     APP_OPTIONS = appOptions;
     Options appVersionOptions = new Options();
     appVersionOptions.addOption(
@@ -121,6 +132,7 @@ class AppCommandLineOptions {
     validateInput(commandLine);
     validateConfig(commandLine);
     validateOutput(commandLine);
+    validateMode(commandLine);
   }
 
   private static void validateInput(CommandLine commandLine) {
@@ -174,7 +186,22 @@ class AppCommandLineOptions {
 
     if (!commandLine.hasOption(OPT_FORCE) && Files.exists(outputPath)) {
       throw new IllegalArgumentException(
-          format("Output file '%s' already exists", outputPath.toString()));
+          format("Output file '%s' already exists", outputPath));
+    }
+  }
+
+  private static void validateMode(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_MODE)) {
+      return;
+    }
+
+    String mode = commandLine.getOptionValue(OPT_MODE);
+    List<String> modes = Arrays.stream(Mode.values()).map(value -> value.toString())
+        .toList();
+
+    if (!modes.contains(mode.toUpperCase())) {
+      throw new IllegalArgumentException(
+          format("Illegal 'mode' argument '%s', only 'variant' and 'sample' ar allowed.", mode));
     }
   }
 }

@@ -70,8 +70,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     Map<String, Node> nodeMap = mapNodes(vcfMetadata, configDecisionTree.getNodes(), labelMap,
         filesMap);
     Node rootNode = nodeMap.get(configDecisionTree.getRootNode());
-    Mode mode = toMode(configDecisionTree.getMode());
-    return DecisionTree.builder().rootNode(rootNode).mode(mode).build();
+    return DecisionTree.builder().rootNode(rootNode).build();
   }
 
   private Mode toMode(ConfigMode configMode) {

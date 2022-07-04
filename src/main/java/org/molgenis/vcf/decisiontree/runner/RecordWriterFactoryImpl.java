@@ -26,6 +26,7 @@ import org.molgenis.vcf.decisiontree.WriterSettings;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.RecordWriterImpl;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
+import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigMode;
 import org.molgenis.vcf.decisiontree.runner.info.MissingVepException;
 import org.springframework.stereotype.Component;
@@ -83,7 +84,7 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
     vcfHeader.addMetaDataLine(
         new VCFHeaderLine(HEADER_VIP_ARGS, String.join(" ", appSettings.getArgs())));
 
-    if (settings.getConfigDecisionTree().getMode() == ConfigMode.VARIANT) {
+    if (settings.getMode() == Mode.VARIANT) {
       vcfHeader = addVariantHeaders(vcfMetadata, writerSettings, vcfHeader);
     } else {
       vcfHeader.addMetaDataLine(new VCFInfoHeaderLine(

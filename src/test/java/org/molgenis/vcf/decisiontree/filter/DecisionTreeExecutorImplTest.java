@@ -34,7 +34,7 @@ class DecisionTreeExecutorImplTest {
     CategoricalNode catNode = mock(CategoricalNode.class);
     BoolNode boolNode = mock(BoolNode.class);
     LeafNode leafNode = LeafNode.builder().id("my_id").clazz(clazz).build();
-    DecisionTree decisionTree = DecisionTree.builder().rootNode(catNode).mode(Mode.VARIANT).build();
+    DecisionTree decisionTree = DecisionTree.builder().rootNode(catNode).build();
 
     Variant variant = mock(Variant.class);
 
@@ -60,7 +60,7 @@ class DecisionTreeExecutorImplTest {
     CategoricalNode catNode = mock(CategoricalNode.class);
     BoolNode boolNode = mock(BoolNode.class);
     LeafNode leafNode = LeafNode.builder().id("my_id").clazz(clazz).build();
-    DecisionTree decisionTree = DecisionTree.builder().rootNode(catNode).mode(Mode.VARIANT).build();
+    DecisionTree decisionTree = DecisionTree.builder().rootNode(catNode).build();
 
     Variant variant = mock(Variant.class);
 

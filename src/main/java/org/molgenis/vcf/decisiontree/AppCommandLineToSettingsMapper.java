@@ -6,6 +6,7 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_CONFIG;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_LABELS;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_MODE;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PATH;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PHENOTYPES;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.cli.CommandLine;
+import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.filter.model.SampleMeta;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
@@ -52,7 +54,9 @@ class AppCommandLineToSettingsMapper {
     WriterSettings writerSettings = createWriterSettings(commandLine);
     boolean strict = commandLine.hasOption(OPT_STRICT);
     SampleInfo sampleInfo = createSampleInfo(commandLine);
+    Mode mode = getMode(commandLine);
     return Settings.builder()
+        .mode(mode)
         .inputVcfPath(inputPath)
         .configDecisionTree(configDecisionTree)
         .appSettings(appSettings)
@@ -60,6 +64,16 @@ class AppCommandLineToSettingsMapper {
         .sampleInfo(sampleInfo)
         .strict(strict)
         .build();
+  }
+
+  private Mode getMode(CommandLine commandLine) {
+    Mode mode;
+    if (commandLine.hasOption(OPT_MODE)) {
+      mode = Mode.valueOf(commandLine.getOptionValue(OPT_MODE).toUpperCase());
+    } else {
+      mode = Mode.VARIANT;
+    }
+    return mode;
   }
 
   private SampleInfo createSampleInfo(CommandLine commandLine) {

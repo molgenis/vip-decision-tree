@@ -1,6 +1,5 @@
 {
   "rootNode": "pheno",
-  "mode": "SAMPLE",
   "nodes": {
     "pheno": {
       "type": "SAMPLE_PHENOTYPE",

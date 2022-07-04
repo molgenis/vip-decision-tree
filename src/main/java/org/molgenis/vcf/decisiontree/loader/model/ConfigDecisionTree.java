@@ -18,8 +18,6 @@ import lombok.experimental.NonFinal;
 public class ConfigDecisionTree {
 
   @NonNull String rootNode;
-  @Builder.Default
-  @NonNull ConfigMode mode = ConfigMode.VARIANT;
   @NonNull Map<String, ConfigNode> nodes;
   Map<String, ConfigLabel> labels;
   Map<String, Path> files;

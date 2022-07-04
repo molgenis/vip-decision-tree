@@ -26,6 +26,7 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
+import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -73,12 +74,12 @@ class DecisionTreeFactoryImplTest{
     when(decisionTree.getLabels()).thenReturn(Collections.emptyMap());
     when(decisionTree.getFiles()).thenReturn(files);
     when(decisionTree.getNodes()).thenReturn(nodes);
-    when(decisionTree.getMode()).thenReturn(ConfigMode.VARIANT);
     when(decisionTree.getRootNode()).thenReturn("test");
     when(vcfMetadata.getField("INFO/testField")).thenReturn(
         FieldImpl.builder().id("testField").fieldType(INFO).valueType(
             ValueType.STRING).valueCount(ValueCount.builder().type(Type.A).build()).build());
-    Settings settings = Settings.builder().configDecisionTree(decisionTree).build();
+    Settings settings = Settings.builder().mode(Mode.VARIANT).configDecisionTree(decisionTree)
+        .build();
     DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
 
     assertAll(

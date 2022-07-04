@@ -10,5 +10,4 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class DecisionTree {
   @NonNull Node rootNode;
-  @NonNull Mode mode;
 }
