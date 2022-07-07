@@ -280,7 +280,12 @@ class VcfMetadataTest {
 
   @Test
   void getFieldFormatUnknown() {
-    assertThrows(UnknownFieldException.class, () -> vcfMetadata.getField("FORMAT/unknown"));
+    assertEquals(new MissingField("unknown"), vcfMetadata.getField("FORMAT/unknown"));
+  }
+
+  @Test
+  void getFieldFormatUnknownStrict() {
+    assertThrows(UnknownFieldException.class, () -> vcfMetadataStrict.getField("FORMAT/unknown"));
   }
 
   @Test

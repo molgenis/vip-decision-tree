@@ -210,7 +210,7 @@ public class VcfMetadata {
     switch (fieldType) {
       case FORMAT:
         vcfCompoundHeaderLine = vcfHeader.getFormatHeaderLine(field);
-        if (vcfCompoundHeaderLine == null) {
+        if (vcfCompoundHeaderLine == null && strict) {
           throw new UnknownFieldException(field, fieldType);
         }
         break;
