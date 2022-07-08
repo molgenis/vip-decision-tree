@@ -10,7 +10,7 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 
 @Value
 @Builder
-public class VepHeaderLine {
+public class NestedHeaderLine {
 
   @NonNull Field parentField;
   @NonNull Map<String, NestedField> nestedFields;

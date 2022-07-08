@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
-import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,16 +59,16 @@ public class SampleClassifierImpl implements Classifier {
   private VcfRecord processRecordSample(
       VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
       SampleAnnotator sampleAnnotator) {
-    VepHeaderLine vepHeaderLine = vcfMetadata.getVepHeaderLine();
+    NestedHeaderLine nestedHeaderLine = vcfMetadata.getVepHeaderLine();
     Map<Integer, List<VcfRecord>> alleleCsqMap = vepHelper.getRecordPerConsequence(vcfRecord,
-        vepHeaderLine);
+        nestedHeaderLine);
     Set<String> decisions = new LinkedHashSet<>();
     VariantContext vc = vcfRecord.getVariantContext();
     for (int sampleIndex = 0; sampleIndex < vc.getNSamples(); sampleIndex++) {
       String sampleName = vc.getGenotype(sampleIndex).getSampleName();
       if (probands.isEmpty() || probands.contains(sampleName)) {
         List<Decision> sampleDecisions = new ArrayList<>();
-        processRecord(vcfRecord, decisionTree, vcfMetadata, vepHeaderLine, alleleCsqMap,
+        processRecord(vcfRecord, decisionTree, vcfMetadata, nestedHeaderLine, alleleCsqMap,
             sampleIndex,
             sampleDecisions);
         vc = sampleAnnotator.annotate(sampleDecisions, sampleIndex, vc);
@@ -86,7 +86,7 @@ public class SampleClassifierImpl implements Classifier {
 
   private void processRecord
       (VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
-          VepHeaderLine vepHeaderLine, Map<Integer, List<VcfRecord>> alleleCsqMap,
+          NestedHeaderLine nestedHeaderLine, Map<Integer, List<VcfRecord>> alleleCsqMap,
           Integer sampleIndex,
           List<Decision> sampleDecisions) {
     for (int alleleIndex = 0; alleleIndex < vcfRecord.getNrAltAlleles(); alleleIndex++) {
@@ -95,7 +95,7 @@ public class SampleClassifierImpl implements Classifier {
       List<VcfRecord> singleCsqRecords = alleleCsqMap.get(vepAlleleIndex);
       if (singleCsqRecords == null || singleCsqRecords.isEmpty()) {
         singleCsqRecords = List.of(
-            vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, vepHeaderLine));
+            vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, nestedHeaderLine));
       }
       for (VcfRecord singleCsqRecord : singleCsqRecords) {
         Variant variant = Variant.builder().vcfMetadata(vcfMetadata).vcfRecord(singleCsqRecord)

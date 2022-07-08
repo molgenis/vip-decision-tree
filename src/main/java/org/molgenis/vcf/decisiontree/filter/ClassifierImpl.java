@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
-import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +49,9 @@ public class ClassifierImpl implements Classifier {
 
   private VcfRecord processRecord(
       VcfRecord vcfRecord) {
-    VepHeaderLine vepHeaderLine = vcfMetadata.getVepHeaderLine();
+    NestedHeaderLine nestedHeaderLine = vcfMetadata.getVepHeaderLine();
     Map<Integer, List<VcfRecord>> alleleCsqMap = vepHelper.getRecordPerConsequence(vcfRecord,
-        vepHeaderLine);
+        nestedHeaderLine);
     List<String> annotatedCsqs = new ArrayList<>();
     for (int alleleIndex = 0; alleleIndex < vcfRecord.getNrAltAlleles(); alleleIndex++) {
       Integer vepAlleleIndex = alleleIndex + 1;
@@ -59,17 +59,17 @@ public class ClassifierImpl implements Classifier {
       List<VcfRecord> singleCsqRecords = alleleCsqMap.get(vepAlleleIndex);
       if (singleCsqRecords == null || singleCsqRecords.isEmpty()) {
         singleCsqRecords = List.of(
-            vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, vepHeaderLine));
+            vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, nestedHeaderLine));
       }
       for (VcfRecord singleCsqRecord : singleCsqRecords) {
         Variant variant = new Variant(vcfMetadata, singleCsqRecord, allele);
         Decision decision = decisionTreeExecutor.execute(decisionTree, variant);
-        String csqString = singleCsqRecord.getVepValues(vepHeaderLine.getParentField())
+        String csqString = singleCsqRecord.getVepValues(nestedHeaderLine.getParentField())
             .get(0);
         annotatedCsqs.add(consequenceAnnotator.annotate(decision, csqString));
       }
     }
-    vcfRecord.setAttribute(vepHeaderLine.getParentField(), annotatedCsqs);
+    vcfRecord.setAttribute(nestedHeaderLine.getParentField(), annotatedCsqs);
 
     return vcfRecord;
   }

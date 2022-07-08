@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedInfoValue;
 
 import htsjdk.variant.variantcontext.Genotype;
+import htsjdk.variant.variantcontext.GenotypeType;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
 import htsjdk.variant.vcf.VCFConstants;
@@ -17,6 +18,8 @@ import java.util.stream.IntStream;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
+import org.molgenis.vcf.decisiontree.filter.model.GenotypeField;
+import org.molgenis.vcf.decisiontree.filter.model.GenotypeFieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
@@ -67,6 +70,9 @@ public class VcfRecord {
       case INFO_VEP:
         value = getNestedVepValue(field);
         break;
+      case FORMAT_GENOTYPE:
+        value = getNestedGTValue((NestedField) field, sampleIndex);
+        break;
       case FORMAT:
         if (sampleIndex == null) {
           throw new UnsupportedOperationException(
@@ -76,6 +82,32 @@ public class VcfRecord {
         break;
       default:
         throw new UnexpectedEnumException(fieldType);
+    }
+    return value;
+  }
+
+  private Object getNestedGTValue(NestedField field, Integer sampleIndex) {
+    Genotype genotype = variantContext.getGenotype(sampleIndex);
+    Object value;
+    switch (GenotypeFieldType.valueOf(field.getId())) {
+      case ALLELES -> value = genotype.getAlleles();
+      case TYPE -> {
+        switch (genotype.getType()) {
+          case MIXED -> value = GenotypeType.MIXED.name();
+          case HET -> value = GenotypeType.HET.name();
+          case HOM_REF -> value = GenotypeType.HOM_REF.name();
+          case HOM_VAR -> value = GenotypeType.HOM_VAR.name();
+          case NO_CALL -> value = GenotypeType.NO_CALL.name();
+          case UNAVAILABLE -> value = GenotypeType.UNAVAILABLE.name();
+          default -> throw new UnexpectedEnumException(genotype.getType());
+        }
+      }
+      case MIXED -> value = genotype.isMixed();
+      case CALLED -> value = genotype.isCalled();
+      case PLOIDY -> value = genotype.getPloidy();
+      case PHASED -> value = genotype.isPhased();
+      case NON_INFORMATIVE -> value = genotype.isNonInformative();
+      default -> throw new UnexpectedEnumException(GenotypeFieldType.valueOf(field.getId()));
     }
     return value;
   }

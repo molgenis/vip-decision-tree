@@ -4,5 +4,5 @@ import htsjdk.variant.vcf.VCFHeader;
 
 public interface VepMetadataParser {
 
-  VepHeaderLine map(VCFHeader header);
+  NestedHeaderLine map(VCFHeader header);
 }

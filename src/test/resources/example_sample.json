@@ -5,9 +5,9 @@
       "type": "BOOL",
       "description": "GT non HOMREF match (test purpose only)",
       "query": {
-        "field": "FORMAT/GT",
-        "operator": "!=",
-        "value": "0/0"
+        "field": "FORMAT/GENOTYPE/PHASED",
+        "operator": "==",
+        "value": true
       },
       "outcomeTrue": {
         "nextNode": "exit_k"

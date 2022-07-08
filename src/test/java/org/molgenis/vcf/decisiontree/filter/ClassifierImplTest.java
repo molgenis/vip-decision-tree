@@ -23,7 +23,7 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
-import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 
 @ExtendWith(MockitoExtension.class)
 class ClassifierImplTest {
@@ -45,7 +45,7 @@ class ClassifierImplTest {
 
   private Classifier classifier;
   private FieldImpl parent;
-  private VepHeaderLine vepHeaderLine;
+  private NestedHeaderLine nestedHeaderLine;
 
   @BeforeEach
   void setUp() {
@@ -60,9 +60,9 @@ class ClassifierImplTest {
         .valueType(ValueType.STRING).valueCount(valueCount).build();
     Map<String, NestedField> nestedFields = Map.of("field1", nestedField1, "ALLELE_NUM",
         nestedField2);
-    vepHeaderLine = VepHeaderLine.builder().parentField(parent)
+    nestedHeaderLine = NestedHeaderLine.builder().parentField(parent)
         .nestedFields(nestedFields).build();
-    when(vcfMetadata.getVepHeaderLine()).thenReturn(vepHeaderLine);
+    when(vcfMetadata.getVepHeaderLine()).thenReturn(nestedHeaderLine);
     classifier = new ClassifierImpl(decisionTreeExecutor, vepHelper, decisionTree,
         consequenceAnnotator, recordWriter, vcfMetadata);
   }
@@ -96,9 +96,9 @@ class ClassifierImplTest {
     Map<Integer, List<VcfRecord>> recordMap1 = Map.of(1, List.of(record1a), 2,
         List.of(record1b));
     when(vepHelper.getRecordPerConsequence(record0,
-        vepHeaderLine)).thenReturn(recordMap0);
+        nestedHeaderLine)).thenReturn(recordMap0);
     when(vepHelper.getRecordPerConsequence(record1,
-        vepHeaderLine)).thenReturn(recordMap1);
+        nestedHeaderLine)).thenReturn(recordMap1);
     Decision decision1a = Decision.builder().clazz("test1a").path(List.of())
         .labels(Set.of()).build();
     Decision decision2a = Decision.builder().clazz("test2a").path(List.of())

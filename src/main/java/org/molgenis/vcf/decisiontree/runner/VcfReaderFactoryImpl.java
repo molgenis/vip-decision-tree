@@ -6,16 +6,21 @@ import htsjdk.variant.vcf.VCFFileReader;
 import java.nio.file.Path;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
+import org.molgenis.vcf.decisiontree.runner.info.GenotypeMetadataMapper;
+import org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.VepMetadataParser;
 import org.springframework.stereotype.Component;
 
 @Component
 class VcfReaderFactoryImpl implements VcfReaderFactory {
 
+  private final GenotypeMetadataMapper genotypeMetadataMapper;
   private VepMetadataParser vepMetadataParser;
 
-  VcfReaderFactoryImpl(VepMetadataParser vepMetadataParser) {
+  VcfReaderFactoryImpl(VepMetadataParser vepMetadataParser,
+      GenotypeMetadataMapper genotypeMetadataMapper) {
     this.vepMetadataParser = requireNonNull(vepMetadataParser);
+    this.genotypeMetadataMapper = requireNonNull(genotypeMetadataMapper);
   }
 
   @Override
@@ -23,6 +28,7 @@ class VcfReaderFactoryImpl implements VcfReaderFactory {
     Path inputVcfPath = settings.getInputVcfPath();
     boolean strict = settings.isStrict();
     return new VcfReader(new VCFFileReader(inputVcfPath.toFile(), false), vepMetadataParser,
+        genotypeMetadataMapper,
         strict);
   }
 }

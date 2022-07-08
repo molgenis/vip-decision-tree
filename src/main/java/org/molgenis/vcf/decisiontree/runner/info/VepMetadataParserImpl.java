@@ -16,7 +16,7 @@ public class VepMetadataParserImpl implements VepMetadataParser {
   }
 
   @Override
-  public VepHeaderLine map(VCFHeader header) {
+  public NestedHeaderLine map(VCFHeader header) {
     for (VCFInfoHeaderLine headerLine : header.getInfoHeaderLines()) {
       if (mapper.canMap(headerLine)) {
         return mapper.map(headerLine);
