@@ -11,5 +11,6 @@ public enum FieldType {
   /**
    * FORMAT field with nested information (GENOTYPE info from htsjdk)
    */
-  FORMAT_GENOTYPE
+  FORMAT_GENOTYPE,
+  SAMPLE
 }

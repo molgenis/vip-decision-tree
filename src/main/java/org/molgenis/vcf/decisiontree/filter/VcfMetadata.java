@@ -6,6 +6,7 @@ import static org.molgenis.vcf.decisiontree.filter.model.FieldType.FORMAT;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.FORMAT_GENOTYPE;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
 
 import htsjdk.variant.vcf.VCFCompoundHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
@@ -56,6 +57,9 @@ public class VcfMetadata {
       case INFO, FORMAT:
         field = toCompoundField(fieldTokens, fieldType);
         break;
+      case SAMPLE:
+        field = toSampleField(fieldTokens);
+        break;
       case INFO_VEP:
         field = toNestedField(fieldTokens, fieldType, nestedVepHeaderLine);
         break;
@@ -67,6 +71,38 @@ public class VcfMetadata {
     }
 
     return field;
+  }
+
+  private Field toSampleField(List<String> fieldTokens) {
+    if (fieldTokens.size() != 2) {
+      throw new InvalidNumberOfTokensException(fieldTokens, SAMPLE, 2);
+    }
+
+    ValueType valueType;
+    ValueCount valueCount;
+    String field = fieldTokens.get(1);
+    switch (field.toUpperCase()) {
+      case "PROBAND":
+        valueType = ValueType.FLAG;
+        valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
+        break;
+      case "AFFECTED_STATUS", "SEX", "FATHER", "MOTHER", "FAMILY":
+        valueType = ValueType.STRING;
+        valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
+        break;
+      case "PHENOTYPES":
+        valueType = ValueType.STRING;
+        valueCount = ValueCount.builder().type(Type.VARIABLE).nullable(true).build();
+        break;
+      default:
+        throw new UnsupportedFieldException(field);
+    }
+    return FieldImpl.builder()
+        .id(field)
+        .fieldType(SAMPLE)
+        .valueType(valueType)
+        .valueCount(valueCount)
+        .build();
   }
 
   private Field toNestedField(List<String> fieldTokens, FieldType fieldType,
@@ -106,6 +142,9 @@ public class VcfMetadata {
         break;
       case "FORMAT":
         fieldType = fields.size() > 2 ? FORMAT_GENOTYPE : FORMAT;
+        break;
+      case "SAMPLE":
+        fieldType = SAMPLE;
         break;
       default:
         throw new UnsupportedFieldException(rootField);
@@ -232,6 +271,10 @@ public class VcfMetadata {
         throw new UnexpectedEnumException(fieldType);
     }
     return vcfCompoundHeaderLine;
+  }
+
+  public List<String> getSampleNamesInOrder() {
+    return vcfHeader.getSampleNamesInOrder();
   }
 
   public VCFHeader unwrap() {

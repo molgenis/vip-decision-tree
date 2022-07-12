@@ -33,6 +33,10 @@ class AppCommandLineOptions {
   static final String OPT_STRICT_LONG = "strict";
   static final String OPT_PROBANDS = "pb";
   static final String OPT_PROBANDS_LONG = "probands";
+  static final String OPT_PED = "pd";
+  static final String OPT_PED_LONG = "pedigree";
+  static final String OPT_PHENOTYPES = "ph";
+  static final String OPT_PHENOTYPES_LONG = "phenotypes";
   static final String OPT_MODE = "m";
   static final String OPT_MODE_LONG = "mode";
   private static final Options APP_OPTIONS;
@@ -93,6 +97,19 @@ class AppCommandLineOptions {
             .desc("Comma-separated list of proband names.")
             .build());
     appOptions.addOption(
+        Option.builder(OPT_PED)
+            .hasArg(true)
+            .longOpt(OPT_PED_LONG)
+            .desc("Comma-separated list of pedigree files (.ped).")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_PHENOTYPES)
+            .hasArg(true)
+            .longOpt(OPT_PHENOTYPES_LONG)
+            .desc(
+                "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
+            .build());
+    appOptions.addOption(
         Option.builder(OPT_MODE)
             .hasArg(true)
             .longOpt(OPT_MODE_LONG)
@@ -131,15 +148,15 @@ class AppCommandLineOptions {
     Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
     if (!Files.exists(inputPath)) {
       throw new IllegalArgumentException(
-          format("Input file '%s' does not exist.", inputPath.toString()));
+          format("Input file '%s' does not exist.", inputPath));
     }
     if (Files.isDirectory(inputPath)) {
       throw new IllegalArgumentException(
-          format("Input file '%s' is a directory.", inputPath.toString()));
+          format("Input file '%s' is a directory.", inputPath));
     }
     if (!Files.isReadable(inputPath)) {
       throw new IllegalArgumentException(
-          format("Input file '%s' is not readable.", inputPath.toString()));
+          format("Input file '%s' is not readable.", inputPath));
     }
     String inputPathStr = inputPath.toString();
     if (!inputPathStr.endsWith(".vcf") && !inputPathStr.endsWith(".vcf.gz")) {

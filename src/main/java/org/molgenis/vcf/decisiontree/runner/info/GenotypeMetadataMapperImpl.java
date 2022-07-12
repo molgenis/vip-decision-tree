@@ -3,7 +3,6 @@ package org.molgenis.vcf.decisiontree.runner.info;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
 
-import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
 import java.util.Map;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
@@ -54,6 +53,9 @@ public class GenotypeMetadataMapperImpl implements GenotypeMetadataMapper {
       case ALLELES -> fieldBuilder
           .valueCount(ValueCount.builder().type(VARIABLE).build())
           .valueType(ValueType.STRING);
+      case ALLELE_NUM -> fieldBuilder
+          .valueCount(ValueCount.builder().type(VARIABLE).build())
+          .valueType(ValueType.INTEGER);
       case PLOIDY -> fieldBuilder
           .valueCount(ValueCount.builder().type(FIXED).count(1).build())
           .valueType(ValueType.INTEGER);

@@ -102,7 +102,7 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
         if (!fields.contains(query.getField())) {
           throw new ConfigDecisionTreeValidationException(
               format(
-                  "Field '%s' refers to a field that is no present in the 'fields' list of node '%s'",
+                  "Field '%s' refers to a field that is not present in the 'fields' list of node '%s'",
                   query.getField(), node.getId()));
         }
       }

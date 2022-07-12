@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
 import org.molgenis.vcf.decisiontree.runner.info.GenotypeMetadataMapper;
-import org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.VepMetadataParser;
 import org.springframework.stereotype.Component;
 

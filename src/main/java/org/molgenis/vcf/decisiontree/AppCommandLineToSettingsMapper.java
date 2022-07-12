@@ -9,11 +9,15 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_LABELS;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_MODE;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_OUTPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PATH;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PED;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PHENOTYPES;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PROBANDS;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_STRICT;
 
 import java.nio.file.Path;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
@@ -27,6 +31,7 @@ class AppCommandLineToSettingsMapper {
   private final String appName;
   private final String appVersion;
   private final ConfigDecisionTreeLoader configDecisionTreeLoader;
+
 
   AppCommandLineToSettingsMapper(
       @Value("${app.name}") String appName,
@@ -44,7 +49,8 @@ class AppCommandLineToSettingsMapper {
     WriterSettings writerSettings = createWriterSettings(commandLine);
     boolean strict = commandLine.hasOption(OPT_STRICT);
     Mode mode = getMode(commandLine);
-    Set<String> probands = getProbands(commandLine);
+    SampleSettings sampleSettings = createSampleSettings(commandLine);
+
     return Settings.builder()
         .mode(mode)
         .inputVcfPath(inputPath)
@@ -52,18 +58,8 @@ class AppCommandLineToSettingsMapper {
         .appSettings(appSettings)
         .writerSettings(writerSettings)
         .strict(strict)
-        .probands(probands)
+        .sampleSettings(sampleSettings)
         .build();
-  }
-
-  private Set<String> getProbands(CommandLine commandLine) {
-    Set<String> probands;
-    if (commandLine.hasOption(OPT_PROBANDS)) {
-      probands = Set.of(commandLine.getOptionValue(OPT_PROBANDS).split(","));
-    } else {
-      probands = Set.of();
-    }
-    return probands;
   }
 
   private Mode getMode(CommandLine commandLine) {
@@ -74,6 +70,25 @@ class AppCommandLineToSettingsMapper {
       mode = Mode.VARIANT;
     }
     return mode;
+  }
+
+  private SampleSettings createSampleSettings(CommandLine commandLine) {
+    String phenotypesString = "";
+    if (commandLine.hasOption(OPT_PHENOTYPES)) {
+      phenotypesString = commandLine.getOptionValue(OPT_PHENOTYPES);
+    }
+
+    List<String> probandNames = List.of();
+    if (commandLine.hasOption(OPT_PROBANDS)) {
+      probandNames = Arrays.asList(commandLine.getOptionValue(OPT_PROBANDS).split(","));
+    }
+
+    List<Path> pedPaths = List.of();
+    if (commandLine.hasOption(OPT_PED)) {
+      pedPaths = parsePaths(commandLine.getOptionValue(OPT_PED));
+    }
+
+    return new SampleSettings(probandNames, pedPaths, phenotypesString);
   }
 
   private ConfigDecisionTree createDecisionTree(CommandLine commandLine) {
@@ -103,5 +118,14 @@ class AppCommandLineToSettingsMapper {
         .writeLabels(writeLabels)
         .writePath(writePath)
         .build();
+  }
+
+  private static List<Path> parsePaths(String optionValue) {
+    List<Path> result = new ArrayList<>();
+    String[] paths = optionValue.split(",");
+    for (String path : paths) {
+      result.add(Path.of(path));
+    }
+    return result;
   }
 }

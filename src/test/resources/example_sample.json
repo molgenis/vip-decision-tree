@@ -1,49 +1,123 @@
 {
-  "rootNode": "GT",
+  "rootNode": "sample_relevance",
   "nodes": {
-    "GT": {
-      "type": "BOOL",
-      "description": "GT non HOMREF match (test purpose only)",
-      "query": {
-        "field": "FORMAT/GENOTYPE/PHASED",
-        "operator": "==",
-        "value": true
-      },
-      "outcomeTrue": {
-        "nextNode": "exit_k"
-      },
-      "outcomeFalse": {
-        "nextNode": "VIM"
+    "sample_relevance": {
+      "type": "BOOL_MULTI",
+      "fields": [
+        "FORMAT/VIM",
+        "FORMAT/GENOTYPE/ALLELE_NUM"
+      ],
+      "outcomes": [
+        {
+          "operator": "AND",
+          "queries": [
+            {
+              "field": "FORMAT/VIM",
+              "operator": "==",
+              "value": 1
+            },
+            {
+              "field": "FORMAT/GENOTYPE/ALLELE_NUM",
+              "operator": "contains",
+              "value": "field:INFO/CSQ/ALLELE_NUM"
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "sample_relevance_2"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "exit_r"
       },
       "outcomeMissing": {
-        "nextNode": "exit_k"
+        "nextNode": "exit_m"
       }
     },
-    "VIM": {
+    "sample_relevance_2": {
+      "type": "BOOL_MULTI",
+      "fields": [
+        "SAMPLE/PROBAND",
+        "SAMPLE/SEX"
+      ],
+      "outcomes": [
+        {
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "SAMPLE/PROBAND",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "field": "SAMPLE/SEX",
+              "operator": "==",
+              "value": "MALE"
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "VIPC"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "exit_r"
+      },
+      "outcomeMissing": {
+        "nextNode": "exit_m"
+      }
+    },
+    "HPO": {
       "type": "BOOL",
-      "description": "VIM",
+      "description": "",
       "query": {
-        "field": "FORMAT/VIM",
-        "operator": "==",
-        "value": 1
+        "field": "INFO/CSQ/HPO",
+        "operator": "contains_all",
+        "value": "field:SAMPLE/PHENOTYPES"
       },
       "outcomeTrue": {
         "nextNode": "exit_k"
       },
       "outcomeFalse": {
-        "nextNode": "exit_f"
+        "nextNode": "exit_r"
       },
       "outcomeMissing": {
-        "nextNode": "exit_k"
+        "nextNode": "exit_m"
+      }
+    },
+    "VIPC": {
+      "type": "BOOL",
+      "description": "",
+      "query": {
+        "field": "INFO/CSQ/VIPC",
+        "operator": "in",
+        "value": [
+          "P",
+          "LP",
+          "VUS"
+        ]
+      },
+      "outcomeTrue": {
+        "nextNode": "HPO"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_r"
+      },
+      "outcomeMissing": {
+        "nextNode": "exit_m"
       }
     },
     "exit_k": {
       "type": "LEAF",
       "class": "k"
     },
-    "exit_f": {
+    "exit_m": {
       "type": "LEAF",
-      "class": "f"
+      "class": "m"
+    },
+    "exit_r": {
+      "type": "LEAF",
+      "class": "r"
     }
   }
 }

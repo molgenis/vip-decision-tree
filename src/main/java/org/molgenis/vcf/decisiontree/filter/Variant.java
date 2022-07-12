@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 
 @Value
 @Builder
@@ -19,8 +20,8 @@ public class Variant {
     return vcfRecord.getValue(field, allele, null);
   }
 
-  public Object getValue(Field field, Integer sampleIndex) {
-    return vcfRecord.getValue(field, allele, sampleIndex);
+  public Object getValue(Field field, SampleContext sampleContext) {
+    return vcfRecord.getValue(field, allele, sampleContext);
   }
 
   public String toDisplayString() {

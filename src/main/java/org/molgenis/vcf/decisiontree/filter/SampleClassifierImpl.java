@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.slf4j.Logger;
@@ -27,17 +29,17 @@ public class SampleClassifierImpl implements Classifier {
   private final DecisionTree decisionTree;
   private final RecordWriter recordWriter;
   private final SampleAnnotator sampleAnnotator;
-  private final Set<String> probands;
+  private final SamplesContext samplesContext;
 
-  public SampleClassifierImpl(DecisionTreeExecutor decisionTreeExecutor, VepHelper vepHelper,
-      DecisionTree decisionTree,
-      RecordWriter recordWriter, SampleAnnotator sampleAnnotator, Set<String> probands) {
+  public SampleClassifierImpl(DecisionTreeExecutor decisionTreeExecutor,
+      DecisionTree decisionTree, RecordWriter recordWriter, SampleAnnotator sampleAnnotator,
+      SamplesContext samplesContext) {
     this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
-    this.vepHelper = requireNonNull(vepHelper);
+    this.vepHelper = new VepHelper();
     this.decisionTree = requireNonNull(decisionTree);
     this.recordWriter = requireNonNull(recordWriter);
     this.sampleAnnotator = requireNonNull(sampleAnnotator);
-    this.probands = requireNonNull(probands);
+    this.samplesContext = requireNonNull(samplesContext);
   }
 
   @Override
@@ -64,19 +66,16 @@ public class SampleClassifierImpl implements Classifier {
         nestedHeaderLine);
     Set<String> decisions = new LinkedHashSet<>();
     VariantContext vc = vcfRecord.getVariantContext();
-    for (int sampleIndex = 0; sampleIndex < vc.getNSamples(); sampleIndex++) {
-      String sampleName = vc.getGenotype(sampleIndex).getSampleName();
-      if (probands.isEmpty() || probands.contains(sampleName)) {
-        List<Decision> sampleDecisions = new ArrayList<>();
-        processRecord(vcfRecord, decisionTree, vcfMetadata, nestedHeaderLine, alleleCsqMap,
-            sampleIndex,
-            sampleDecisions);
-        vc = sampleAnnotator.annotate(sampleDecisions, sampleIndex, vc);
-        decisions.addAll(
-            sampleDecisions.stream().map(Decision::getClazz).toList());
-      }
-    }
     VariantContextBuilder vcBuilder = new VariantContextBuilder(vc);
+    List<SampleContext> samplesContexts = samplesContext.getSampleContexts();
+    for (SampleContext sampleContext : samplesContexts) {
+      List<Decision> sampleDecisions = new ArrayList<>();
+      processRecord(vcfRecord, decisionTree, vcfMetadata, nestedHeaderLine, alleleCsqMap,
+          sampleContext, sampleDecisions);
+      sampleAnnotator.annotate(sampleDecisions, sampleContext.getIndex(), vcBuilder);
+      decisions.addAll(
+          sampleDecisions.stream().map(Decision::getClazz).toList());
+    }
     if (!decisions.isEmpty()) {
       vcBuilder.attribute(VIPC_S, String.join(",", decisions));
     }
@@ -87,7 +86,7 @@ public class SampleClassifierImpl implements Classifier {
   private void processRecord
       (VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
           NestedHeaderLine nestedHeaderLine, Map<Integer, List<VcfRecord>> alleleCsqMap,
-          Integer sampleIndex,
+          SampleContext sampleContext,
           List<Decision> sampleDecisions) {
     for (int alleleIndex = 0; alleleIndex < vcfRecord.getNrAltAlleles(); alleleIndex++) {
       Integer vepAlleleIndex = alleleIndex + 1;
@@ -101,7 +100,7 @@ public class SampleClassifierImpl implements Classifier {
         Variant variant = Variant.builder().vcfMetadata(vcfMetadata).vcfRecord(singleCsqRecord)
             .allele(allele).build();
         sampleDecisions.add(
-            decisionTreeExecutor.execute(decisionTree, variant, sampleIndex));
+            decisionTreeExecutor.execute(decisionTree, variant, sampleContext));
       }
     }
   }

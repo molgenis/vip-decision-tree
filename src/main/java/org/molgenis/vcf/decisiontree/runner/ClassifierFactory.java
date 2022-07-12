@@ -7,6 +7,7 @@ import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.SampleAnnotator;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
 
 interface ClassifierFactory {
 
@@ -14,6 +15,6 @@ interface ClassifierFactory {
       ConsequenceAnnotator consequenceAnnotator, RecordWriter recordWriter,
       VcfMetadata vcfMetadata);
 
-  Classifier create(Settings settings, DecisionTree decisionTree, RecordWriter recordWriter,
-      SampleAnnotator sampleAnnotator);
+  Classifier create(Settings settings, DecisionTree decisionTree,
+      RecordWriter recordWriter, SampleAnnotator sampleAnnotator, SamplesContext samplesContext);
 }

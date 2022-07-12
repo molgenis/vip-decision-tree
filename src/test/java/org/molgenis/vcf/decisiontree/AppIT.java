@@ -69,10 +69,12 @@ class AppIT {
   void testSamples() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:example_samples.vcf").toString();
     String treeConfigFile = ResourceUtils.getFile("classpath:example_sample.json").toString();
+    String pedFile = ResourceUtils.getFile("classpath:example_samples.ped").toString();
     String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
 
     String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
-        "-m", "samPlE"};
+        "-m", "samPlE", "-ph", "HP:0000951;HP:0003124", "-pb", "Patient", "-pd", pedFile
+    };
     SpringApplication.run(App.class, args);
 
     String outputVcf = Files.readString(Path.of(outputFile));
