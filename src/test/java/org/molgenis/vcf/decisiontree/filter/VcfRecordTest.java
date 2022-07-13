@@ -416,6 +416,21 @@ class VcfRecordTest {
     assertEquals("testValue", vcfRecord.getValue(field, createAllele(), 0));
   }
 
+  @Test
+  void getValueFormatCustomInt() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("test")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.INTEGER)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getExtendedAttribute("test")).thenReturn("1");
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals(1, vcfRecord.getValue(field, createAllele(), 0));
+  }
+
   private Allele createAllele() {
     return createAllele(1);
   }

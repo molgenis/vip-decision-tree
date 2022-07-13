@@ -101,6 +101,8 @@ public class VcfRecord {
         break;
       default:
         value = genotype.getExtendedAttribute(field.getId());
+        value = value != null ? getTypedInfoValue(field, value.toString()) : null;
+
     }
     return value;
   }
