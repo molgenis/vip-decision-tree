@@ -431,6 +431,23 @@ class VcfRecordTest {
     assertEquals(1, vcfRecord.getValue(field, createAllele(), 0));
   }
 
+  @Test
+  void getValueFormatCustomException() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("test")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.INTEGER)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getExtendedAttribute("test")).thenReturn(List.of(1, 2));
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    Allele allele = createAllele();
+    assertThrows(UnsupportedFormatFieldException.class,
+        () -> vcfRecord.getValue(field, allele, 0));
+  }
+
   private Allele createAllele() {
     return createAllele(1);
   }
