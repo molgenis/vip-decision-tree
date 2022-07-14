@@ -101,6 +101,11 @@ public class VcfRecord {
         break;
       default:
         value = genotype.getExtendedAttribute(field.getId());
+        if (value != null && !(value instanceof String)) {
+          throw new UnsupportedFormatFieldException(value.getClass());
+        }
+        value = value != null ? getTypedInfoValue(field, value.toString()) : null;
+
     }
     return value;
   }

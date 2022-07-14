@@ -13,6 +13,24 @@
         "nextNode": "exit_k"
       },
       "outcomeFalse": {
+        "nextNode": "VIM"
+      },
+      "outcomeMissing": {
+        "nextNode": "exit_k"
+      }
+    },
+    "VIM": {
+      "type": "BOOL",
+      "description": "VIM",
+      "query": {
+        "field": "FORMAT/VIM",
+        "operator": "==",
+        "value": 1
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_k"
+      },
+      "outcomeFalse": {
         "nextNode": "exit_f"
       },
       "outcomeMissing": {
