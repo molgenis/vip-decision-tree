@@ -31,11 +31,11 @@ public class SampleClassifierImpl implements Classifier {
   private final SampleAnnotator sampleAnnotator;
   private final SamplesContext samplesContext;
 
-  public SampleClassifierImpl(DecisionTreeExecutor decisionTreeExecutor,
+  public SampleClassifierImpl(DecisionTreeExecutor decisionTreeExecutor, VepHelper vepHelper,
       DecisionTree decisionTree, RecordWriter recordWriter, SampleAnnotator sampleAnnotator,
       SamplesContext samplesContext) {
     this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
-    this.vepHelper = new VepHelper();
+    this.vepHelper = requireNonNull(vepHelper);
     this.decisionTree = requireNonNull(decisionTree);
     this.recordWriter = requireNonNull(recordWriter);
     this.sampleAnnotator = requireNonNull(sampleAnnotator);
