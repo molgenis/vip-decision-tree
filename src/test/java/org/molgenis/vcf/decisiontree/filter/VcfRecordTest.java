@@ -434,7 +434,7 @@ class VcfRecordTest {
     Genotype gt = mock(Genotype.class);
     when(gt.getExtendedAttribute("test")).thenReturn("1");
     when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals(1, vcfRecord.getValue(field, createAllele(), 0));
+    assertEquals(1, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
   @Test
@@ -451,7 +451,7 @@ class VcfRecordTest {
     when(variantContext.getGenotype(0)).thenReturn(gt);
     Allele allele = createAllele();
     assertThrows(UnsupportedFormatFieldException.class,
-        () -> vcfRecord.getValue(field, allele, 0));
+        () -> vcfRecord.getValue(field, allele, sampleContext));
   }
 
   private Allele createAllele() {
