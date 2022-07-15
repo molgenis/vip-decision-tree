@@ -1,6 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter.model;
 
-import java.util.List;
+import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
@@ -9,5 +9,5 @@ import lombok.Value;
 @Builder
 public class SamplesContext {
 
-  @NonNull List<SampleContext> sampleContexts;
+  @NonNull Set<SampleContext> sampleContexts;
 }

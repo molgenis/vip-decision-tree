@@ -66,7 +66,7 @@ class SampleClassifierImplTest {
       .sex(Sex.MALE)
       .affectedStatus(AffectedStatus.AFFECTED).id("test2").phenotypes(List.of()).build();
   private SamplesContext samplesContext = SamplesContext.builder()
-      .sampleContexts(List.of(sampleContext1, sampleContext2)).build();
+      .sampleContexts(Set.of(sampleContext1, sampleContext2)).build();
 
   @BeforeEach
   void setUp() {

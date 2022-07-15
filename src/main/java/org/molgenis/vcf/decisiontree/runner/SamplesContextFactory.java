@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Spliterators;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.molgenis.vcf.decisiontree.SampleSettings;
 import org.molgenis.vcf.decisiontree.Settings;
@@ -67,7 +68,8 @@ public class SamplesContextFactory {
                 defaultPhenotypes, phenotypesPerSample, probands)));
 
     return SamplesContext.builder().sampleContexts(
-            sampleContexts.stream().filter(sampleContext -> sampleContext.getIndex() != -1).toList())
+            sampleContexts.stream().filter(sampleContext -> sampleContext.getIndex() != -1).collect(
+                Collectors.toSet()))
         .build();
   }
 

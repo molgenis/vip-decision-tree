@@ -1,5 +1,8 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import static htsjdk.variant.variantcontext.GenotypeType.HET;
+import static htsjdk.variant.variantcontext.GenotypeType.HOM_REF;
+import static htsjdk.variant.variantcontext.GenotypeType.NO_CALL;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -9,8 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.molgenis.vcf.decisiontree.filter.model.GenotypeFieldType.ALLELES;
-import static org.molgenis.vcf.decisiontree.filter.model.GenotypeFieldType.MIXED;
 import static org.molgenis.vcf.decisiontree.ped.model.Sex.MALE;
 
 import htsjdk.variant.variantcontext.Genotype;
@@ -23,6 +24,8 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -34,7 +37,6 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
-import org.molgenis.vcf.decisiontree.ped.model.Sex;
 
 @ExtendWith(MockitoExtension.class)
 class VcfRecordTest {
@@ -509,8 +511,9 @@ class VcfRecordTest {
     assertEquals(List.of(2, 0), vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
-  @Test
-  void getValueFormatGenotypeTypeUnavailable() {
+  @ParameterizedTest
+  @CsvSource({"NO_CALL", "HOM_REF", "HET", "HOM_VAR", "UNAVAILABLE", "MIXED"})
+  void getValueFormatGenotypeType(String argument) {
     Field parent = FieldImpl.builder()
         .id("GENOTYPE")
         .fieldType(FieldType.FORMAT_GENOTYPE)
@@ -525,13 +528,14 @@ class VcfRecordTest {
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
     Genotype gt = mock(Genotype.class);
-    when(gt.getType()).thenReturn(GenotypeType.UNAVAILABLE);
+    when(gt.getType()).thenReturn(GenotypeType.valueOf(argument));
     when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals("UNAVAILABLE", vcfRecord.getValue(field, createAllele(), sampleContext));
+    assertEquals(argument, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
-  @Test
-  void getValueFormatGenotypeTypeNC() {
+  @ParameterizedTest
+  @CsvSource({"CALLED, false", "NON_INFORMATIVE, false", "PHASED, false"})
+  void getValueFormatGenotype(String fieldName, boolean expected) {
     Field parent = FieldImpl.builder()
         .id("GENOTYPE")
         .fieldType(FieldType.FORMAT_GENOTYPE)
@@ -540,160 +544,14 @@ class VcfRecordTest {
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
-        .id("TYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    Genotype gt = mock(Genotype.class);
-    when(gt.getType()).thenReturn(GenotypeType.NO_CALL);
-    when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals("NO_CALL", vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-
-  @Test
-  void getValueFormatGenotypeTypeMixed() {
-    Field parent = FieldImpl.builder()
-        .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    NestedField field = NestedField.nestedBuilder()
-        .parent(parent)
-        .id("TYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    Genotype gt = mock(Genotype.class);
-    when(gt.getType()).thenReturn(GenotypeType.MIXED);
-    when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals("MIXED", vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-  @Test
-  void getValueFormatGenotypeTypeHomVar() {
-    Field parent = FieldImpl.builder()
-        .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    NestedField field = NestedField.nestedBuilder()
-        .parent(parent)
-        .id("TYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    Genotype gt = mock(Genotype.class);
-    when(gt.getType()).thenReturn(GenotypeType.HOM_VAR);
-    when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals("HOM_VAR", vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-  @Test
-  void getValueFormatGenotypeTypeHomRef() {
-    Field parent = FieldImpl.builder()
-        .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    NestedField field = NestedField.nestedBuilder()
-        .parent(parent)
-        .id("TYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    Genotype gt = mock(Genotype.class);
-    when(gt.getType()).thenReturn(GenotypeType.HOM_REF);
-    when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals("HOM_REF", vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-  @Test
-  void getValueFormatGenotypeTypeHet() {
-    Field parent = FieldImpl.builder()
-        .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    NestedField field = NestedField.nestedBuilder()
-        .parent(parent)
-        .id("TYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    Genotype gt = mock(Genotype.class);
-    when(gt.getType()).thenReturn(GenotypeType.HET);
-    when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals("HET", vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-  @Test
-  void getValueFormatGenotypeCalled() {
-    Field parent = FieldImpl.builder()
-        .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    NestedField field = NestedField.nestedBuilder()
-        .parent(parent)
-        .id("CALLED")
+        .id(fieldName)
         .fieldType(FieldType.FORMAT_GENOTYPE)
         .valueType(ValueType.FLAG)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
     Genotype gt = mock(Genotype.class);
     when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals(false, vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-  @Test
-  void getValueFormatGenotypeNI() {
-    Field parent = FieldImpl.builder()
-        .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    NestedField field = NestedField.nestedBuilder()
-        .parent(parent)
-        .id("NON_INFORMATIVE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.FLAG)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    Genotype gt = mock(Genotype.class);
-    when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals(false, vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-  @Test
-  void getValueFormatGenotypePhased() {
-    Field parent = FieldImpl.builder()
-        .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    NestedField field = NestedField.nestedBuilder()
-        .parent(parent)
-        .id("PHASED")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
-        .valueType(ValueType.FLAG)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-        .build();
-    Genotype gt = mock(Genotype.class);
-    when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals(false, vcfRecord.getValue(field, createAllele(), sampleContext));
+    assertEquals(expected, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
   @Test
@@ -729,56 +587,18 @@ class VcfRecordTest {
     assertEquals(true, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
-  @Test
-  void getValueSampleSex() {
+  @ParameterizedTest
+  @CsvSource({"SEX,MALE", "FATHER,DAD", "MOTHER,MOM", "FAMILY,FAM"})
+  void getValueSample(String fieldName, String expected) {
     FieldImpl field =
         FieldImpl.builder()
-            .id("Sex")
+            .id(fieldName)
             .fieldType(FieldType.SAMPLE)
             .valueType(ValueType.STRING)
             .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
-    assertEquals("MALE", vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-  @Test
-  void getValueSampleFather() {
-    FieldImpl field =
-        FieldImpl.builder()
-            .id("FATHER")
-            .fieldType(FieldType.SAMPLE)
-            .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-            .build();
-    Genotype gt = mock(Genotype.class);
-    assertEquals("DAD", vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-  @Test
-  void getValueSampleMother() {
-    FieldImpl field =
-        FieldImpl.builder()
-            .id("MOTHER")
-            .fieldType(FieldType.SAMPLE)
-            .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-            .build();
-    Genotype gt = mock(Genotype.class);
-    assertEquals("MOM", vcfRecord.getValue(field, createAllele(), sampleContext));
-  }
-
-  @Test
-  void getValueSampleFamily() {
-    FieldImpl field =
-        FieldImpl.builder()
-            .id("FAMILY")
-            .fieldType(FieldType.SAMPLE)
-            .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
-            .build();
-    Genotype gt = mock(Genotype.class);
-    assertEquals("FAM", vcfRecord.getValue(field, createAllele(), sampleContext));
+    assertEquals(expected, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
   @Test

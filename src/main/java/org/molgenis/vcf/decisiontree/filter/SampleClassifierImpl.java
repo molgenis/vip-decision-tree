@@ -67,7 +67,7 @@ public class SampleClassifierImpl implements Classifier {
     Set<String> decisions = new LinkedHashSet<>();
     VariantContext vc = vcfRecord.getVariantContext();
     VariantContextBuilder vcBuilder = new VariantContextBuilder(vc);
-    List<SampleContext> samplesContexts = samplesContext.getSampleContexts();
+    Set<SampleContext> samplesContexts = samplesContext.getSampleContexts();
     for (SampleContext sampleContext : samplesContexts) {
       List<Decision> sampleDecisions = new ArrayList<>();
       processRecord(vcfRecord, decisionTree, vcfMetadata, nestedHeaderLine, alleleCsqMap,
@@ -77,7 +77,7 @@ public class SampleClassifierImpl implements Classifier {
           sampleDecisions.stream().map(Decision::getClazz).toList());
     }
     if (!decisions.isEmpty()) {
-      vcBuilder.attribute(VIPC_S, String.join(",", decisions));
+      vcBuilder.attribute(VIPC_S, String.join(",", decisions.stream().sorted().toList()));
     }
     return new VcfRecord(vcBuilder.make());
 
