@@ -46,6 +46,7 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
       VcfMetadata vcfMetadata = vcfReader.getMetadata();
       RecordWriter recordWriter = recordWriterFactory.create(vcfMetadata, settings);
       DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
+      ValueValidator.validate(settings.getConfigDecisionTree(), vcfMetadata);
       Classifier classifier;
       if (settings.getMode() == Mode.VARIANT) {
         ConsequenceAnnotator consequenceAnnotator = ConsequenceAnnotatorFactory.create(settings);
