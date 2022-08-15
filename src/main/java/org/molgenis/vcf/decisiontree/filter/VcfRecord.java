@@ -73,7 +73,7 @@ public class VcfRecord {
         value = getNestedVepValue(field);
         break;
       case FORMAT_GENOTYPE:
-        value = getNestedGTValue((NestedField) field, sampleContext);
+        value = sampleContext != null ? getNestedGTValue((NestedField) field, sampleContext) : null;
         break;
       case FORMAT:
         if (sampleContext == null) {
