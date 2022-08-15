@@ -21,6 +21,7 @@ import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.GenotypeFieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.molgenis.vcf.decisiontree.filter.model.SampleFieldType;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
@@ -82,7 +83,7 @@ public class VcfRecord {
         value = getFormatField(field, sampleContext);
         break;
       case SAMPLE:
-        value = getSampleValue(field, sampleContext);
+        value = sampleContext != null ? getSampleValue(field, sampleContext) : null;
         break;
       default:
         throw new UnexpectedEnumException(fieldType);
@@ -92,26 +93,26 @@ public class VcfRecord {
 
   private Object getSampleValue(Field field, SampleContext sampleContext) {
     Object value;
-    switch (field.getId().toUpperCase()) {
-      case "AFFECTED_STATUS":
+    switch (SampleFieldType.valueOf(field.getId().toUpperCase())) {
+      case AFFECTED_STATUS:
         value = sampleContext.getAffectedStatus().toString();
         break;
-      case "PROBAND":
+      case PROBAND:
         value = sampleContext.getProband();
         break;
-      case "SEX":
+      case SEX:
         value = sampleContext.getSex().toString();
         break;
-      case "FATHER":
+      case FATHER:
         value = sampleContext.getFather();
         break;
-      case "MOTHER":
+      case MOTHER:
         value = sampleContext.getMother();
         break;
-      case "FAMILY":
+      case FAMILY:
         value = sampleContext.getFamily();
         break;
-      case "PHENOTYPES":
+      case PHENOTYPES:
         value = sampleContext.getPhenotypes();
         break;
       default:
@@ -121,8 +122,13 @@ public class VcfRecord {
   }
 
   private Object getNestedGTValue(NestedField field, SampleContext sampleContext) {
-    Genotype genotype = variantContext.getGenotype(sampleContext.getIndex());
     Object value;
+
+    Genotype genotype =
+        sampleContext != null ? variantContext.getGenotype(sampleContext.getIndex()) : null;
+    if (genotype == null) {
+      return null;
+    }
     switch (GenotypeFieldType.valueOf(field.getId())) {
       case ALLELES:
         value = genotype.getAlleles().stream().map(
