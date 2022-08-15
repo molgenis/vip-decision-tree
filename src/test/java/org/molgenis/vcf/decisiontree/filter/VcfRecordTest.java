@@ -1,8 +1,5 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import static htsjdk.variant.variantcontext.GenotypeType.HET;
-import static htsjdk.variant.variantcontext.GenotypeType.HOM_REF;
-import static htsjdk.variant.variantcontext.GenotypeType.NO_CALL;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -49,8 +46,8 @@ class VcfRecordTest {
   @BeforeEach
   void setUp() {
     vcfRecord = new VcfRecord(variantContext);
-    sampleContext = SampleContext.builder().index(0).proband(true).sex(MALE).father("DAD")
-        .mother("MOM").family("FAM")
+    sampleContext = SampleContext.builder().index(0).proband(true).sex(MALE).fatherId("DAD")
+        .motherId("MOM").familyId("FAM")
         .affectedStatus(AffectedStatus.AFFECTED).id("test").phenotypes(List.of("HP1", "HP2"))
         .build();
   }
