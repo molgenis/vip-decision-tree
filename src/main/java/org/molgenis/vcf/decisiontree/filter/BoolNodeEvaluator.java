@@ -5,14 +5,15 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BoolNodeEvaluator implements BaseBoolNodeEvaluator<BoolNode> {
 
   @Override
-  public NodeOutcome evaluate(BoolNode node,
-      Variant variant, SampleContext sampleContext) {
+  public NodeOutcome evaluate(
+      BoolNode node, Variant variant, @Nullable SampleContext sampleContext) {
     NodeOutcome nodeOutcome;
 
     BoolQuery query = postProcessQuery(node.getQuery(), variant, sampleContext);

@@ -25,6 +25,7 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.utils.VcfUtils;
+import org.springframework.lang.Nullable;
 
 /**
  * {@link VariantContext} wrapper that works with nested data (e.g. CSQ INFO fields)..
@@ -57,7 +58,7 @@ public class VcfRecord {
     return getValue(field, allele, null);
   }
 
-  public Object getValue(Field field, Allele allele, SampleContext sampleContext) {
+  public Object getValue(Field field, Allele allele, @Nullable SampleContext sampleContext) {
     Object value;
     FieldType fieldType = field.getFieldType();
     switch (fieldType) {

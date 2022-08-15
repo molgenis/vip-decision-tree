@@ -9,6 +9,7 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.springframework.lang.Nullable;
 
 interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
     NodeEvaluator<T> {
@@ -127,11 +128,11 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
     return queryValues.contains(value);
   }
 
-  default BoolQuery postProcessQuery(BoolQuery query, Variant variant,
-      SampleContext sampleContext) {
+  default BoolQuery postProcessQuery(
+      BoolQuery query, Variant variant, @Nullable SampleContext sampleContext) {
     String stringQueryValue = query.getValue().toString();
     if (stringQueryValue.startsWith(FIELD_PREFIX)) {
-      String fieldId = query.getValue().toString().substring(6);
+      String fieldId = stringQueryValue.substring(FIELD_PREFIX.length());
       query = BoolQuery.builder().field(query.getField()).operator(query.getOperator())
           .value(variant.getValue(variant.getVcfMetadata().getField(fieldId), sampleContext))
           .build();

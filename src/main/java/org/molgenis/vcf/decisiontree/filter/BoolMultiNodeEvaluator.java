@@ -21,8 +21,8 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
   public enum TripleBoolean {TRUE, FALSE, MISSING}
 
   @Override
-  public NodeOutcome evaluate(BoolMultiNode node,
-      Variant variant, SampleContext sampleContext) {
+  public NodeOutcome evaluate(
+      BoolMultiNode node, Variant variant, @Nullable SampleContext sampleContext) {
     if (containsMissingFields(node, variant)) {
       return node.getOutcomeMissing();
     }
