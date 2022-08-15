@@ -105,13 +105,13 @@ public class VcfRecord {
         value = sampleContext.getSex().toString();
         break;
       case FATHER:
-        value = sampleContext.getFather();
+        value = sampleContext.getFatherId();
         break;
       case MOTHER:
-        value = sampleContext.getMother();
+        value = sampleContext.getMotherId();
         break;
       case FAMILY:
-        value = sampleContext.getFamily();
+        value = sampleContext.getFamilyId();
         break;
       case PHENOTYPES:
         value = sampleContext.getPhenotypes();

@@ -13,6 +13,7 @@ import org.molgenis.vcf.decisiontree.ped.model.Sex;
 @Value
 @Builder
 public class SampleContext {
+
   @NonNull String id;
   @NonFinal
   @Setter
@@ -20,9 +21,9 @@ public class SampleContext {
   Integer index = -1;
   @NonNull Sex sex;
   @NonNull AffectedStatus affectedStatus;
-  String father;
-  String mother;
-  String family;
+  String fatherId;
+  String motherId;
+  String familyId;
   @NonNull Boolean proband;
   @NonNull List<String> phenotypes;
 }

@@ -99,9 +99,9 @@ public class SamplesContextFactory {
         .index(sampleIndex)
         .affectedStatus(AffectedStatus.MISSING)
         .sex(Sex.UNKNOWN_SEX)
-        .family(null)
-        .father(null)
-        .mother(null)
+        .familyId(null)
+        .fatherId(null)
+        .motherId(null)
         .proband(probands.contains(sampleId))
         .phenotypes(getSamplePhenotypes(sampleId, phenotypesPerSample, defaultPhenotypes))
         .build();
@@ -134,9 +134,9 @@ public class SamplesContextFactory {
         .index(index)
         .affectedStatus(map(pedIndividual.getAffectionStatus()))
         .sex(map(pedIndividual.getSex()))
-        .family(pedIndividual.getFamilyId())
-        .father(pedIndividual.getPaternalId())
-        .mother(pedIndividual.getMaternalId())
+        .familyId(pedIndividual.getFamilyId())
+        .fatherId(pedIndividual.getPaternalId())
+        .motherId(pedIndividual.getMaternalId())
         .proband(probands.contains(pedIndividual.getId()))
         .phenotypes(phenotypes).build();
   }

@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,11 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.decisiontree.AppSettings;
 import org.molgenis.vcf.decisiontree.SampleSettings;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
-import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
 import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
@@ -36,11 +33,11 @@ class SamplesContextFactoryTest {
     SampleSettings sampleSettings = new SampleSettings(List.of("Patient"), List.of(pedFile),
         "Patient/HP:123,Mother/HP:234,");
     Settings settings = Settings.builder().sampleSettings(sampleSettings).build();
-    SampleContext patient = SampleContext.builder().id("Patient").index(0).family("FAM001")
-        .father("Father").mother("Mother").phenotypes(List.of("HP:123")).proband(true).sex(
+    SampleContext patient = SampleContext.builder().id("Patient").index(0).familyId("FAM001")
+        .fatherId("Father").motherId("Mother").phenotypes(List.of("HP:123")).proband(true).sex(
             Sex.MALE).affectedStatus(AffectedStatus.AFFECTED).build();
-    SampleContext mother = SampleContext.builder().id("Mother").index(1).family("FAM001")
-        .father("0").mother("0").phenotypes(List.of("HP:234")).proband(false).sex(
+    SampleContext mother = SampleContext.builder().id("Mother").index(1).familyId("FAM001")
+        .fatherId("0").motherId("0").phenotypes(List.of("HP:234")).proband(false).sex(
             Sex.FEMALE).affectedStatus(AffectedStatus.UNAFFECTED).build();
 
     SamplesContext expected = SamplesContext.builder().sampleContexts(Set.of(patient, mother))
