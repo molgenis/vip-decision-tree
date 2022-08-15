@@ -17,8 +17,7 @@ public class SampleContext {
   @NonNull String id;
   @NonFinal
   @Setter
-  @Default
-  Integer index = -1;
+  Integer index;
   @NonNull Sex sex;
   @NonNull AffectedStatus affectedStatus;
   String fatherId;
