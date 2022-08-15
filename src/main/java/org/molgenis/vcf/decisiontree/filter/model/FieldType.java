@@ -10,7 +10,14 @@ public enum FieldType {
   FORMAT,
   /**
    * FORMAT field with nested information (GENOTYPE info from htsjdk)
+   *
+   * Allowed values: {@link GenotypeFieldType}
    */
   FORMAT_GENOTYPE,
+  /**
+   * Sample information
+   *
+   * Allowed values: {@link SampleFieldType}
+   */
   SAMPLE
 }

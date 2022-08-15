@@ -93,7 +93,8 @@ public class VcfRecord {
 
   private Object getSampleValue(Field field, SampleContext sampleContext) {
     Object value;
-    switch (SampleFieldType.valueOf(field.getId().toUpperCase())) {
+    SampleFieldType sampleField = SampleFieldType.valueOf(field.getId().toUpperCase());
+    switch (sampleField) {
       case AFFECTED_STATUS:
         value = sampleContext.getAffectedStatus().toString();
         break;
@@ -116,7 +117,7 @@ public class VcfRecord {
         value = sampleContext.getPhenotypes();
         break;
       default:
-        throw new UnknownFieldException(field.getId(), FieldType.SAMPLE);
+        throw new UnexpectedEnumException(sampleField);
     }
     return value;
   }
@@ -129,7 +130,8 @@ public class VcfRecord {
     if (genotype == null) {
       return null;
     }
-    switch (GenotypeFieldType.valueOf(field.getId())) {
+    GenotypeFieldType genotypeFieldType = GenotypeFieldType.valueOf(field.getId());
+    switch (genotypeFieldType) {
       case ALLELES:
         value = genotype.getAlleles().stream().map(
             htsjdk.variant.variantcontext.Allele::getBaseString).toList();
@@ -178,7 +180,7 @@ public class VcfRecord {
         value = genotype.isNonInformative();
         break;
       default:
-        throw new UnexpectedEnumException(GenotypeFieldType.valueOf(field.getId()));
+        throw new UnexpectedEnumException(genotypeFieldType);
     }
     return value;
   }

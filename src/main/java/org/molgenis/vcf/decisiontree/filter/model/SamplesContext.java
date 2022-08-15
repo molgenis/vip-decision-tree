@@ -8,6 +8,5 @@ import lombok.Value;
 @Value
 @Builder
 public class SamplesContext {
-
   @NonNull Set<SampleContext> sampleContexts;
 }

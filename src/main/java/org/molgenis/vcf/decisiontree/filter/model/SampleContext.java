@@ -13,7 +13,6 @@ import org.molgenis.vcf.decisiontree.ped.model.Sex;
 @Value
 @Builder
 public class SampleContext {
-
   @NonNull String id;
   @NonFinal
   @Setter
