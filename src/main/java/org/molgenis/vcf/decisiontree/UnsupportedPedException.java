@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 public class UnsupportedPedException extends RuntimeException {
 
@@ -9,7 +10,7 @@ public class UnsupportedPedException extends RuntimeException {
   private final String token;
 
   public UnsupportedPedException(String token) {
-    this.token = token;
+    this.token = requireNonNull(token);
   }
 
   @Override
