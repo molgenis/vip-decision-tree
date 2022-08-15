@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.ped;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 public class InvalidPedException extends RuntimeException {
 
@@ -8,7 +9,7 @@ public class InvalidPedException extends RuntimeException {
   private final String argument;
 
   public InvalidPedException(String argument) {
-    this.argument = argument;
+    this.argument = requireNonNull(argument);
   }
 
   @Override
