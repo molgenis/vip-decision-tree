@@ -187,6 +187,10 @@ public class VcfRecord {
 
   private Object getFormatField(Field field, SampleContext sampleContext) {
     Genotype genotype = variantContext.getGenotype(sampleContext.getIndex());
+    if (genotype == null) {
+      return null;
+    }
+
     Object value;
     switch (field.getId()) {
       case ("GT"):
