@@ -2,14 +2,22 @@ package org.molgenis.vcf.decisiontree.loader;
 
 import static java.lang.String.format;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_ALL;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_ANY;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_NONE;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.NOT_CONTAINS;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.NOT_IN;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
@@ -50,7 +58,8 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
     nodes.forEach((key, value) -> validateNode(key, value, nodes, files));
   }
 
-  private void validateNode(String id, ConfigNode node, Map<String, ConfigNode> nodes, Map<String, Path> files) {
+  private void validateNode(String id, ConfigNode node, Map<String, ConfigNode> nodes,
+      Map<String, Path> files) {
     validateAlphanumericValue("id", id);
     switch (node.getType()) {
       case EXISTS:
@@ -80,7 +89,7 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
 
   private void validateBoolNode(String id, ConfigBoolNode node, Map<String, ConfigNode> nodes,
       Map<String, Path> files) {
-    validateValue(id, node.getQuery().getValue(), files);
+    validateValue(id, node.getQuery(), files);
     validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
     validateOutcome(id, OUTCOME_FALSE, nodes, node.getOutcomeFalse());
     validateOutcome(id, OUTCOME_MISSING, nodes, node.getOutcomeMissing());
@@ -131,13 +140,14 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
       }
 
       for (ConfigBoolQuery query : outcome.getQueries()) {
-        validateValue(id, query.getValue(), files);
+        validateValue(id, query, files);
       }
       validateOutcome(id, OUTCOME_TRUE, nodes, outcome.getOutcomeTrue());
     }
   }
 
-  private void validateValue(String id, Object value, Map<String, Path> files) {
+  private void validateValue(String id, ConfigBoolQuery query, Map<String, Path> files) {
+    Object value = query.getValue();
     if (value instanceof String && value.toString().startsWith(FILE_PREFIX)) {
       String file = value.toString().substring(FILE_PREFIX.length());
       if (!files.containsKey(file)) {

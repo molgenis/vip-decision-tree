@@ -240,13 +240,23 @@ public class VcfUtils {
         break;
       case FLOAT:
         typedValue = VcfUtils.getVcfValueAsDouble(stringValue);
-          break;
-        case CHARACTER, STRING:
-          typedValue = VcfUtils.getVcfValueAsString(stringValue);
-          break;
-        default:
-          throw new UnexpectedEnumException(valueType);
-      }
-      return typedValue;
+        break;
+      case CHARACTER, STRING:
+        typedValue = VcfUtils.getVcfValueAsString(stringValue);
+        break;
+      default:
+        throw new UnexpectedEnumException(valueType);
     }
+    return typedValue;
+  }
+
+
+  public static Object getTypedVcfListValue(Field field, String stringValue) {
+    String[] stringValues = stringValue.split(",");
+    List<Object> values = new ArrayList<>();
+    for (String value : stringValues) {
+      values.add(getTypedVcfValue(field, value));
+    }
+    return values;
+  }
 }

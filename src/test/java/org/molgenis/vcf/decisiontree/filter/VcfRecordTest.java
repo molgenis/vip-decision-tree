@@ -378,9 +378,14 @@ class VcfRecordTest {
             .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
-    when(gt.getGenotypeString()).thenReturn("1|1");
+    when(gt.getAlleles()).thenReturn(List.of(htsjdk.variant.variantcontext.Allele.ALT_T,
+        htsjdk.variant.variantcontext.Allele.REF_A));
+    when(gt.isPhased()).thenReturn(true);
+    when(variantContext.getAlleles()).thenReturn(List.of(htsjdk.variant.variantcontext.Allele.REF_A,
+        htsjdk.variant.variantcontext.Allele.ALT_G,
+        htsjdk.variant.variantcontext.Allele.ALT_T));
     when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals("1|1", vcfRecord.getValue(field, createAllele(), sampleContext));
+    assertEquals("2|0", vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
   @Test

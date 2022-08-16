@@ -185,37 +185,72 @@ public class VcfRecord {
     return value;
   }
 
+  @SuppressWarnings("java:S1612")
+  //suggested use of methode reference Integer::toString is not possible due to ambiguity
   private Object getFormatField(Field field, SampleContext sampleContext) {
     Genotype genotype = variantContext.getGenotype(sampleContext.getIndex());
     if (genotype == null) {
       return null;
     }
 
-    Object value;
+    Object typedValue;
     switch (field.getId()) {
       case ("GT"):
-        value = genotype.getGenotypeString();
+        String separator = genotype.isPhased() ? "|" : "/";
+        typedValue = String.join(separator, genotype.getAlleles().stream().map(allele ->
+                variantContext.getAlleles().indexOf(allele)).map(index -> Integer.toString(index))
+            .toList());
         break;
       case ("AD"):
-        value = IntStream.of(genotype.getAD()).boxed().toList();
+        int[] ad = genotype.getAD();
+        typedValue = ad != null ? IntStream.of(ad).boxed().toList() : null;
         break;
       case ("DP"):
-        value = genotype.getDP();
+        typedValue = genotype.getDP();
+        if ((Integer) typedValue == -1) {
+          typedValue = null;
+        }
         break;
       case ("GQ"):
-        value = genotype.getGQ();
+        typedValue = genotype.getGQ();
         break;
       case ("PL"):
-        value = genotype.getPL();
+        typedValue = genotype.getPL();
         break;
       default:
-        value = genotype.getExtendedAttribute(field.getId());
-        if (value != null && !(value instanceof String)) {
-          throw new UnsupportedFormatFieldException(value.getClass());
-        }
-        value = value != null ? VcfUtils.getTypedVcfValue(field, value.toString()) : null;
+        typedValue = getExtendedAttributeValue(field, genotype);
     }
-    return value;
+    return typedValue;
+  }
+
+  private Object getExtendedAttributeValue(Field field, Genotype genotype) {
+    Object typedValue;
+    Object value;
+    value = genotype.getExtendedAttribute(field.getId());
+    if (value != null && !(value instanceof String)) {
+      throw new UnsupportedFormatFieldException(value.getClass());
+    }
+
+    ValueCount valueCount = field.getValueCount();
+    Type valueCountType = valueCount.getType();
+    switch (valueCountType) {
+      case A, R, VARIABLE:
+        typedValue =
+            value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
+        break;
+      case FIXED:
+        if (valueCount.getCount() == 1) {
+          typedValue =
+              value != null ? VcfUtils.getTypedVcfValue(field, value.toString()) : null;
+        } else {
+          typedValue =
+              value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
+        }
+        break;
+      default:
+        throw new UnexpectedEnumException(valueCountType);
+    }
+    return typedValue;
   }
 
   public List<String> getVepValues(Field vepField) {

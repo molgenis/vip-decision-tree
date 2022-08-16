@@ -69,12 +69,14 @@ public class SampleClassifierImpl implements Classifier {
     VariantContextBuilder vcBuilder = new VariantContextBuilder(vc);
     Set<SampleContext> samplesContexts = samplesContext.getSampleContexts();
     for (SampleContext sampleContext : samplesContexts) {
-      List<Decision> sampleDecisions = new ArrayList<>();
-      processRecord(vcfRecord, decisionTree, vcfMetadata, nestedHeaderLine, alleleCsqMap,
-          sampleContext, sampleDecisions);
-      sampleAnnotator.annotate(sampleDecisions, sampleContext.getIndex(), vcBuilder);
-      decisions.addAll(
-          sampleDecisions.stream().map(Decision::getClazz).toList());
+      if (sampleContext.getProband()) {
+        List<Decision> sampleDecisions = new ArrayList<>();
+        processRecord(vcfRecord, decisionTree, vcfMetadata, nestedHeaderLine, alleleCsqMap,
+            sampleContext, sampleDecisions);
+        sampleAnnotator.annotate(sampleDecisions, sampleContext.getIndex(), vcBuilder);
+        decisions.addAll(
+            sampleDecisions.stream().map(Decision::getClazz).toList());
+      }
     }
     if (!decisions.isEmpty()) {
       vcBuilder.attribute(VIPC_S, String.join(",", decisions.stream().sorted().toList()));

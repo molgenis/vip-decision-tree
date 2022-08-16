@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +43,9 @@ class SamplesContextFactoryTest {
 
     SamplesContext expected = SamplesContext.builder().sampleContexts(Set.of(patient, mother))
         .build();
-    when(vcfMetadata.getSampleNamesInOrder()).thenReturn(List.of("Patient", "Mother"));
+    HashMap<String, Integer> sampleMap = new HashMap<>();
+    sampleMap.putAll(Map.of("Patient", Integer.valueOf(0), "Mother", Integer.valueOf(1)));
+    when(vcfMetadata.getSampleNameToOffset()).thenReturn(sampleMap);
 
     assertEquals(expected, SamplesContextFactory.create(settings, vcfMetadata));
   }

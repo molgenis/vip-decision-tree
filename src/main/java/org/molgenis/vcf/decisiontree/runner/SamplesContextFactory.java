@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,7 @@ public class SamplesContextFactory {
 
   public static SamplesContext create(Settings settings, VcfMetadata vcfMetadata) {
     SampleSettings sampleSettings = settings.getSampleSettings();
-    List<String> vcfSampleNames = vcfMetadata.getSampleNamesInOrder();
+    Map<String, Integer> vcfSampleNames = vcfMetadata.getSampleNameToOffset();
     List<String> probands = sampleSettings.getProbandNames();
     String phenotypesString = sampleSettings.getPhenotypeString();
     Map<String, List<String>> phenotypesPerSample = new HashMap<>();
@@ -63,9 +62,15 @@ public class SamplesContextFactory {
       }
     }
 
-    vcfSampleNames.stream().filter(sampleId -> !processedSamples.contains(sampleId))
+    if (!vcfSampleNames.keySet().containsAll(probands)) {
+      List<String> unmatchedProbands = probands.stream()
+          .filter(proband -> !vcfSampleNames.containsKey(proband)).toList();
+      throw new MissingProbandsException(unmatchedProbands);
+    }
+
+    vcfSampleNames.keySet().stream().filter(sampleId -> !processedSamples.contains(sampleId))
         .forEach(sampleId -> sampleContexts.add(
-            createDefaultSampleContext(sampleId, vcfSampleNames.indexOf(sampleId),
+            createDefaultSampleContext(sampleId, vcfSampleNames.get(sampleId),
                 defaultPhenotypes, phenotypesPerSample, probands)));
 
     return SamplesContext.builder().sampleContexts(
@@ -118,12 +123,13 @@ public class SamplesContextFactory {
 
   private static Map<String, SampleContext> parse(PedReader reader, List<String> probands,
       Map<String, List<String>> phenotypesPerSample, List<String> defaultPhenotypes,
-      List<String> vcfSampleNames) {
+      Map<String, Integer> vcfSampleNames) {
     final Map<String, SampleContext> samplesContextMap = new HashMap<>();
     StreamSupport.stream(Spliterators.spliteratorUnknownSize(reader.iterator(), 0), false)
+        .filter(pedIndividual -> vcfSampleNames.containsKey(pedIndividual.getId()))
         .map(individual -> map(individual, probands,
             getSamplePhenotypes(individual.getId(), phenotypesPerSample, defaultPhenotypes),
-            vcfSampleNames.indexOf(individual.getId())))
+            vcfSampleNames.get(individual.getId())))
         .filter(person -> person.getIndex() != -1).forEach(person -> samplesContextMap
             .put(person.getId(), person));
     return samplesContextMap;

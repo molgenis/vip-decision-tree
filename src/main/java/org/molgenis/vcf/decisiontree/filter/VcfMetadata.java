@@ -14,6 +14,7 @@ import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
@@ -273,8 +274,8 @@ public class VcfMetadata {
     return vcfCompoundHeaderLine;
   }
 
-  public List<String> getSampleNamesInOrder() {
-    return vcfHeader.getSampleNamesInOrder();
+  public Map<String, Integer> getSampleNameToOffset() {
+    return vcfHeader.getSampleNameToOffset();
   }
 
   public VCFHeader unwrap() {

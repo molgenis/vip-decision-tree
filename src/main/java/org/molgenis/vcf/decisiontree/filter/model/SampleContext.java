@@ -2,7 +2,6 @@ package org.molgenis.vcf.decisiontree.filter.model;
 
 import java.util.List;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.Value;
