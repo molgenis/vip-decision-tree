@@ -66,21 +66,21 @@ COMMON, INFO, FORMAT
 Any field in the VEP value can be used, if the field is unknown to the tool it is interpreted as a
 singel value string field.
 
-##### FORMAT_GENOTYPE
+##### GENOTYPE
 
 This fieldtype uses the information provided by htsjdk about the Genotype FORMAT field.
 
 Allowed values are:
 
-- ALLELES: The alleles present in the genotype
-- ALLELE_NUM: The allele numbers corresponding with the index in the VCF ALT field
+- ALLELES: The alleles (list of strings) present in the genotype.
+- ALLELE_NUM: The allele numbers corresponding with the index in the VCF ALT field.
 - TYPE: The htsjdk genotype type, possible values: MIXED, HET, HOM_REF, HOM_VAR, NO_CALL,
   UNAVAILABLE.
-- CALLED: if the genotype for this sample is called
+- CALLED: Boolean indication if the genotype for this sample is called.
 - MIXED: Boolean indication if the genotype is comprised of both calls and no-calls.
 - NON_INFORMATIVE: Boolean that returns true if all samples PLs are 0.
 - PHASED: Boolean indicating the genotype was called phased or unphased.
-- PLOIDY: The ploidy of the genotype.
+- PLOIDY: The ploidy of the genotype as an integer.
 
 ##### SAMPLE
 
@@ -88,7 +88,15 @@ This fieldtype is used to query properties of the samples, like phenotypes and p
 which are provided outside the VCF.
 
 Allowed values are:
-TODO
+
+- ID: The sample identifier.
+- AFFECTED_STATUS: The affected status of the sample, possible values: AFFECTED, UNAFFECTED,
+  MISSING.
+- SEX: The sex of the sample, possible values: MALE, FEMALE, UNKNOWN.
+- FATHER_ID: The identifier for the father sample.
+- MOTHER_ID: The identifier for the mother sample.
+- FAMILY_ID: The identifier for the family.
+- PHENOTYPES: The list of phenotypes for the sample.
 
 #### Modes
 
