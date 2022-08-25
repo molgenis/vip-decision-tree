@@ -217,7 +217,8 @@ public class VcfRecord {
         typedValue = genotype.getGQ();
         break;
       case ("PL"):
-        typedValue = genotype.getPL();
+        int[] pl = genotype.getPL();
+        typedValue = pl != null ? IntStream.of(pl).boxed().toList() : null;
         break;
       default:
         typedValue = getExtendedAttributeValue(field, genotype);
