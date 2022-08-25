@@ -214,7 +214,8 @@ public class VcfRecord {
         }
         break;
       case ("GQ"):
-        typedValue = genotype.getGQ();
+        int gq = genotype.getGQ();
+        typedValue = gq != -1 ? gq : null;
         break;
       case ("PL"):
         int[] pl = genotype.getPL();
@@ -303,7 +304,7 @@ public class VcfRecord {
         value = variantContext.getReference().getBaseString();
         break;
       case "ALT":
-        value = allele.getBases();
+        value = asList(allele.getBases().split(","));
         break;
       case "QUAL":
         value = variantContext.hasLog10PError() ? variantContext.getPhredScaledQual() : null;

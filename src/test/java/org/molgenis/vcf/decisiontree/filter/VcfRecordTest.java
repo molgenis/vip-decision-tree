@@ -139,7 +139,7 @@ class VcfRecordTest {
     FieldImpl field = when(mock(FieldImpl.class).getFieldType()).thenReturn(FieldType.COMMON)
         .getMock();
     when(field.getId()).thenReturn("ALT");
-    assertEquals("A", vcfRecord.getValue(field, createAllele()));
+    assertEquals(List.of("A"), vcfRecord.getValue(field, createAllele()));
   }
 
   @Test
@@ -353,6 +353,23 @@ class VcfRecordTest {
         vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
+
+  @Test
+  void getValueFormatAdNull() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("AD")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getAD()).thenReturn(null);
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals(null,
+        vcfRecord.getValue(field, createAllele(), sampleContext));
+  }
+
   @Test
   void getValueFormatDP() {
     FieldImpl field =
@@ -366,6 +383,22 @@ class VcfRecordTest {
     when(gt.getDP()).thenReturn(10);
     when(variantContext.getGenotype(0)).thenReturn(gt);
     assertEquals(10, vcfRecord.getValue(field, createAllele(), sampleContext));
+  }
+
+
+  @Test
+  void getValueFormatDPNull() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("DP")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getDP()).thenReturn(-1);
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals(null, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
   @Test
@@ -389,6 +422,26 @@ class VcfRecordTest {
   }
 
   @Test
+  void getValueFormatGtNoCall() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("GT")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getAlleles()).thenReturn(List.of(htsjdk.variant.variantcontext.Allele.NO_CALL,
+        htsjdk.variant.variantcontext.Allele.NO_CALL));
+    when(gt.isPhased()).thenReturn(true);
+    when(variantContext.getAlleles()).thenReturn(List.of(htsjdk.variant.variantcontext.Allele.REF_A,
+        htsjdk.variant.variantcontext.Allele.ALT_G,
+        htsjdk.variant.variantcontext.Allele.ALT_T));
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals(".|.", vcfRecord.getValue(field, createAllele(), sampleContext));
+  }
+
+  @Test
   void getValueFormatGQ() {
     FieldImpl field =
         FieldImpl.builder()
@@ -401,6 +454,21 @@ class VcfRecordTest {
     when(gt.getGQ()).thenReturn(10);
     when(variantContext.getGenotype(0)).thenReturn(gt);
     assertEquals(10, vcfRecord.getValue(field, createAllele(), sampleContext));
+  }
+
+  @Test
+  void getValueFormatGQMissing() {
+    FieldImpl field =
+        FieldImpl.builder()
+            .id("GQ")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getGQ()).thenReturn(-1);
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals(null, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
   @Test

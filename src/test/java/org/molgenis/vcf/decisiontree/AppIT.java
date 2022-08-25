@@ -97,7 +97,7 @@ class AppIT {
     String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
 
     String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
-        "-l", "-p", "-m", "sAMPlE"};
+        "-l", "-p", "-m", "sAMPlE", "-ph", "HP:0000951;HP:0003124",};
     SpringApplication.run(App.class, args);
 
     String outputVcf = Files.readString(Path.of(outputFile));

@@ -1,123 +1,105 @@
 {
-  "rootNode": "sample_relevance",
+  "rootNode": "depth",
   "nodes": {
-    "sample_relevance": {
-      "type": "BOOL_MULTI",
-      "fields": [
-        "FORMAT/VIM",
-        "FORMAT/GENOTYPE/ALLELE_NUM"
-      ],
-      "outcomes": [
-        {
-          "operator": "AND",
-          "queries": [
-            {
-              "field": "FORMAT/VIM",
-              "operator": "==",
-              "value": 1
-            },
-            {
-              "field": "FORMAT/GENOTYPE/ALLELE_NUM",
-              "operator": "contains",
-              "value": "field:INFO/CSQ/ALLELE_NUM"
-            }
-          ],
-          "outcomeTrue": {
-            "nextNode": "sample_relevance_2"
-          }
-        }
-      ],
-      "outcomeDefault": {
-        "nextNode": "exit_r"
-      },
-      "outcomeMissing": {
-        "nextNode": "exit_m"
-      }
-    },
-    "sample_relevance_2": {
-      "type": "BOOL_MULTI",
-      "fields": [
-        "SAMPLE/AFFECTED_STATUS",
-        "SAMPLE/SEX"
-      ],
-      "outcomes": [
-        {
-          "operator": "OR",
-          "queries": [
-            {
-              "field": "SAMPLE/AFFECTED_STATUS",
-              "operator": "==",
-              "value": "AFFECTED"
-            },
-            {
-              "field": "SAMPLE/SEX",
-              "operator": "==",
-              "value": "MALE"
-            }
-          ],
-          "outcomeTrue": {
-            "nextNode": "VIPC"
-          }
-        }
-      ],
-      "outcomeDefault": {
-        "nextNode": "exit_r"
-      },
-      "outcomeMissing": {
-        "nextNode": "exit_m"
-      }
-    },
-    "HPO": {
+    "depth": {
       "type": "BOOL",
-      "description": "",
       "query": {
-        "field": "INFO/CSQ/HPO",
-        "operator": "contains_all",
-        "value": "field:SAMPLE/PHENOTYPES"
-      },
-      "outcomeTrue": {
-        "nextNode": "exit_k"
-      },
-      "outcomeFalse": {
-        "nextNode": "exit_r"
-      },
-      "outcomeMissing": {
-        "nextNode": "exit_m"
-      }
-    },
-    "VIPC": {
-      "type": "BOOL",
-      "description": "",
-      "query": {
-        "field": "INFO/CSQ/VIPC",
-        "operator": "in",
+        "field": "FORMAT/AD",
+        "operator": "==",
         "value": [
-          "P",
-          "LP",
-          "VUS"
+          0,
+          10
         ]
       },
       "outcomeTrue": {
-        "nextNode": "HPO"
+        "nextNode": "phenotype"
       },
       "outcomeFalse": {
-        "nextNode": "exit_r"
+        "nextNode": "read_depth"
       },
       "outcomeMissing": {
-        "nextNode": "exit_m"
+        "nextNode": "read_depth"
       }
     },
-    "exit_k": {
-      "type": "LEAF",
-      "class": "k"
+    "read_depth": {
+      "type": "BOOL",
+      "query": {
+        "field": "FORMAT/DP",
+        "operator": ">",
+        "value": 20
+      },
+      "outcomeTrue": {
+        "nextNode": "alleles"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_false"
+      },
+      "outcomeMissing": {
+        "nextNode": "alleles"
+      }
     },
-    "exit_m": {
-      "type": "LEAF",
-      "class": "m"
+    "alleles": {
+      "type": "BOOL",
+      "query": {
+        "field": "FORMAT/GENOTYPE/ALLELES",
+        "operator": "contains_any",
+        "value": "field:ALT"
+      },
+      "outcomeTrue": {
+        "nextNode": "genotype"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_false"
+      },
+      "outcomeMissing": {
+        "nextNode": "genotype"
+      }
     },
-    "exit_r": {
+    "genotype": {
+      "type": "BOOL",
+      "query": {
+        "field": "FORMAT/GT",
+        "operator": "!=",
+        "value": "0|0"
+      },
+      "outcomeTrue": {
+        "nextNode": "phenotype"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_false"
+      },
+      "outcomeMissing": {
+        "nextNode": "phenotype"
+      }
+    },
+    "phenotype": {
+      "type": "BOOL",
+      "query": {
+        "field": "SAMPLE/PHENOTYPES",
+        "operator": "contains",
+        "value": "HP:0000951"
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_true"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_false"
+      },
+      "outcomeMissing": {
+        "nextNode": "exit_miss"
+      }
+    },
+    "exit_true": {
       "type": "LEAF",
-      "class": "r"
+      "class": "class_true"
+    },
+    "exit_false": {
+      "type": "LEAF",
+      "class": "class_false"
+    },
+    "exit_miss": {
+      "type": "LEAF",
+      "class": "class_miss"
     }
   }
 }
