@@ -599,16 +599,16 @@ class VcfRecordTest {
   }
 
   @Test
-  void getValueSampleProband() {
+  void getValueSampleId() {
     FieldImpl field =
         FieldImpl.builder()
-            .id("PROBAND")
+            .id("ID")
             .fieldType(FieldType.SAMPLE)
-            .valueType(ValueType.FLAG)
+            .valueType(ValueType.STRING)
             .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
-    assertEquals(true, vcfRecord.getValue(field, createAllele(), sampleContext));
+    assertEquals("test", vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
   @ParameterizedTest

@@ -37,7 +37,7 @@
     "sample_relevance_2": {
       "type": "BOOL_MULTI",
       "fields": [
-        "SAMPLE/PROBAND",
+        "SAMPLE/AFFECTED_STATUS",
         "SAMPLE/SEX"
       ],
       "outcomes": [
@@ -45,9 +45,9 @@
           "operator": "OR",
           "queries": [
             {
-              "field": "SAMPLE/PROBAND",
+              "field": "SAMPLE/AFFECTED_STATUS",
               "operator": "==",
-              "value": true
+              "value": "AFFECTED"
             },
             {
               "field": "SAMPLE/SEX",

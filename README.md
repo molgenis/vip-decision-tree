@@ -80,7 +80,7 @@ Allowed values are:
 - MIXED: Boolean indication if the genotype is comprised of both calls and no-calls.
 - NON_INFORMATIVE: Boolean that returns true if all samples PLs are 0.
 - PHASED: Boolean indicating the genotype was called phased or unphased.
-- PLOIDY: The ploidy of the genotype as an integer.
+- PLOIDY: The ploidy of the genotype as an integer, null if no call is present.
 
 ##### SAMPLE
 
