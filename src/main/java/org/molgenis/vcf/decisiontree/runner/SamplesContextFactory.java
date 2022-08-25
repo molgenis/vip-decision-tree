@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -109,16 +110,23 @@ public class SamplesContextFactory {
         .fatherId(null)
         .motherId(null)
         .proband(probands.contains(sampleId))
-        .phenotypes(getSamplePhenotypes(sampleId, phenotypesPerSample, defaultPhenotypes))
+        .phenotypes(getSamplePhenotypes(sampleId, AffectedStatus.MISSING,
+            phenotypesPerSample, defaultPhenotypes))
         .build();
   }
 
   private static List<String> getSamplePhenotypes(String sampleId,
+      AffectedStatus affectedStatus,
       Map<String, List<String>> phenotypesPerSample, List<String> defaultPhenotypes) {
     if (phenotypesPerSample.containsKey(sampleId)) {
       return phenotypesPerSample.get(sampleId);
+    } else {
+      if (affectedStatus == AffectedStatus.AFFECTED) {
+        return defaultPhenotypes;
+      } else {
+        return Collections.emptyList();
+      }
     }
-    return defaultPhenotypes;
   }
 
   private static Map<String, SampleContext> parse(PedReader reader, List<String> probands,
@@ -128,7 +136,8 @@ public class SamplesContextFactory {
     StreamSupport.stream(Spliterators.spliteratorUnknownSize(reader.iterator(), 0), false)
         .filter(pedIndividual -> vcfSampleNames.containsKey(pedIndividual.getId()))
         .map(individual -> map(individual, probands,
-            getSamplePhenotypes(individual.getId(), phenotypesPerSample, defaultPhenotypes),
+            getSamplePhenotypes(individual.getId(), map(individual.getAffectionStatus()),
+                phenotypesPerSample, defaultPhenotypes),
             vcfSampleNames.get(individual.getId())))
         .filter(person -> person.getIndex() != -1).forEach(person -> samplesContextMap
             .put(person.getId(), person));
@@ -166,9 +175,8 @@ public class SamplesContextFactory {
       case UNAFFECTED:
         return AffectedStatus.UNAFFECTED;
       case UNKNOWN:
-        return AffectedStatus.MISSING;
       default:
-        return AffectedStatus.UNRECOGNIZED;
+        return AffectedStatus.MISSING;
     }
   }
 }

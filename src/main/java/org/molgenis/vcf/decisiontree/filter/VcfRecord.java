@@ -114,7 +114,8 @@ public class VcfRecord {
         value = sampleContext.getFamilyId();
         break;
       case PHENOTYPES:
-        value = sampleContext.getPhenotypes();
+        List<String> phenotypes = sampleContext.getPhenotypes();
+        value = phenotypes.isEmpty() ? null : phenotypes;
         break;
       default:
         throw new UnexpectedEnumException(sampleField);
