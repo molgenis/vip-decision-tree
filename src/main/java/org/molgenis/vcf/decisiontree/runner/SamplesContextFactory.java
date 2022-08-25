@@ -121,7 +121,7 @@ public class SamplesContextFactory {
     if (phenotypesPerSample.containsKey(sampleId)) {
       return phenotypesPerSample.get(sampleId);
     } else {
-      if (affectedStatus == AffectedStatus.AFFECTED) {
+      if (affectedStatus != AffectedStatus.UNAFFECTED) {
         return defaultPhenotypes;
       } else {
         return Collections.emptyList();

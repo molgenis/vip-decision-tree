@@ -415,8 +415,8 @@ class VcfRecordTest {
     Genotype gt = mock(Genotype.class);
     when(gt.getPL()).thenReturn(new int[]{10, 10});
     when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertTrue(java.util.Arrays.equals(new int[]{10, 10},
-        (int[]) vcfRecord.getValue(field, createAllele(), sampleContext)));
+    assertEquals(List.of(Integer.valueOf(10), Integer.valueOf(10)),
+        vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
   @Test
