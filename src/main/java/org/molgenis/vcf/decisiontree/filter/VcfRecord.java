@@ -171,7 +171,8 @@ public class VcfRecord {
         value = genotype.isCalled();
         break;
       case PLOIDY:
-        value = genotype.getPloidy();
+        int ploidy = genotype.getPloidy();
+        value = ploidy != 0 ? ploidy : null;
         break;
       case PHASED:
         value = genotype.isPhased();
