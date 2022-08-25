@@ -95,11 +95,11 @@ public class VcfRecord {
     Object value;
     SampleFieldType sampleField = SampleFieldType.valueOf(field.getId().toUpperCase());
     switch (sampleField) {
+      case ID:
+        value = sampleContext.getId();
+        break;
       case AFFECTED_STATUS:
         value = sampleContext.getAffectedStatus().toString();
-        break;
-      case PROBAND:
-        value = sampleContext.getProband();
         break;
       case SEX:
         value = sampleContext.getSex().toString();
