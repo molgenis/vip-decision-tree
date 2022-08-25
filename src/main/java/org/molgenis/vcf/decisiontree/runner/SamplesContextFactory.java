@@ -153,7 +153,7 @@ public class SamplesContextFactory {
         .familyId(pedIndividual.getFamilyId())
         .fatherId(pedIndividual.getPaternalId())
         .motherId(pedIndividual.getMaternalId())
-        .proband(probands.contains(pedIndividual.getId()))
+        .proband(probands.isEmpty() || probands.contains(pedIndividual.getId()))
         .phenotypes(phenotypes).build();
   }
 
