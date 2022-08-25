@@ -13,7 +13,7 @@ public enum FieldType {
    *
    * Allowed values: {@link GenotypeFieldType}
    */
-  FORMAT_GENOTYPE,
+  GENOTYPE,
   /**
    * Sample information
    *

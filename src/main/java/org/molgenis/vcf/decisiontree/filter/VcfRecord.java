@@ -72,7 +72,7 @@ public class VcfRecord {
       case INFO_VEP:
         value = getNestedVepValue(field);
         break;
-      case FORMAT_GENOTYPE:
+      case GENOTYPE:
         value = sampleContext != null ? getNestedGTValue((NestedField) field, sampleContext) : null;
         break;
       case FORMAT:
@@ -104,13 +104,13 @@ public class VcfRecord {
       case SEX:
         value = sampleContext.getSex().toString();
         break;
-      case FATHER:
+      case FATHER_ID:
         value = sampleContext.getFatherId();
         break;
-      case MOTHER:
+      case MOTHER_ID:
         value = sampleContext.getMotherId();
         break;
-      case FAMILY:
+      case FAMILY_ID:
         value = sampleContext.getFamilyId();
         break;
       case PHENOTYPES:

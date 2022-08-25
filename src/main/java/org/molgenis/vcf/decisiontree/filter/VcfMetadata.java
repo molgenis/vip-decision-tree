@@ -3,7 +3,7 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.COMMON;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.FORMAT;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.FORMAT_GENOTYPE;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.GENOTYPE;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
@@ -64,7 +64,7 @@ public class VcfMetadata {
       case INFO_VEP:
         field = toNestedField(fieldTokens, fieldType, nestedVepHeaderLine);
         break;
-      case FORMAT_GENOTYPE:
+      case GENOTYPE:
         field = toNestedField(fieldTokens, fieldType, nestedGenotypeHeaderLine);
         break;
       default:
@@ -142,7 +142,7 @@ public class VcfMetadata {
         fieldType = fields.size() > 2 ? INFO_VEP : INFO;
         break;
       case "FORMAT":
-        fieldType = fields.size() > 2 ? FORMAT_GENOTYPE : FORMAT;
+        fieldType = fields.size() > 2 ? GENOTYPE : FORMAT;
         break;
       case "SAMPLE":
         fieldType = SAMPLE;

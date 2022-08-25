@@ -470,14 +470,14 @@ class VcfRecordTest {
   void getValueFormatGenotype() {
     Field parent = FieldImpl.builder()
         .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id("ALLELES")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.INTEGER)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
@@ -492,14 +492,14 @@ class VcfRecordTest {
   void getValueFormatGenotypeNum() {
     Field parent = FieldImpl.builder()
         .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id("ALLELE_NUM")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.INTEGER)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
@@ -518,14 +518,14 @@ class VcfRecordTest {
   void getValueFormatGenotypeType(String argument) {
     Field parent = FieldImpl.builder()
         .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id("TYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.INTEGER)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
@@ -540,14 +540,14 @@ class VcfRecordTest {
   void getValueFormatGenotype(String fieldName, boolean expected) {
     Field parent = FieldImpl.builder()
         .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id(fieldName)
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.FLAG)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
@@ -560,14 +560,14 @@ class VcfRecordTest {
   void getValueFormatGenotypePloidy() {
     Field parent = FieldImpl.builder()
         .id("GENOTYPE")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id("PLOIDY")
-        .fieldType(FieldType.FORMAT_GENOTYPE)
+        .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.INTEGER)
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();

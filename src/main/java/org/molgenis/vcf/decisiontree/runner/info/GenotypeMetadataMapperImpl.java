@@ -48,7 +48,7 @@ public class GenotypeMetadataMapperImpl implements GenotypeMetadataMapper {
             .id(genotypeFieldType.name())
             .index(index)
             .parent(vepField)
-            .fieldType(FieldType.FORMAT_GENOTYPE);
+            .fieldType(FieldType.GENOTYPE);
     switch (genotypeFieldType) {
       case ALLELES -> fieldBuilder
           .valueCount(ValueCount.builder().type(VARIABLE).build())
