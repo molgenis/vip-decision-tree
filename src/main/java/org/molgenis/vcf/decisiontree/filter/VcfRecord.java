@@ -200,7 +200,7 @@ public class VcfRecord {
       case ("GT"):
         String separator = genotype.isPhased() ? "|" : "/";
         typedValue = String.join(separator, genotype.getAlleles().stream().map(allele ->
-                variantContext.getAlleles().indexOf(allele)).map(index -> Integer.toString(index))
+                variantContext.getAlleles().indexOf(allele)).map(index -> mapAlleleString(index))
             .toList());
         break;
       case ("AD"):
@@ -223,6 +223,10 @@ public class VcfRecord {
         typedValue = getExtendedAttributeValue(field, genotype);
     }
     return typedValue;
+  }
+
+  private String mapAlleleString(Integer index) {
+    return index != -1 ? Integer.toString(index) : ".";
   }
 
   private Object getExtendedAttributeValue(Field field, Genotype genotype) {
