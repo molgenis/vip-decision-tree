@@ -104,7 +104,7 @@ public class SamplesContextFactory {
     return SampleContext.builder().id(sampleId)
         .index(sampleIndex)
         .affectedStatus(AffectedStatus.MISSING)
-        .sex(Sex.UNKNOWN_SEX)
+        .sex(Sex.UNKNOWN)
         .familyId(null)
         .fatherId(null)
         .motherId(null)
@@ -154,10 +154,8 @@ public class SamplesContextFactory {
         return Sex.MALE;
       case FEMALE:
         return Sex.FEMALE;
-      case UNKNOWN:
-        return Sex.UNKNOWN_SEX;
       default:
-        return Sex.OTHER_SEX;
+        return Sex.UNKNOWN;
     }
   }
 

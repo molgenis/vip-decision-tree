@@ -54,7 +54,7 @@ class SamplesContextFactoryTest {
   void createDefaultSampleContext() {
     SampleContext expected = SampleContext.builder().id("sample").index(2)
         .phenotypes(List.of("HP3", "HP4")).proband(true).sex(
-            Sex.UNKNOWN_SEX).affectedStatus(AffectedStatus.MISSING).build();
+            Sex.UNKNOWN).affectedStatus(AffectedStatus.MISSING).build();
     SampleContext actual = SamplesContextFactory.createDefaultSampleContext("sample", 2,
         List.of("HP1", "HP2"), Map.of("sample", List.of("HP3", "HP4")), List.of("sample"));
     assertEquals(expected, actual);
@@ -64,7 +64,7 @@ class SamplesContextFactoryTest {
   void createDefaultSampleContext2() {
     SampleContext expected = SampleContext.builder().id("sample2").index(2)
         .phenotypes(List.of("HP1", "HP2")).proband(false).sex(
-            Sex.UNKNOWN_SEX).affectedStatus(AffectedStatus.MISSING).build();
+            Sex.UNKNOWN).affectedStatus(AffectedStatus.MISSING).build();
     SampleContext actual = SamplesContextFactory.createDefaultSampleContext("sample2", 2,
         List.of("HP1", "HP2"), Map.of("sample", List.of("HP3", "HP4")), List.of("sample"));
     assertEquals(expected, actual);

@@ -572,8 +572,30 @@ class VcfRecordTest {
         .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
         .build();
     Genotype gt = mock(Genotype.class);
+    when(gt.getPloidy()).thenReturn(1);
     when(variantContext.getGenotype(0)).thenReturn(gt);
-    assertEquals(0, vcfRecord.getValue(field, createAllele(), sampleContext));
+    assertEquals(1, vcfRecord.getValue(field, createAllele(), sampleContext));
+  }
+
+  @Test
+  void getValueFormatGenotypePloidyNull() {
+    Field parent = FieldImpl.builder()
+        .id("GENOTYPE")
+        .fieldType(FieldType.GENOTYPE)
+        .valueType(ValueType.STRING)
+        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .build();
+    NestedField field = NestedField.nestedBuilder()
+        .parent(parent)
+        .id("PLOIDY")
+        .fieldType(FieldType.GENOTYPE)
+        .valueType(ValueType.INTEGER)
+        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getPloidy()).thenReturn(0);
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals(null, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
   @Test
@@ -590,7 +612,7 @@ class VcfRecordTest {
   }
 
   @ParameterizedTest
-  @CsvSource({"SEX,MALE", "FATHER,DAD", "MOTHER,MOM", "FAMILY,FAM"})
+  @CsvSource({"SEX,MALE", "FATHER_ID,DAD", "MOTHER_ID,MOM", "FAMILY_ID,FAM"})
   void getValueSample(String fieldName, String expected) {
     FieldImpl field =
         FieldImpl.builder()
