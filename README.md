@@ -33,9 +33,6 @@ usage: java -jar vcf-decision-tree.jar -i <arg> -c <arg> [-o <arg>] [-f]
 
 usage: java -jar vcf-decision-tree.jar -v
  -v,--version   Print version.
-
-Process finished with exit code 64
-
 ```
 
 *:[VEP](https://www.ensembl.org/info/docs/tools/vep/index.html)
@@ -58,34 +55,11 @@ variant.
 
 ### Supported Fields
 
-#### VCF
+#### Standard VCF
 
-COMMON, INFO, /**
+COMMON, INFO, FORMAT
 
-* INFO field with nested information (VEP CSQ)
-  */, FORMAT, /**
-* FORMAT field with nested information (GENOTYPE info from htsjdk)
-*
-* Allowed values: {@link GenotypeFieldType}
-
-#### Modes
-
-##### Variant classification (default)
-
-In the variant classification mode the tool will output a classification per VEP value (CSQ), this
-classification will be added to the VEP value under the key "VIPC".
-
-Optionally labels and the path through the tree can be annotated to the VEP value as well.
-
-##### Sample classification
-
-In the sample classification mode the tool will output a classification per VEP value as a comma
-separated list for which the index corresponds to the VEP value index, this classification will be
-added to the FORMAT fields value under the key "VIPC_S".
-
-Optionally labels and the path through the tree can be annotated to the FORMAT fields as well.
-
-#### Custom
+#### Customized fields
 
 ##### INFO_VEP
 
@@ -115,6 +89,23 @@ which are provided outside the VCF.
 
 Allowed values are:
 TODO
+
+#### Modes
+
+##### Variant classification (default)
+
+In the variant classification mode the tool will output a classification per VEP value (CSQ), this
+classification will be added to the VEP value under the key "VIPC".
+
+Optionally labels and the path through the tree can be annotated to the VEP value as well.
+
+##### Sample classification
+
+In the sample classification mode the tool will output a classification per VEP value as a comma
+separated list for which the index corresponds to the VEP value index, this classification will be
+added to the FORMAT fields value under the key "VIPC_S".
+
+Optionally labels and the path through the tree can be annotated to the FORMAT fields as well.
 
 ### Example
 
