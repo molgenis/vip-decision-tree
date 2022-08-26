@@ -43,8 +43,8 @@ class SamplesContextFactoryTest {
 
     SamplesContext expected = SamplesContext.builder().sampleContexts(Set.of(patient, mother))
         .build();
-    HashMap<String, Integer> sampleMap = new HashMap<>();
-    sampleMap.putAll(Map.of("Patient", Integer.valueOf(0), "Mother", Integer.valueOf(1)));
+    HashMap<String, Integer> sampleMap = new HashMap<>(
+        Map.of("Patient", Integer.valueOf(0), "Mother", Integer.valueOf(1)));
     when(vcfMetadata.getSampleNameToOffset()).thenReturn(sampleMap);
 
     assertEquals(expected, SamplesContextFactory.create(settings, vcfMetadata));

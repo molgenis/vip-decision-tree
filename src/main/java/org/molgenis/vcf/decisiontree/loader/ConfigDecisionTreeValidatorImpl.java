@@ -2,16 +2,8 @@ package org.molgenis.vcf.decisiontree.loader;
 
 import static java.lang.String.format;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_ALL;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_ANY;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_NONE;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.NOT_CONTAINS;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.NOT_IN;
 
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;

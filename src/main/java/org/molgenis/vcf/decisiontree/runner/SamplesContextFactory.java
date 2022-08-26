@@ -109,7 +109,7 @@ public class SamplesContextFactory {
         .familyId(null)
         .fatherId(null)
         .motherId(null)
-        .proband(probands.contains(sampleId))
+        .proband(isProband(probands, sampleId))
         .phenotypes(getSamplePhenotypes(sampleId, AffectedStatus.MISSING,
             phenotypesPerSample, defaultPhenotypes))
         .build();
@@ -153,7 +153,7 @@ public class SamplesContextFactory {
         .familyId(pedIndividual.getFamilyId())
         .fatherId(pedIndividual.getPaternalId())
         .motherId(pedIndividual.getMaternalId())
-        .proband(probands.isEmpty() || probands.contains(pedIndividual.getId()))
+        .proband(isProband(probands, pedIndividual.getId()))
         .phenotypes(phenotypes).build();
   }
 
@@ -178,5 +178,9 @@ public class SamplesContextFactory {
       default:
         return AffectedStatus.MISSING;
     }
+  }
+
+  private static boolean isProband(List<String> probands, String sampleId) {
+    return probands.isEmpty() || probands.contains(sampleId);
   }
 }
