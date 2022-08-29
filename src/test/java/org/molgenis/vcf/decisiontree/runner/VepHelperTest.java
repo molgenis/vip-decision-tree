@@ -68,7 +68,7 @@ class VepHelperTest {
     when(variantContext.getAlleles()).thenReturn(
         List.of(Allele.REF_A, Allele.ALT_G, Allele.ALT_T));
     when(record.getVariantContext()).thenReturn(variantContext);
-    assertEquals(List.of("0||"), vepHelper.createEmptyCsqRecord(record, 0, vepHeader).getVepValues(
+    assertEquals(List.of("0|"), vepHelper.createEmptyCsqRecord(record, 0, vepHeader).getVepValues(
         vepHeader.getParentField()));
   }
 }
