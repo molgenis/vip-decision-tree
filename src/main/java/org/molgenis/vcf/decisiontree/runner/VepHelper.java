@@ -51,7 +51,7 @@ public class VepHelper {
     for (int index = 0; index < fields.size(); index++) {
       values.add("");
     }
-    values.add(fields.get(ALLELE_NUM).getIndex(), alleleIndex.toString());
+    values.set(fields.get(ALLELE_NUM).getIndex(), alleleIndex.toString());
     VariantContext variantContext = vcfRecord.getVariantContext();
     VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
     variantContextBuilder.attribute(nestedHeaderLine.getParentField().getId(),
