@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
+import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
@@ -60,6 +61,27 @@ class ValueValidatorTest {
         () -> ValueValidator.validate(configDecisionTree, vcfMetadata));
   }
 
+  @ParameterizedTest
+  @MethodSource("provideValidEnumValues")
+  void validateEnum(Object value, Field field) {
+    when(vcfMetadata.getField(field.getId())).thenReturn(field);
+    when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
+        new ConfigBoolNode("", new ConfigBoolQuery(field.getId(), ConfigOperator.EQUALS, value),
+            configNodeOutcome, configNodeOutcome, configNodeOutcome)));
+    assertDoesNotThrow(() -> ValueValidator.validate(configDecisionTree, vcfMetadata));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideInvalidEnumValues")
+  void validateInvalidEnum(Object value, Field field) {
+    when(vcfMetadata.getField(field.getId())).thenReturn(field);
+    when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
+        new ConfigBoolNode("", new ConfigBoolQuery(field.getId(), ConfigOperator.EQUALS, value),
+            configNodeOutcome, configNodeOutcome, configNodeOutcome)));
+    assertThrows(ConfigDecisionTreeValidationException.class,
+        () -> ValueValidator.validate(configDecisionTree, vcfMetadata));
+  }
+
   private static Stream<Arguments> provideValidValues() {
     return Stream.of(
         Arguments.of(1, ValueType.INTEGER),
@@ -72,6 +94,48 @@ class ValueValidatorTest {
         Arguments.of(List.of(1, 2), ValueType.FLOAT),
         Arguments.of(List.of(true, false), ValueType.FLAG),
         Arguments.of(List.of("1", "2"), ValueType.CHARACTER)
+    );
+  }
+
+  private static Stream<Arguments> provideValidEnumValues() {
+    return Stream.of(
+        Arguments.of("MALE", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("FEMALE", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("UNKNOWN", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("AFFECTED",
+            new FieldImpl("AFFECTED_STATUS", FieldType.SAMPLE, ValueType.STRING,
+                ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("UNAFFECTED",
+            new FieldImpl("AFFECTED_STATUS", FieldType.SAMPLE, ValueType.STRING,
+                ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("MISSING", new FieldImpl("AFFECTED_STATUS", FieldType.SAMPLE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("NO_CALL", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("HOM_REF", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("HET", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("HOM_VAR", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("UNAVAILABLE", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("MIXED", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null))
+    );
+  }
+
+  private static Stream<Arguments> provideInvalidEnumValues() {
+    return Stream.of(
+        Arguments.of("TEST", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("TEST", new FieldImpl("AFFECTED_STATUS", FieldType.SAMPLE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("TEST", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null))
     );
   }
 

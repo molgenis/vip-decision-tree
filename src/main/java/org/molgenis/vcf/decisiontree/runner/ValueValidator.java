@@ -3,7 +3,13 @@ package org.molgenis.vcf.decisiontree.runner;
 import static java.lang.String.format;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FIELD_PREFIX;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.GENOTYPE;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
+import static org.molgenis.vcf.decisiontree.filter.model.SampleFieldType.AFFECTED_STATUS;
+import static org.molgenis.vcf.decisiontree.filter.model.SampleFieldType.SEX;
 
+import htsjdk.variant.variantcontext.GenotypeType;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
@@ -17,10 +23,13 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
+import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
+import org.molgenis.vcf.decisiontree.ped.model.Sex;
 
 public class ValueValidator {
 
   public static final String MESSAGE = "Query value '%s' is of type '%s' while INFO field is of type '%s' for node '%s'.";
+  public static final String INVALID_ENUM_MESSAGE = "Value '%s' is not a valid value for '%s', valid values: %s.";
 
   private ValueValidator() {
   }
@@ -55,7 +64,45 @@ public class ValueValidator {
     if (!(field instanceof MissingField)) {
       ValueType valueType = field.getValueType();
       Object value = query.getValue();
+      validateEnumFields(field, value);
       validateQueryValue(nodeId, value, valueType);
+    }
+  }
+
+  private static void validateEnumFields(Field field, Object value) {
+    String genotypeTypeField = "TYPE";
+    String sexField = SEX.name();
+    String affectedField = AFFECTED_STATUS.name();
+    if (field.getId().equals(genotypeTypeField) && field.getFieldType() == GENOTYPE) {
+      if (Arrays.stream(GenotypeType.values()).map(GenotypeType::name)
+          .noneMatch(enumValue -> enumValue.equals(
+              value))) {
+        throw new ConfigDecisionTreeValidationException(
+            format(INVALID_ENUM_MESSAGE, value,
+                sexField, Arrays.stream(GenotypeType.values()).map(GenotypeType::name).toList()));
+      }
+    } else if (field.getFieldType() == SAMPLE) {
+      validateSampleEnums(field, value, sexField, affectedField);
+    }
+  }
+
+  private static void validateSampleEnums(Field field, Object value, String sexField,
+      String affectedField) {
+    if (field.getId().equals(sexField)) {
+      if (Arrays.stream(Sex.values()).map(Sex::name)
+          .noneMatch(enumValue -> enumValue.equals(value))) {
+        throw new ConfigDecisionTreeValidationException(
+            format(INVALID_ENUM_MESSAGE, value,
+                sexField, Arrays.stream(Sex.values()).map(Sex::name).toList()));
+      }
+    } else if (field.getId().equals(affectedField) && Arrays.stream(AffectedStatus.values())
+        .map(AffectedStatus::name)
+        .noneMatch(enumValue -> enumValue.equals(
+            value))) {
+      throw new ConfigDecisionTreeValidationException(
+          format(INVALID_ENUM_MESSAGE, value,
+              affectedField,
+              Arrays.stream(AffectedStatus.values()).map(AffectedStatus::name).toList()));
     }
   }
 
@@ -71,48 +118,52 @@ public class ValueValidator {
   private static void validateSingleValue(String nodeId, Object singleValue, ValueType valueType) {
     if (!singleValue.toString().startsWith(FILE_PREFIX) && !singleValue.toString()
         .startsWith(FIELD_PREFIX)) {
-      switch (valueType) {
-        case INTEGER, FLOAT:
-          if (!Number.class.isAssignableFrom(singleValue.getClass())) {
-            throw new ConfigDecisionTreeValidationException(
-                format(
-                    MESSAGE,
-                    singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
-          }
-          break;
-        case FLAG:
-          if (!Boolean.class.isAssignableFrom(singleValue.getClass())) {
-            throw new ConfigDecisionTreeValidationException(
-                format(
-                    MESSAGE,
-                    singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
-          }
-          break;
-        case STRING:
-          if (!(String.class.isAssignableFrom(singleValue.getClass()))) {
-            throw new ConfigDecisionTreeValidationException(
-                format(
-                    MESSAGE,
-                    singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
-          }
-          break;
-        case CHARACTER:
-          if (!(String.class.isAssignableFrom(singleValue.getClass()))) {
-            throw new ConfigDecisionTreeValidationException(
-                format(
-                    MESSAGE,
-                    singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
-          }
-          if (singleValue.toString().length() > 1) {
-            throw new ConfigDecisionTreeValidationException(
-                format(
-                    "Value '%s' is more than one character long while the fieldtype of the field is 'CHARACTER' for node '%s'.",
-                    singleValue, nodeId));
-          }
-          break;
-        default:
-          throw new UnexpectedEnumException(valueType);
-      }
+      validateValueTypes(nodeId, singleValue, valueType);
+    }
+  }
+
+  private static void validateValueTypes(String nodeId, Object singleValue, ValueType valueType) {
+    switch (valueType) {
+      case INTEGER, FLOAT:
+        if (!Number.class.isAssignableFrom(singleValue.getClass())) {
+          throw new ConfigDecisionTreeValidationException(
+              format(
+                  MESSAGE,
+                  singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
+        }
+        break;
+      case FLAG:
+        if (!Boolean.class.isAssignableFrom(singleValue.getClass())) {
+          throw new ConfigDecisionTreeValidationException(
+              format(
+                  MESSAGE,
+                  singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
+        }
+        break;
+      case STRING:
+        if (!(String.class.isAssignableFrom(singleValue.getClass()))) {
+          throw new ConfigDecisionTreeValidationException(
+              format(
+                  MESSAGE,
+                  singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
+        }
+        break;
+      case CHARACTER:
+        if (!(String.class.isAssignableFrom(singleValue.getClass()))) {
+          throw new ConfigDecisionTreeValidationException(
+              format(
+                  MESSAGE,
+                  singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
+        }
+        if (singleValue.toString().length() > 1) {
+          throw new ConfigDecisionTreeValidationException(
+              format(
+                  "Value '%s' is more than one character long while the fieldtype of the field is 'CHARACTER' for node '%s'.",
+                  singleValue, nodeId));
+        }
+        break;
+      default:
+        throw new UnexpectedEnumException(valueType);
     }
   }
 

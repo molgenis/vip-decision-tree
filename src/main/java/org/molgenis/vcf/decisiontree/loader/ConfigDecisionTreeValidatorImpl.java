@@ -1,13 +1,25 @@
 package org.molgenis.vcf.decisiontree.loader;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FIELD_PREFIX;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_ALL;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_ANY;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_NONE;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
+import static org.molgenis.vcf.decisiontree.utils.VcfUtils.FIELD_TOKEN_SEPARATOR;
+import static org.molgenis.vcf.decisiontree.utils.VcfUtils.toFieldType;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
+import org.molgenis.vcf.decisiontree.filter.model.FieldType;
+import org.molgenis.vcf.decisiontree.filter.model.GenotypeFieldType;
+import org.molgenis.vcf.decisiontree.filter.model.SampleFieldType;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
@@ -77,16 +89,32 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
   private void validateExistsNode(String id, ConfigExistsNode node, Map<String, ConfigNode> nodes) {
     validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
     validateOutcome(id, OUTCOME_FALSE, nodes, node.getOutcomeFalse());
+    validateField(node.getField());
   }
 
   private void validateBoolNode(String id, ConfigBoolNode node, Map<String, ConfigNode> nodes,
       Map<String, Path> files) {
     validateValue(id, node.getQuery(), files);
+    validateQueryValue(node.getQuery());
     validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
     validateOutcome(id, OUTCOME_FALSE, nodes, node.getOutcomeFalse());
     validateOutcome(id, OUTCOME_MISSING, nodes, node.getOutcomeMissing());
   }
 
+  private void validateQueryValue(ConfigBoolQuery query) {
+    validateField(query.getField());
+    if (List.of(CONTAINS_NONE, CONTAINS_ALL, CONTAINS_ANY, IN).contains(query.getOperator())) {
+      Object value = query.getValue();
+      if (!(value instanceof Collection<?>) && !value.toString().startsWith(FILE_PREFIX)
+          && !value.toString()
+          .startsWith(FIELD_PREFIX)) {
+        throw new ConfigDecisionTreeValidationException(
+            format(
+                "The query for field '%s' with operator '%s' should have a collection as value",
+                query.getField(), query.getOperator()));
+      }
+    }
+  }
 
   private void validateBoolMultiNode(String id, ConfigBoolMultiNode node,
       Map<String, ConfigNode> nodes, Map<String, Path> files) {
@@ -100,6 +128,7 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
     List<String> fields = node.getFields();
     for (ConfigBoolMultiQuery clause : node.getOutcomes()) {
       for (ConfigBoolQuery query : clause.getQueries()) {
+        validateQueryValue(query);
         if (!fields.contains(query.getField())) {
           throw new ConfigDecisionTreeValidationException(
               format(
@@ -164,6 +193,29 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
 
     validateOutcome(id, OUTCOME_DEFAULT, nodes, node.getOutcomeDefault());
     validateOutcome(id, OUTCOME_MISSING, nodes, node.getOutcomeMissing());
+    validateField(node.getField());
+  }
+
+  private void validateField(String field) {
+    List<String> fieldTokens = Arrays.asList(field.split(FIELD_TOKEN_SEPARATOR));
+    FieldType fieldType = toFieldType(fieldTokens);
+    if (fieldType == FieldType.SAMPLE) {
+      String parentField = fieldTokens.get(0);
+      String childField = fieldTokens.get(1);
+      if (Arrays.stream(SampleFieldType.values()).map(SampleFieldType::name)
+          .noneMatch(enumValue -> enumValue.equals(childField))) {
+        throw new ConfigDecisionTreeValidationException(
+            format("Field '%s' is not a valid child of field '%s'.", childField, parentField));
+      }
+    } else if (fieldType == FieldType.GENOTYPE) {
+      String parentField = fieldTokens.get(1);
+      String childField = fieldTokens.get(2);
+      if (Arrays.stream(GenotypeFieldType.values()).map(GenotypeFieldType::name)
+          .noneMatch(enumValue -> enumValue.equals(childField))) {
+        throw new ConfigDecisionTreeValidationException(
+            format("Field '%s' is not a valid child of field '%s'.", childField, parentField));
+      }
+    }
   }
 
   private void validateLeafNode(String id, ConfigLeafNode node) {
