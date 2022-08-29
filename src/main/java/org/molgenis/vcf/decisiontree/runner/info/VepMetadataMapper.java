@@ -6,5 +6,5 @@ public interface VepMetadataMapper {
 
   boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine);
 
-  VepHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine);
+  NestedHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine);
 }

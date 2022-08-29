@@ -69,10 +69,12 @@ class AppIT {
   void testSamples() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:example_samples.vcf").toString();
     String treeConfigFile = ResourceUtils.getFile("classpath:example_sample.json").toString();
+    String pedFile = ResourceUtils.getFile("classpath:example_samples.ped").toString();
     String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
 
     String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
-        "-m", "samPlE"};
+        "-m", "samPlE", "-ph", "HP:0000951;HP:0003124", "-pd", pedFile
+    };
     SpringApplication.run(App.class, args);
 
     String outputVcf = Files.readString(Path.of(outputFile));
@@ -95,7 +97,7 @@ class AppIT {
     String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
 
     String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
-        "-l", "-p", "-m", "sAMPlE"};
+        "-l", "-p", "-m", "sAMPlE", "-ph", "HP:0000951;HP:0003124",};
     SpringApplication.run(App.class, args);
 
     String outputVcf = Files.readString(Path.of(outputFile));
@@ -106,6 +108,31 @@ class AppIT {
 
     Path expectedOutputFile = ResourceUtils.getFile(
             "classpath:example_samples-classified_paths-labels.vcf")
+        .toPath();
+    String expectedOutputVcf = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
+
+    assertEquals(expectedOutputVcf, outputVcf);
+  }
+
+  @Test
+  void testSamplesNoProbandPhenoPed() throws IOException {
+    String inputFile = ResourceUtils.getFile("classpath:example_samples.vcf").toString();
+    String treeConfigFile = ResourceUtils.getFile("classpath:example_sample.json").toString();
+    String outputFile = sharedTempDir.resolve("example-classified-noPPP.vcf").toString();
+
+    String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile,
+        "-m", "samPlE", "-l", "-p",
+    };
+    SpringApplication.run(App.class, args);
+
+    String outputVcf = Files.readString(Path.of(outputFile));
+
+    // output differs every run (different tmp dir)
+    outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
+    outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
+
+    Path expectedOutputFile = ResourceUtils.getFile(
+            "classpath:example_samples-classified-noPPP.vcf")
         .toPath();
     String expectedOutputVcf = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
 

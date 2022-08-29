@@ -4,17 +4,19 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
+import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BoolNodeEvaluator implements BaseBoolNodeEvaluator<BoolNode> {
 
   @Override
-  public NodeOutcome evaluate(BoolNode node,
-      Variant variant, Integer sampleIndex) {
+  public NodeOutcome evaluate(
+      BoolNode node, Variant variant, @Nullable SampleContext sampleContext) {
     NodeOutcome nodeOutcome;
 
-    BoolQuery query = node.getQuery();
+    BoolQuery query = postProcessQuery(node.getQuery(), variant, sampleContext);
     if (query.getField() instanceof MissingField) {
       if (node.getOutcomeMissing() != null) {
         return node.getOutcomeMissing();
@@ -22,7 +24,7 @@ public class BoolNodeEvaluator implements BaseBoolNodeEvaluator<BoolNode> {
         throw new EvaluationException(node, variant, "missing 'missingOutcome'");
       }
     }
-    Object value = variant.getValue(query.getField(), sampleIndex);
+    Object value = variant.getValue(query.getField(), sampleContext);
     if (!isMissingValue(value)) {
       boolean matches = executeQuery(query, value);
       nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();

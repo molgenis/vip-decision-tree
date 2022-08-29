@@ -11,6 +11,7 @@ import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 
 @ExtendWith(MockitoExtension.class)
 class VcfMetadataTest {
@@ -46,10 +47,12 @@ class VcfMetadataTest {
     Field vepField = FieldImpl.builder().id("VEP").fieldType(FieldType.INFO)
         .valueType(ValueType.STRING).valueCount(ValueCount.builder()
             .type(Type.VARIABLE).build()).build();
-    VepHeaderLine vepHeaderLine = VepHeaderLine.builder()
+    NestedHeaderLine nestedVepHeaderLine = NestedHeaderLine.builder()
         .nestedFields(vepNestedMetadata).parentField(vepField).build();
-    vcfMetadata = new VcfMetadata(vcfHeader, vepHeaderLine, false);
-    vcfMetadataStrict = new VcfMetadata(vcfHeader, vepHeaderLine, true);
+    NestedHeaderLine nestedGtHeaderLine = NestedHeaderLine.builder()
+        .nestedFields(Map.of()).parentField(vepField).build();
+    vcfMetadata = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, false);
+    vcfMetadataStrict = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, true);
   }
 
 @Test

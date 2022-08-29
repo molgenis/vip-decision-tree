@@ -20,13 +20,13 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 
 @ExtendWith(MockitoExtension.class)
 class VepHelperTest {
 
   private VepHelper vepHelper;
-  private VepHeaderLine vepHeader;
+  private NestedHeaderLine vepHeader;
 
   @BeforeEach
   private void setUp() {
@@ -43,7 +43,7 @@ class VepHelperTest {
         .valueType(ValueType.STRING).valueCount(valueCount).build();
     Map<String, NestedField> nestedFields = Map.of("field1", nestedField1, "ALLELE_NUM",
         nestedField2);
-    vepHeader = VepHeaderLine.builder().parentField(parent)
+    vepHeader = NestedHeaderLine.builder().parentField(parent)
         .nestedFields(nestedFields).build();
   }
 

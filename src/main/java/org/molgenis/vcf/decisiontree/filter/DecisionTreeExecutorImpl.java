@@ -14,7 +14,7 @@ import org.molgenis.vcf.decisiontree.filter.model.Label;
 import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
 import org.molgenis.vcf.decisiontree.filter.model.Node;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
-import org.springframework.lang.Nullable;
+import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 
 public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
 
@@ -37,7 +37,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
   }
 
   @Override
-  public Decision execute(DecisionTree tree, Variant variant, @Nullable Integer sampleIndex) {
+  public Decision execute(DecisionTree tree, Variant variant, SampleContext sampleContext) {
     List<Node> nodePath = storePaths ? new ArrayList<>() : List.of();
     Set<Label> labels = storeLabels ? new HashSet<>() : Set.of();
 
@@ -52,7 +52,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
       }
 
       NodeOutcome nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant,
-          sampleIndex);
+          sampleContext);
       if (storeLabels) {
         storeLabel(nodeOutcome, labels);
       }

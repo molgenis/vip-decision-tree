@@ -1,49 +1,105 @@
 {
-  "rootNode": "GT",
+  "rootNode": "depth",
   "nodes": {
-    "GT": {
+    "depth": {
       "type": "BOOL",
-      "description": "GT non HOMREF match (test purpose only)",
+      "query": {
+        "field": "FORMAT/AD",
+        "operator": "==",
+        "value": [
+          0,
+          10
+        ]
+      },
+      "outcomeTrue": {
+        "nextNode": "phenotype"
+      },
+      "outcomeFalse": {
+        "nextNode": "read_depth"
+      },
+      "outcomeMissing": {
+        "nextNode": "read_depth"
+      }
+    },
+    "read_depth": {
+      "type": "BOOL",
+      "query": {
+        "field": "FORMAT/DP",
+        "operator": ">",
+        "value": 20
+      },
+      "outcomeTrue": {
+        "nextNode": "alleles"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_false"
+      },
+      "outcomeMissing": {
+        "nextNode": "alleles"
+      }
+    },
+    "alleles": {
+      "type": "BOOL",
+      "query": {
+        "field": "FORMAT/GENOTYPE/ALLELES",
+        "operator": "contains_any",
+        "value": "field:ALT"
+      },
+      "outcomeTrue": {
+        "nextNode": "genotype"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_false"
+      },
+      "outcomeMissing": {
+        "nextNode": "genotype"
+      }
+    },
+    "genotype": {
+      "type": "BOOL",
       "query": {
         "field": "FORMAT/GT",
         "operator": "!=",
-        "value": "0/0"
+        "value": "0|0"
       },
       "outcomeTrue": {
-        "nextNode": "exit_k"
+        "nextNode": "phenotype"
       },
       "outcomeFalse": {
-        "nextNode": "VIM"
+        "nextNode": "exit_false"
       },
       "outcomeMissing": {
-        "nextNode": "exit_k"
+        "nextNode": "phenotype"
       }
     },
-    "VIM": {
+    "phenotype": {
       "type": "BOOL",
-      "description": "VIM",
       "query": {
-        "field": "FORMAT/VIM",
-        "operator": "==",
-        "value": 1
+        "field": "SAMPLE/PHENOTYPES",
+        "operator": "contains",
+        "value": "HP:0000951"
       },
       "outcomeTrue": {
-        "nextNode": "exit_k"
+        "nextNode": "exit_true"
       },
       "outcomeFalse": {
-        "nextNode": "exit_f"
+        "nextNode": "exit_false"
       },
       "outcomeMissing": {
-        "nextNode": "exit_k"
+        "nextNode": "exit_miss"
       }
     },
-    "exit_k": {
+    "exit_true": {
       "type": "LEAF",
-      "class": "k"
+      "class": "class_true"
     },
-    "exit_f": {
+    "exit_false": {
       "type": "LEAF",
-      "class": "f"
+      "class": "class_false"
+    },
+    "exit_miss": {
+      "type": "LEAF",
+      "class": "class_miss"
     }
   }
 }

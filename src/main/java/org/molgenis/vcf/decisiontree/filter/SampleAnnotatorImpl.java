@@ -3,7 +3,6 @@ package org.molgenis.vcf.decisiontree.filter;
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.GenotypeBuilder;
 import htsjdk.variant.variantcontext.GenotypesContext;
-import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
 import java.util.List;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
@@ -22,9 +21,9 @@ public class SampleAnnotatorImpl implements SampleAnnotator {
   }
 
   @Override
-  public VariantContext annotate(List<Decision> decisions, Integer sampleIndex, VariantContext vc) {
-    VariantContextBuilder vcBuilder = new VariantContextBuilder(vc);
-    GenotypesContext genotypeContext = GenotypesContext.copy(vc.getGenotypes());
+  public void annotate(List<Decision> decisions, Integer sampleIndex,
+      VariantContextBuilder vcBuilder) {
+    GenotypesContext genotypeContext = GenotypesContext.copy(vcBuilder.getGenotypes());
     Genotype genotype = genotypeContext.get(sampleIndex);
     GenotypeBuilder gtBuilder = new GenotypeBuilder(genotype);
     gtBuilder.attribute(VIPC_S,
@@ -39,6 +38,5 @@ public class SampleAnnotatorImpl implements SampleAnnotator {
     }
     genotypeContext.replace(gtBuilder.make());
     vcBuilder.genotypes(genotypeContext);
-    return vcBuilder.make();
   }
 }

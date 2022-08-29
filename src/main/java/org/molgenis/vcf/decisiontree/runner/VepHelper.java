@@ -14,17 +14,17 @@ import org.molgenis.vcf.decisiontree.filter.UnknownFieldException;
 import org.molgenis.vcf.decisiontree.filter.VcfRecord;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 
 public class VepHelper {
 
   public Map<Integer, List<VcfRecord>> getRecordPerConsequence(VcfRecord vcfRecord,
-      VepHeaderLine vepHeaderLine) {
-    List<String> consequences = vcfRecord.getVepValues(vepHeaderLine.getParentField());
+      NestedHeaderLine nestedHeaderLine) {
+    List<String> consequences = vcfRecord.getVepValues(nestedHeaderLine.getParentField());
     Map<Integer, List<VcfRecord>> records = new HashMap<>();
     for (String consequence : consequences) {
       int alleleNumIndex;
-      if (vepHeaderLine.getField(ALLELE_NUM) instanceof NestedField alleleField) {
+      if (nestedHeaderLine.getField(ALLELE_NUM) instanceof NestedField alleleField) {
         alleleNumIndex = alleleField.getIndex();
       } else {
         throw new UnknownFieldException(ALLELE_NUM, FieldType.INFO_VEP);
@@ -36,7 +36,8 @@ public class VepHelper {
       } else {
         singleCsqRecord = new ArrayList<>();
       }
-      singleCsqRecord.add(vcfRecord.getFilteredCopy(consequence, vepHeaderLine.getParentField()));
+      singleCsqRecord.add(
+          vcfRecord.getFilteredCopy(consequence, nestedHeaderLine.getParentField()));
       records.put(index, singleCsqRecord);
     }
     return records;
@@ -44,8 +45,8 @@ public class VepHelper {
 
 
   public VcfRecord createEmptyCsqRecord(VcfRecord vcfRecord,
-      Integer alleleIndex, VepHeaderLine vepHeaderLine) {
-    Map<String, NestedField> fields = vepHeaderLine.getNestedFields();
+      Integer alleleIndex, NestedHeaderLine nestedHeaderLine) {
+    Map<String, NestedField> fields = nestedHeaderLine.getNestedFields();
     List<String> values = new ArrayList<>();
     for (int index = 0; index < fields.size(); index++) {
       values.add("");
@@ -53,7 +54,7 @@ public class VepHelper {
     values.add(fields.get(ALLELE_NUM).getIndex(), alleleIndex.toString());
     VariantContext variantContext = vcfRecord.getVariantContext();
     VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
-    variantContextBuilder.attribute(vepHeaderLine.getParentField().getId(),
+    variantContextBuilder.attribute(nestedHeaderLine.getParentField().getId(),
         singletonList(Strings.join(values, '|')));
     return new VcfRecord(variantContextBuilder.make());
   }

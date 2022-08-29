@@ -20,7 +20,7 @@ public class VcfUtils {
 
   public static Integer getInfoAsInteger(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
-    return getInfoValueAsInteger(value);
+    return getVcfValueAsInteger(value);
   }
 
   public static List<Integer> getInfoAsIntegerList(VariantContext variantContext, Field field) {
@@ -34,11 +34,11 @@ public class VcfUtils {
       if (size == 0) {
         integerValues = emptyList();
       } else if (size == 1) {
-        integerValues = singletonList(getInfoValueAsInteger(objectValues.get(0)));
+        integerValues = singletonList(getVcfValueAsInteger(objectValues.get(0)));
       } else {
         integerValues = new ArrayList<>(objectValues.size());
         for (Object objValue : objectValues) {
-          integerValues.add(getInfoValueAsInteger(objValue));
+          integerValues.add(getVcfValueAsInteger(objValue));
         }
       }
     } else if (value instanceof String stringValue) {
@@ -51,7 +51,7 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  Integer getInfoValueAsInteger(@Nullable Object objValue) {
+  Integer getVcfValueAsInteger(@Nullable Object objValue) {
     Integer intValue;
     if (objValue == null) {
       intValue = null;
@@ -78,7 +78,7 @@ public class VcfUtils {
 
   public static Double getInfoAsDouble(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
-    return getInfoValueAsDouble(value);
+    return getVcfValueAsDouble(value);
   }
 
   public static List<Double> getInfoAsDoubleList(VariantContext variantContext, Field field) {
@@ -92,11 +92,11 @@ public class VcfUtils {
       if (size == 0) {
         doubleValues = emptyList();
       } else if (size == 1) {
-        doubleValues = singletonList(getInfoValueAsDouble(objectValues.get(0)));
+        doubleValues = singletonList(getVcfValueAsDouble(objectValues.get(0)));
       } else {
         doubleValues = new ArrayList<>(objectValues.size());
         for (Object objValue : objectValues) {
-          doubleValues.add(getInfoValueAsDouble(objValue));
+          doubleValues.add(getVcfValueAsDouble(objValue));
         }
       }
     } else if (value instanceof String string) {
@@ -109,7 +109,7 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  Double getInfoValueAsDouble(@Nullable Object objValue) {
+  Double getVcfValueAsDouble(@Nullable Object objValue) {
     Double doubleValue;
     if (objValue == null) {
       doubleValue = null;
@@ -136,7 +136,7 @@ public class VcfUtils {
 
   public static String getInfoAsString(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
-    return getInfoValueAsString(value);
+    return getVcfValueAsString(value);
   }
 
   public static List<String> getInfoAsStringList(VariantContext variantContext, Field field) {
@@ -158,11 +158,11 @@ public class VcfUtils {
       if (size == 0) {
         strValues = emptyList();
       } else if (size == 1) {
-        strValues = singletonList(getInfoValueAsString(objectValues.get(0)));
+        strValues = singletonList(getVcfValueAsString(objectValues.get(0)));
       } else {
         strValues = new ArrayList<>(objectValues.size());
         for (Object objValue : objectValues) {
-          strValues.add(getInfoValueAsString(objValue));
+          strValues.add(getVcfValueAsString(objValue));
         }
       }
     } else if (value instanceof String string) {
@@ -175,7 +175,7 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  String getInfoValueAsString(@Nullable Object objValue) {
+  String getVcfValueAsString(@Nullable Object objValue) {
     String strValue;
     if (objValue == null) {
       strValue = null;
@@ -200,10 +200,10 @@ public class VcfUtils {
 
   public static boolean getInfoAsBoolean(VariantContext variantContext, Field field) {
     Object objValue = variantContext.getAttribute(field.getId());
-    return getInfoValueAsBoolean(objValue);
+    return getVcfValueAsBoolean(objValue);
   }
 
-  private static boolean getInfoValueAsBoolean(Object objValue) {
+  private static boolean getVcfValueAsBoolean(Object objValue) {
     boolean bool;
 
     if (objValue == null) {
@@ -217,36 +217,46 @@ public class VcfUtils {
     return bool;
   }
 
-  public static Object getTypedInfoValue(Field field, String stringValue, String separator) {
+  public static Object getTypedVcfValue(Field field, String stringValue, String separator) {
     Object value;
-    if(separator == null){
-      value = getTypedInfoValue(field, stringValue);
-    }else{
+    if (separator == null) {
+      value = getTypedVcfValue(field, stringValue);
+    } else {
       List<String> values = Arrays.asList(stringValue.split(separator));
-      value = values.stream().map(singleValue -> getTypedInfoValue(field, singleValue)).toList();
+      value = values.stream().map(singleValue -> getTypedVcfValue(field, singleValue)).toList();
     }
     return value;
   }
 
-    public static Object getTypedInfoValue(Field field, String stringValue) {
-      Object typedValue;
-      ValueType valueType = field.getValueType();
-      switch (valueType) {
-        case INTEGER:
-          typedValue = VcfUtils.getInfoValueAsInteger(stringValue);
-          break;
-        case FLAG:
-          typedValue = VcfUtils.getInfoValueAsBoolean(stringValue);
-          break;
-        case FLOAT:
-          typedValue = VcfUtils.getInfoValueAsDouble(stringValue);
-          break;
-        case CHARACTER, STRING:
-          typedValue = VcfUtils.getInfoValueAsString(stringValue);
-          break;
-        default:
-          throw new UnexpectedEnumException(valueType);
-      }
-      return typedValue;
+  public static Object getTypedVcfValue(Field field, String stringValue) {
+    Object typedValue;
+    ValueType valueType = field.getValueType();
+    switch (valueType) {
+      case INTEGER:
+        typedValue = VcfUtils.getVcfValueAsInteger(stringValue);
+        break;
+      case FLAG:
+        typedValue = VcfUtils.getVcfValueAsBoolean(stringValue);
+        break;
+      case FLOAT:
+        typedValue = VcfUtils.getVcfValueAsDouble(stringValue);
+        break;
+      case CHARACTER, STRING:
+        typedValue = VcfUtils.getVcfValueAsString(stringValue);
+        break;
+      default:
+        throw new UnexpectedEnumException(valueType);
     }
+    return typedValue;
+  }
+
+
+  public static Object getTypedVcfListValue(Field field, String stringValue) {
+    String[] stringValues = stringValue.split(",");
+    List<Object> values = new ArrayList<>();
+    for (String value : stringValues) {
+      values.add(getTypedVcfValue(field, value));
+    }
+    return values;
+  }
 }

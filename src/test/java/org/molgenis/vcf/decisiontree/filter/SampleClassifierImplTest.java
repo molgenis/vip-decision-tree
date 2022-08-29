@@ -1,5 +1,8 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -9,7 +12,7 @@ import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.GenotypeBuilder;
 import htsjdk.variant.variantcontext.GenotypesContext;
 import htsjdk.variant.variantcontext.VariantContext;
-import java.util.Collections;
+import htsjdk.variant.variantcontext.VariantContextBuilder;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +20,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
@@ -24,15 +28,18 @@ import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
+import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
+import org.molgenis.vcf.decisiontree.ped.model.Sex;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
-import org.molgenis.vcf.decisiontree.runner.info.VepHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 
 @ExtendWith(MockitoExtension.class)
 class SampleClassifierImplTest {
-
   @Mock
   private DecisionTreeExecutor decisionTreeExecutor;
   @Mock
@@ -51,7 +58,15 @@ class SampleClassifierImplTest {
 
   private Classifier classifier;
   private FieldImpl parent;
-  private VepHeaderLine vepHeaderLine;
+  private NestedHeaderLine nestedHeaderLine;
+  private SampleContext sampleContext1 = SampleContext.builder().index(0).proband(true)
+      .sex(Sex.MALE)
+      .affectedStatus(AffectedStatus.AFFECTED).id("test1").phenotypes(List.of()).build();
+  private SampleContext sampleContext2 = SampleContext.builder().index(1).proband(true)
+      .sex(Sex.MALE)
+      .affectedStatus(AffectedStatus.AFFECTED).id("test2").phenotypes(List.of()).build();
+  private SamplesContext samplesContext = SamplesContext.builder()
+      .sampleContexts(Set.of(sampleContext1, sampleContext2)).build();
 
   @BeforeEach
   void setUp() {
@@ -66,18 +81,17 @@ class SampleClassifierImplTest {
         .valueType(ValueType.STRING).valueCount(valueCount).build();
     Map<String, NestedField> nestedFields = Map.of("field1", nestedField1, "ALLELE_NUM",
         nestedField2);
-    vepHeaderLine = VepHeaderLine.builder().parentField(parent)
+    nestedHeaderLine = NestedHeaderLine.builder().parentField(parent)
         .nestedFields(nestedFields).build();
-    when(vcfMetadata.getVepHeaderLine()).thenReturn(vepHeaderLine);
+    when(vcfMetadata.getVepHeaderLine()).thenReturn(nestedHeaderLine);
     classifier = new SampleClassifierImpl(decisionTreeExecutor, vepHelper, decisionTree,
-        recordWriter, sampleAnnotator, Set.of());
+        recordWriter, sampleAnnotator, samplesContext);
   }
 
   @Test
   void classify() {
     VcfRecord record0 = mock(VcfRecord.class, "record0");
     VariantContext vc0 = mock(VariantContext.class, "vc0");
-
     GenotypesContext genotypesContext = GenotypesContext.copy(GenotypesContext.NO_GENOTYPES);
     Genotype gt0a = new GenotypeBuilder().name("Patient").make();
     genotypesContext.add(gt0a);
@@ -88,26 +102,20 @@ class SampleClassifierImplTest {
     when(vc0.getID()).thenReturn("1");
     when(vc0.getStart()).thenReturn(1);
     when(vc0.getEnd()).thenReturn(1);
-    when(vc0.getNSamples()).thenReturn(2);
-    when(vc0.getGenotype(0)).thenReturn(gt0a);
-    when(vc0.getGenotype(1)).thenReturn(gt0b);
     when(vc0.getAlleles()).thenReturn(List.of(
         htsjdk.variant.variantcontext.Allele.REF_A, htsjdk.variant.variantcontext.Allele.ALT_T));
 
     VariantContext vc1 = mock(VariantContext.class, "vc1");
     GenotypesContext genotypesContext1 = GenotypesContext.copy(GenotypesContext.NO_GENOTYPES);
     Genotype gt1a = new GenotypeBuilder().name("Patient").make();
-    genotypesContext.add(gt1a);
+    genotypesContext1.add(gt1a);
     Genotype gt1b = new GenotypeBuilder().name("Patient2").make();
-    genotypesContext.add(gt1b);
+    genotypesContext1.add(gt1b);
     when(vc1.getGenotypes()).thenReturn(genotypesContext1);
     when(vc1.getContig()).thenReturn("1");
     when(vc1.getID()).thenReturn("1");
     when(vc1.getStart()).thenReturn(1);
     when(vc1.getEnd()).thenReturn(1);
-    when(vc1.getNSamples()).thenReturn(2);
-    when(vc1.getGenotype(0)).thenReturn(gt1a);
-    when(vc1.getGenotype(1)).thenReturn(gt1b);
     when(vc1.getAlleles()).thenReturn(List.of(
         htsjdk.variant.variantcontext.Allele.REF_A, htsjdk.variant.variantcontext.Allele.ALT_T));
 
@@ -138,9 +146,9 @@ class SampleClassifierImplTest {
     Map<Integer, List<VcfRecord>> recordMap1 = Map.of(1, List.of(record1a), 2,
         List.of(record1b));
     when(vepHelper.getRecordPerConsequence(record0,
-        vepHeaderLine)).thenReturn(recordMap0);
+        nestedHeaderLine)).thenReturn(recordMap0);
     when(vepHelper.getRecordPerConsequence(record1,
-        vepHeaderLine)).thenReturn(recordMap1);
+        nestedHeaderLine)).thenReturn(recordMap1);
     Decision decision1a = Decision.builder().clazz("test1a").path(List.of())
         .labels(Set.of()).build();
     Decision decision2a = Decision.builder().clazz("test2a").path(List.of())
@@ -150,53 +158,38 @@ class SampleClassifierImplTest {
 
     doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1),
-            0);
+            sampleContext1);
     doReturn(decision2a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1),
-            0);
+            sampleContext1);
     doReturn(decision2b).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2),
-            0);
+            sampleContext1);
     doReturn(decision1a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1),
-            1);
+            sampleContext2);
     doReturn(decision2a).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1),
-            1);
+            sampleContext2);
     doReturn(decision2b).when(decisionTreeExecutor)
         .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2),
-            1);
-
-    doReturn(vc0).when(sampleAnnotator)
-        .annotate(List.of(new Decision("test1a", List.of(), Set.of())),
-            0, vc0);
-    doReturn(vc0).when(sampleAnnotator)
-        .annotate(List.of(new Decision("test1a", List.of(), Set.of())),
-            1, vc0);
-    doReturn(vc1).when(sampleAnnotator).annotate(
-        List.of(new Decision("test2a", List.of(), Set.of()),
-            new Decision("test2b", List.of(), Set.of())), 0,
-        vc1);
-    doReturn(vc1).when(sampleAnnotator).annotate(
-        List.of(new Decision("test2a", List.of(), Set.of()),
-            new Decision("test2b", List.of(), Set.of())), 1,
-        vc1);
+            sampleContext2);
 
     classifier.classify(vcfReader);
 
     verify(sampleAnnotator).annotate(
-        List.of(new Decision("test1a", List.of(), Set.of())), 0,
-        vc0);
+        eq(List.of(new Decision("test1a", List.of(), Set.of()))), eq(0),
+        any());
     verify(sampleAnnotator).annotate(
-        List.of(new Decision("test1a", List.of(), Set.of())),
-        1, vc0);
+        eq(List.of(new Decision("test1a", List.of(), Set.of()))),
+        eq(1), any());
     verify(sampleAnnotator).annotate(
-        List.of(new Decision("test2a", List.of(), Set.of()),
-            new Decision("test2b", List.of(), Set.of())), 0,
-        vc1);
+        eq(List.of(new Decision("test2a", List.of(), Set.of()),
+            new Decision("test2b", List.of(), Set.of()))), eq(0),
+        any());
     verify(sampleAnnotator).annotate(
-        List.of(new Decision("test2a", List.of(), Set.of()),
-            new Decision("test2b", List.of(), Set.of())), 1,
-        vc1);
+        eq(List.of(new Decision("test2a", List.of(), Set.of()),
+            new Decision("test2b", List.of(), Set.of()))), eq(1),
+        any());
   }
 }

@@ -67,7 +67,7 @@ class VepInfoMetadataMapperTest {
         .thenReturn(
             "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|gnomAD_HN|PUBMED|CAPICE_CL|CAPICE_SC|clinVar|clinVar_CLNSIG|clinVar_CLNSIGINCL|clinVar_CLNREVSTAT");
 
-    VepHeaderLine actual = vepInfoMetadataMapper
+    NestedHeaderLine actual = vepInfoMetadataMapper
         .map(headerLine);
     Field vepField = FieldImpl.builder().id("CSQ").fieldType(FieldType.INFO)
         .valueType(ValueType.STRING).valueCount(ValueCount.builder()
@@ -87,7 +87,7 @@ class VepInfoMetadataMapperTest {
     expectedMap.put("clinVar_CLNSIG", getVariableIntegerField("clinVar_CLNSIG", 10));
     expectedMap.put("clinVar_CLNSIGINCL", getVariableIntegerField("clinVar_CLNSIGINCL", 11));
     expectedMap.put("clinVar_CLNREVSTAT", getVariableIntegerField("clinVar_CLNREVSTAT", 12));
-    assertEquals(VepHeaderLine.builder().nestedFields(expectedMap).parentField(vepField).build(),
+    assertEquals(NestedHeaderLine.builder().nestedFields(expectedMap).parentField(vepField).build(),
         actual);
   }
 

@@ -1,11 +1,16 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FIELD_PREFIX;
+
 import java.util.Collection;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.springframework.lang.Nullable;
+
 interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
     NodeEvaluator<T> {
 
@@ -121,5 +126,17 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
 
   default boolean executeInQuery(Object value, Collection<?> queryValues) {
     return queryValues.contains(value);
+  }
+
+  default BoolQuery postProcessQuery(
+      BoolQuery query, Variant variant, @Nullable SampleContext sampleContext) {
+    String stringQueryValue = query.getValue().toString();
+    if (stringQueryValue.startsWith(FIELD_PREFIX)) {
+      String fieldId = stringQueryValue.substring(FIELD_PREFIX.length());
+      query = BoolQuery.builder().field(query.getField()).operator(query.getOperator())
+          .value(variant.getValue(variant.getVcfMetadata().getField(fieldId), sampleContext))
+          .build();
+    }
+    return query;
   }
 }

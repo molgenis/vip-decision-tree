@@ -3,9 +3,10 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedInfoValue;
+import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedVcfValue;
 
 import htsjdk.variant.variantcontext.Genotype;
+import htsjdk.variant.variantcontext.GenotypeType;
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
 import htsjdk.variant.vcf.VCFConstants;
@@ -17,11 +18,15 @@ import java.util.stream.IntStream;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
+import org.molgenis.vcf.decisiontree.filter.model.GenotypeFieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
+import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.molgenis.vcf.decisiontree.filter.model.SampleFieldType;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.utils.VcfUtils;
+import org.springframework.lang.Nullable;
 
 /**
  * {@link VariantContext} wrapper that works with nested data (e.g. CSQ INFO fields)..
@@ -54,7 +59,7 @@ public class VcfRecord {
     return getValue(field, allele, null);
   }
 
-  public Object getValue(Field field, Allele allele, Integer sampleIndex) {
+  public Object getValue(Field field, Allele allele, @Nullable SampleContext sampleContext) {
     Object value;
     FieldType fieldType = field.getFieldType();
     switch (fieldType) {
@@ -67,12 +72,18 @@ public class VcfRecord {
       case INFO_VEP:
         value = getNestedVepValue(field);
         break;
+      case GENOTYPE:
+        value = sampleContext != null ? getNestedGTValue((NestedField) field, sampleContext) : null;
+        break;
       case FORMAT:
-        if (sampleIndex == null) {
+        if (sampleContext == null) {
           throw new UnsupportedOperationException(
               "Cannot filter on FORMAT fields when running in variant filter mode.");
         }
-        value = getFormatField(field, sampleIndex);
+        value = getFormatField(field, sampleContext);
+        break;
+      case SAMPLE:
+        value = sampleContext != null ? getSampleValue(field, sampleContext) : null;
         break;
       default:
         throw new UnexpectedEnumException(fieldType);
@@ -80,34 +91,174 @@ public class VcfRecord {
     return value;
   }
 
-  private Object getFormatField(Field field, Integer sampleIndex) {
-    Genotype genotype = variantContext.getGenotype(sampleIndex);
+  private Object getSampleValue(Field field, SampleContext sampleContext) {
     Object value;
-    switch (field.getId()) {
-      case ("GT"):
-        value = genotype.getGenotypeString();
+    SampleFieldType sampleField = SampleFieldType.valueOf(field.getId().toUpperCase());
+    switch (sampleField) {
+      case ID:
+        value = sampleContext.getId();
         break;
-      case ("AD"):
-        value = IntStream.of(genotype.getAD()).boxed().toList();
+      case AFFECTED_STATUS:
+        value = sampleContext.getAffectedStatus().toString();
         break;
-      case ("DP"):
-        value = genotype.getDP();
+      case SEX:
+        value = sampleContext.getSex().toString();
         break;
-      case ("GQ"):
-        value = genotype.getGQ();
+      case FATHER_ID:
+        value = sampleContext.getFatherId();
         break;
-      case ("PL"):
-        value = genotype.getPL();
+      case MOTHER_ID:
+        value = sampleContext.getMotherId();
+        break;
+      case FAMILY_ID:
+        value = sampleContext.getFamilyId();
+        break;
+      case PHENOTYPES:
+        List<String> phenotypes = sampleContext.getPhenotypes();
+        value = phenotypes.isEmpty() ? null : phenotypes;
         break;
       default:
-        value = genotype.getExtendedAttribute(field.getId());
-        if (value != null && !(value instanceof String)) {
-          throw new UnsupportedFormatFieldException(value.getClass());
-        }
-        value = value != null ? getTypedInfoValue(field, value.toString()) : null;
-
+        throw new UnexpectedEnumException(sampleField);
     }
     return value;
+  }
+
+  private Object getNestedGTValue(NestedField field, SampleContext sampleContext) {
+    Object value;
+
+    Genotype genotype =
+        sampleContext != null ? variantContext.getGenotype(sampleContext.getIndex()) : null;
+    if (genotype == null) {
+      return null;
+    }
+    GenotypeFieldType genotypeFieldType = GenotypeFieldType.valueOf(field.getId());
+    switch (genotypeFieldType) {
+      case ALLELES:
+        value = genotype.getAlleles().stream().map(
+            htsjdk.variant.variantcontext.Allele::getBaseString).toList();
+        break;
+      case ALLELE_NUM:
+        value = genotype.getAlleles().stream().map(allele ->
+            variantContext.getAlleles().indexOf(allele)).toList();
+        break;
+      case TYPE:
+        switch (genotype.getType()) {
+          case MIXED:
+            value = GenotypeType.MIXED.name();
+            break;
+          case HET:
+            value = GenotypeType.HET.name();
+            break;
+          case HOM_REF:
+            value = GenotypeType.HOM_REF.name();
+            break;
+          case HOM_VAR:
+            value = GenotypeType.HOM_VAR.name();
+            break;
+          case NO_CALL:
+            value = GenotypeType.NO_CALL.name();
+            break;
+          case UNAVAILABLE:
+            value = GenotypeType.UNAVAILABLE.name();
+            break;
+          default:
+            throw new UnexpectedEnumException(genotype.getType());
+        }
+        break;
+      case MIXED:
+        value = genotype.isMixed();
+        break;
+      case CALLED:
+        value = genotype.isCalled();
+        break;
+      case PLOIDY:
+        int ploidy = genotype.getPloidy();
+        value = ploidy != 0 ? ploidy : null;
+        break;
+      case PHASED:
+        value = genotype.isPhased();
+        break;
+      case NON_INFORMATIVE:
+        value = genotype.isNonInformative();
+        break;
+      default:
+        throw new UnexpectedEnumException(genotypeFieldType);
+    }
+    return value;
+  }
+
+  @SuppressWarnings("java:S1612")
+  //suggested use of methode reference Integer::toString is not possible due to ambiguity
+  private Object getFormatField(Field field, SampleContext sampleContext) {
+    Genotype genotype = variantContext.getGenotype(sampleContext.getIndex());
+    if (genotype == null) {
+      return null;
+    }
+
+    Object typedValue;
+    switch (field.getId()) {
+      case ("GT"):
+        String separator = genotype.isPhased() ? "|" : "/";
+        typedValue = String.join(separator, genotype.getAlleles().stream().map(allele ->
+                variantContext.getAlleles().indexOf(allele)).map(index -> mapAlleleString(index))
+            .toList());
+        break;
+      case ("AD"):
+        int[] ad = genotype.getAD();
+        typedValue = ad != null ? IntStream.of(ad).boxed().toList() : null;
+        break;
+      case ("DP"):
+        typedValue = genotype.getDP();
+        if ((Integer) typedValue == -1) {
+          typedValue = null;
+        }
+        break;
+      case ("GQ"):
+        int gq = genotype.getGQ();
+        typedValue = gq != -1 ? gq : null;
+        break;
+      case ("PL"):
+        int[] pl = genotype.getPL();
+        typedValue = pl != null ? IntStream.of(pl).boxed().toList() : null;
+        break;
+      default:
+        typedValue = getExtendedAttributeValue(field, genotype);
+    }
+    return typedValue;
+  }
+
+  private String mapAlleleString(Integer index) {
+    return index != -1 ? Integer.toString(index) : ".";
+  }
+
+  private Object getExtendedAttributeValue(Field field, Genotype genotype) {
+    Object typedValue;
+    Object value;
+    value = genotype.getExtendedAttribute(field.getId());
+    if (value != null && !(value instanceof String)) {
+      throw new UnsupportedFormatFieldException(value.getClass());
+    }
+
+    ValueCount valueCount = field.getValueCount();
+    Type valueCountType = valueCount.getType();
+    switch (valueCountType) {
+      case A, R, VARIABLE:
+        typedValue =
+            value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
+        break;
+      case FIXED:
+        if (valueCount.getCount() == 1) {
+          typedValue =
+              value != null ? VcfUtils.getTypedVcfValue(field, value.toString()) : null;
+        } else {
+          typedValue =
+              value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
+        }
+        break;
+      default:
+        throw new UnexpectedEnumException(valueCountType);
+    }
+    return typedValue;
   }
 
   public List<String> getVepValues(Field vepField) {
@@ -128,9 +279,9 @@ public class VcfRecord {
       if (!stringValue.isEmpty()) {
         if (field.getSeparator() != null) {
           String nestedSeparator = Pattern.quote(nestedField.getSeparator().toString());
-          value = getTypedInfoValue(field, stringValue, nestedSeparator);
+          value = getTypedVcfValue(field, stringValue, nestedSeparator);
         } else {
-          value = getTypedInfoValue(field, stringValue);
+          value = VcfUtils.getTypedVcfValue(field, stringValue);
         }
       }
     }
@@ -153,7 +304,7 @@ public class VcfRecord {
         value = variantContext.getReference().getBaseString();
         break;
       case "ALT":
-        value = allele.getBases();
+        value = asList(allele.getBases().split(","));
         break;
       case "QUAL":
         value = variantContext.hasLog10PError() ? variantContext.getPhredScaledQual() : null;

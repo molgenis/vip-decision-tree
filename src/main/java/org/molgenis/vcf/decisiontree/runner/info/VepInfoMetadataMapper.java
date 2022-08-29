@@ -33,7 +33,7 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
   }
 
   @Override
-  public VepHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine) {
+  public NestedHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine) {
     Map<String, NestedField> nestedFields = new HashMap<>();
     int index = 0;
     FieldImpl vepField =
@@ -48,7 +48,7 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
       nestedFields.put(id, mapNestedMetadataToField(id, index, vepField));
       index++;
     }
-    return VepHeaderLine.builder().parentField(vepField)
+    return NestedHeaderLine.builder().parentField(vepField)
         .nestedFields(nestedFields).build();
   }
 

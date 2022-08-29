@@ -2,6 +2,7 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.springframework.lang.Nullable;
 
 public interface DecisionTreeExecutor {
@@ -10,5 +11,5 @@ public interface DecisionTreeExecutor {
     return execute(tree, variant, null);
   }
 
-  Decision execute(DecisionTree tree, Variant variant, @Nullable Integer sampleIndex);
+  Decision execute(DecisionTree tree, Variant variant, @Nullable SampleContext sampleContext);
 }
