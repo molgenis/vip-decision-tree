@@ -1,16 +1,20 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.decisiontree.filter.VcfMetadata.isSingleValueField;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FIELD_PREFIX;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.GENOTYPE;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
 import static org.molgenis.vcf.decisiontree.filter.model.SampleFieldType.AFFECTED_STATUS;
 import static org.molgenis.vcf.decisiontree.filter.model.SampleFieldType.SEX;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.EQUALS;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.NOT_EQUALS;
 
 import htsjdk.variant.variantcontext.GenotypeType;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
@@ -23,6 +27,7 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
 import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
 import org.molgenis.vcf.decisiontree.ped.model.Sex;
 
@@ -62,10 +67,9 @@ public class ValueValidator {
       VcfMetadata vcfMetadata) {
     Field field = vcfMetadata.getField(query.getField());
     if (!(field instanceof MissingField)) {
-      ValueType valueType = field.getValueType();
       Object value = query.getValue();
       validateEnumFields(field, value);
-      validateQueryValue(nodeId, value, valueType);
+      validateQueryValue(nodeId, field, query);
     }
   }
 
@@ -106,12 +110,20 @@ public class ValueValidator {
     }
   }
 
-  private static void validateQueryValue(String nodeId, Object value, ValueType valueType) {
+  private static void validateQueryValue(String nodeId, Field field, ConfigBoolQuery query) {
+    Object value = query.getValue();
+    ConfigOperator operator = query.getOperator();
     if (value instanceof Collection<?>) {
       ((Collection<?>) value).forEach(
-          singleValue -> validateSingleValue(nodeId, singleValue, valueType));
+          singleValue -> validateSingleValue(nodeId, singleValue, field.getValueType()));
     } else {
-      validateSingleValue(nodeId, value, valueType);
+      if (!isSingleValueField(field) && List.of(EQUALS, NOT_EQUALS).contains(operator)) {
+        throw new ConfigDecisionTreeValidationException(
+            format(
+                "Field '%s' in node '%s' contains a collection of values, therefor the '%s' query value should also have a collection as value.",
+                field.getId(), nodeId, operator));
+      }
+      validateSingleValue(nodeId, value, field.getValueType());
     }
   }
 

@@ -248,6 +248,10 @@ public class VcfMetadata {
     return vcfCompoundHeaderLine;
   }
 
+  public static boolean isSingleValueField(Field field) {
+    return field.getValueCount().getType() == Type.FIXED && field.getValueCount().getCount() == 1;
+  }
+
   public Map<String, Integer> getSampleNameToOffset() {
     return vcfHeader.getSampleNameToOffset();
   }

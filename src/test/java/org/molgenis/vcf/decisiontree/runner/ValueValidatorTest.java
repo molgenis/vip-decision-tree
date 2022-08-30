@@ -38,10 +38,8 @@ class ValueValidatorTest {
 
   @ParameterizedTest
   @MethodSource("provideValidValues")
-  void validate(Object value, ValueType valueType) {
-    when(vcfMetadata.getField("field")).thenReturn(
-        new FieldImpl("id", FieldType.INFO, valueType,
-            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null));
+  void validate(Object value, Field field) {
+    when(vcfMetadata.getField("field")).thenReturn(field);
     when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
         new ConfigBoolNode("", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
             configNodeOutcome, configNodeOutcome, configNodeOutcome)));
@@ -50,10 +48,8 @@ class ValueValidatorTest {
 
   @ParameterizedTest
   @MethodSource("provideInvalidValues")
-  void validateInvalid(Object value, ValueType valueType) {
-    when(vcfMetadata.getField("field")).thenReturn(
-        new FieldImpl("id", FieldType.INFO, valueType,
-            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null));
+  void validateInvalid(Object value, Field field) {
+    when(vcfMetadata.getField("field")).thenReturn(field);
     when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
         new ConfigBoolNode("", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
             configNodeOutcome, configNodeOutcome, configNodeOutcome)));
@@ -61,44 +57,28 @@ class ValueValidatorTest {
         () -> ValueValidator.validate(configDecisionTree, vcfMetadata));
   }
 
-  @ParameterizedTest
-  @MethodSource("provideValidEnumValues")
-  void validateEnum(Object value, Field field) {
-    when(vcfMetadata.getField(field.getId())).thenReturn(field);
-    when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
-        new ConfigBoolNode("", new ConfigBoolQuery(field.getId(), ConfigOperator.EQUALS, value),
-            configNodeOutcome, configNodeOutcome, configNodeOutcome)));
-    assertDoesNotThrow(() -> ValueValidator.validate(configDecisionTree, vcfMetadata));
-  }
-
-  @ParameterizedTest
-  @MethodSource("provideInvalidEnumValues")
-  void validateInvalidEnum(Object value, Field field) {
-    when(vcfMetadata.getField(field.getId())).thenReturn(field);
-    when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
-        new ConfigBoolNode("", new ConfigBoolQuery(field.getId(), ConfigOperator.EQUALS, value),
-            configNodeOutcome, configNodeOutcome, configNodeOutcome)));
-    assertThrows(ConfigDecisionTreeValidationException.class,
-        () -> ValueValidator.validate(configDecisionTree, vcfMetadata));
-  }
-
   private static Stream<Arguments> provideValidValues() {
     return Stream.of(
-        Arguments.of(1, ValueType.INTEGER),
-        Arguments.of("123", ValueType.STRING),
-        Arguments.of(1, ValueType.FLOAT),
-        Arguments.of(true, ValueType.FLAG),
-        Arguments.of("1", ValueType.CHARACTER),
-        Arguments.of(List.of(1, 2), ValueType.INTEGER),
-        Arguments.of(List.of("123", "2"), ValueType.STRING),
-        Arguments.of(List.of(1, 2), ValueType.FLOAT),
-        Arguments.of(List.of(true, false), ValueType.FLAG),
-        Arguments.of(List.of("1", "2"), ValueType.CHARACTER)
-    );
-  }
-
-  private static Stream<Arguments> provideValidEnumValues() {
-    return Stream.of(
+        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("123", new FieldImpl("id", FieldType.INFO, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(true, new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of(1, 2), new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of("123", "2"), new FieldImpl("id", FieldType.INFO, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of(1, 2), new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of(true, false), new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of("1", "2"), new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
         Arguments.of("MALE", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
             ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
         Arguments.of("FEMALE", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
@@ -124,34 +104,62 @@ class ValueValidatorTest {
         Arguments.of("UNAVAILABLE", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
             ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
         Arguments.of("MIXED", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
-            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null))
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of(1, 2), new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
+            ValueCount.builder().type(Type.FIXED).count(2).build(), null, null)),
+        Arguments.of(List.of("123", "2"), new FieldImpl("id", FieldType.INFO, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(2).build(), null, null)),
+        Arguments.of(List.of(1, 2), new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
+            ValueCount.builder().type(Type.VARIABLE).build(), null, null)),
+        Arguments.of(List.of(true, false), new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
+            ValueCount.builder().type(Type.A).build(), null, null)),
+        Arguments.of(List.of("1", "2"), new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
+            ValueCount.builder().type(Type.G).build(), null, null))
     );
   }
 
-  private static Stream<Arguments> provideInvalidEnumValues() {
+  private static Stream<Arguments> provideInvalidValues() {
     return Stream.of(
         Arguments.of("TEST", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
             ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
         Arguments.of("TEST", new FieldImpl("AFFECTED_STATUS", FieldType.SAMPLE, ValueType.STRING,
             ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
         Arguments.of("TEST", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
-            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null))
-    );
-  }
-
-  private static Stream<Arguments> provideInvalidValues() {
-    return Stream.of(
-        Arguments.of("1", ValueType.INTEGER),
-        Arguments.of(1, ValueType.STRING),
-        Arguments.of("1", ValueType.FLOAT),
-        Arguments.of("true", ValueType.FLAG),
-        Arguments.of(1, ValueType.CHARACTER),
-        Arguments.of(List.of(1, "2"), ValueType.INTEGER),
-        Arguments.of(List.of("123", 2), ValueType.STRING),
-        Arguments.of(List.of(1, "2"), ValueType.FLOAT),
-        Arguments.of(List.of(true, "false"), ValueType.FLAG),
-        Arguments.of(List.of("1", 2), ValueType.CHARACTER),
-        Arguments.of(List.of("1", "12"), ValueType.CHARACTER)
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("true", new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of(1, "2"), new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of("123", 2), new FieldImpl("id", FieldType.INFO, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of(1, "2"), new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of(true, "false"), new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of("1", 2), new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(List.of("1", "12"), new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
+            ValueCount.builder().type(Type.FIXED).count(1).build(), null, null)),
+        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
+            ValueCount.builder().type(Type.FIXED).count(2).build(), null, null)),
+        Arguments.of("123", new FieldImpl("id", FieldType.INFO, ValueType.STRING,
+            ValueCount.builder().type(Type.FIXED).count(2).build(), null, null)),
+        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
+            ValueCount.builder().type(Type.VARIABLE).build(), null, null)),
+        Arguments.of(true, new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
+            ValueCount.builder().type(Type.A).build(), null, null)),
+        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
+            ValueCount.builder().type(Type.G).build(), null, null)),
+        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
+            ValueCount.builder().type(Type.R).build(), null, null))
     );
   }
 }

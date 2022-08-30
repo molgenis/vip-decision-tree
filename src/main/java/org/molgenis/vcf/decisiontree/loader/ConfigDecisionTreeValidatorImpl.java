@@ -89,20 +89,20 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
   private void validateExistsNode(String id, ConfigExistsNode node, Map<String, ConfigNode> nodes) {
     validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
     validateOutcome(id, OUTCOME_FALSE, nodes, node.getOutcomeFalse());
-    validateField(node.getField());
+    validateField(node.getField(), id);
   }
 
   private void validateBoolNode(String id, ConfigBoolNode node, Map<String, ConfigNode> nodes,
       Map<String, Path> files) {
     validateValue(id, node.getQuery(), files);
-    validateQueryValue(node.getQuery());
+    validateQueryValue(node.getQuery(), id);
     validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
     validateOutcome(id, OUTCOME_FALSE, nodes, node.getOutcomeFalse());
     validateOutcome(id, OUTCOME_MISSING, nodes, node.getOutcomeMissing());
   }
 
-  private void validateQueryValue(ConfigBoolQuery query) {
-    validateField(query.getField());
+  private void validateQueryValue(ConfigBoolQuery query, String nodeId) {
+    validateField(query.getField(), nodeId);
     if (List.of(CONTAINS_NONE, CONTAINS_ALL, CONTAINS_ANY, IN).contains(query.getOperator())) {
       Object value = query.getValue();
       if (!(value instanceof Collection<?>) && !value.toString().startsWith(FILE_PREFIX)
@@ -128,7 +128,7 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
     List<String> fields = node.getFields();
     for (ConfigBoolMultiQuery clause : node.getOutcomes()) {
       for (ConfigBoolQuery query : clause.getQueries()) {
-        validateQueryValue(query);
+        validateQueryValue(query, node.getId());
         if (!fields.contains(query.getField())) {
           throw new ConfigDecisionTreeValidationException(
               format(
@@ -193,10 +193,10 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
 
     validateOutcome(id, OUTCOME_DEFAULT, nodes, node.getOutcomeDefault());
     validateOutcome(id, OUTCOME_MISSING, nodes, node.getOutcomeMissing());
-    validateField(node.getField());
+    validateField(node.getField(), id);
   }
 
-  private void validateField(String field) {
+  private void validateField(String field, String nodeId) {
     List<String> fieldTokens = Arrays.asList(field.split(FIELD_TOKEN_SEPARATOR));
     FieldType fieldType = toFieldType(fieldTokens);
     if (fieldType == FieldType.SAMPLE) {
@@ -205,7 +205,8 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
       if (Arrays.stream(SampleFieldType.values()).map(SampleFieldType::name)
           .noneMatch(enumValue -> enumValue.equals(childField))) {
         throw new ConfigDecisionTreeValidationException(
-            format("Field '%s' is not a valid child of field '%s'.", childField, parentField));
+            format("Field '%s' is not a valid child of field '%s' in node '%s'.", childField,
+                parentField, nodeId));
       }
     } else if (fieldType == FieldType.GENOTYPE) {
       String parentField = fieldTokens.get(1);
@@ -213,7 +214,8 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
       if (Arrays.stream(GenotypeFieldType.values()).map(GenotypeFieldType::name)
           .noneMatch(enumValue -> enumValue.equals(childField))) {
         throw new ConfigDecisionTreeValidationException(
-            format("Field '%s' is not a valid child of field '%s'.", childField, parentField));
+            format("Field '%s' is not a valid child of field '%s' in node '%s'.", childField,
+                parentField, nodeId));
       }
     }
   }
