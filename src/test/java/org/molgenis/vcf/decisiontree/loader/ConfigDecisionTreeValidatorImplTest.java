@@ -9,6 +9,8 @@ import static org.mockito.Mockito.mock;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigClauseOperator.AND;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigClauseOperator.OR;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_ANY;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.CONTAINS_NONE;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.EQUALS;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
 
@@ -39,7 +41,7 @@ class ConfigDecisionTreeValidatorImplTest {
   void validateBoolNode() {
     ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
     ConfigBoolQuery configBoolQuery =
-        ConfigBoolQuery.builder().field("field").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
     ConfigBoolNode configBoolNode =
         ConfigBoolNode.builder()
@@ -56,10 +58,136 @@ class ConfigDecisionTreeValidatorImplTest {
   }
 
   @Test
+  void validateUnknownSampleField() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery =
+        ConfigBoolQuery.builder().field("SAMPLE/TEST").operator(EQUALS).value(1).build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolNode configBoolNode =
+        ConfigBoolNode.builder()
+            .query(configBoolQuery)
+            .outcomeTrue(configNodeOutcome)
+            .outcomeFalse(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .nodes(Map.of("node", configBoolNode, "exit", configLeafNode))
+            .build();
+    assertThrows(ConfigDecisionTreeValidationException.class,
+        () -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+  @Test
+  void validateValidSampleField() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery =
+        ConfigBoolQuery.builder().field("SAMPLE/FATHER_ID").operator(EQUALS).value(1).build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolNode configBoolNode =
+        ConfigBoolNode.builder()
+            .query(configBoolQuery)
+            .outcomeTrue(configNodeOutcome)
+            .outcomeFalse(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .nodes(Map.of("node", configBoolNode, "exit", configLeafNode))
+            .build();
+    assertDoesNotThrow(() -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+
+  @Test
+  void validateInvalidGenotypeField() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery =
+        ConfigBoolQuery.builder().field("FORMAT/GENOTYPE/TEST").operator(EQUALS).value(1).build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolNode configBoolNode =
+        ConfigBoolNode.builder()
+            .query(configBoolQuery)
+            .outcomeTrue(configNodeOutcome)
+            .outcomeFalse(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .nodes(Map.of("node", configBoolNode, "exit", configLeafNode))
+            .build();
+    assertThrows(ConfigDecisionTreeValidationException.class,
+        () -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+  @Test
+  void validateValidGenotypeField() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery =
+        ConfigBoolQuery.builder().field("FORMAT/GENOTYPE/PHASED").operator(EQUALS).value(1).build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolNode configBoolNode =
+        ConfigBoolNode.builder()
+            .query(configBoolQuery)
+            .outcomeTrue(configNodeOutcome)
+            .outcomeFalse(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .nodes(Map.of("node", configBoolNode, "exit", configLeafNode))
+            .build();
+    assertDoesNotThrow(() -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+  @Test
+  void validateValidListValueField() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery =
+        ConfigBoolQuery.builder().field("INFO/test").operator(CONTAINS_ANY).value(List.of(1, 2, 3))
+            .build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolNode configBoolNode =
+        ConfigBoolNode.builder()
+            .query(configBoolQuery)
+            .outcomeTrue(configNodeOutcome)
+            .outcomeFalse(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .nodes(Map.of("node", configBoolNode, "exit", configLeafNode))
+            .build();
+    assertDoesNotThrow(() -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+  @Test
+  void validateValidListInvalueField() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigBoolQuery configBoolQuery =
+        ConfigBoolQuery.builder().field("INFO/test").operator(CONTAINS_NONE).value(1).build();
+    ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
+    ConfigBoolNode configBoolNode =
+        ConfigBoolNode.builder()
+            .query(configBoolQuery)
+            .outcomeTrue(configNodeOutcome)
+            .outcomeFalse(configNodeOutcome)
+            .build();
+    ConfigDecisionTree configDecisionTree =
+        ConfigDecisionTree.builder()
+            .rootNode("node")
+            .nodes(Map.of("node", configBoolNode, "exit", configLeafNode))
+            .build();
+    assertThrows(ConfigDecisionTreeValidationException.class,
+        () -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+  @Test
   void validateBoolNodeFileValue() {
     ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
     ConfigBoolQuery configBoolQuery =
-        ConfigBoolQuery.builder().field("field").operator(IN).value(FILE_PREFIX+"testFile").build();
+        ConfigBoolQuery.builder().field("INFO/field").operator(IN).value(FILE_PREFIX + "testFile")
+            .build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
     ConfigBoolNode configBoolNode =
         ConfigBoolNode.builder()
@@ -80,9 +208,9 @@ class ConfigDecisionTreeValidatorImplTest {
   void validateBoolMultiNode() {
     ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
     ConfigBoolQuery configBoolQuery1 =
-        ConfigBoolQuery.builder().field("field1").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field1").operator(EQUALS).value(1).build();
     ConfigBoolQuery configBoolQuery2 =
-        ConfigBoolQuery.builder().field("field2").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
     ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
@@ -92,7 +220,7 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolMultiNode configBoolMultiNode =
         ConfigBoolMultiNode.builder()
             .id("node1")
-            .fields(List.of("field1", "field2"))
+            .fields(List.of("INFO/field1", "INFO/field2"))
             .outcomes(clauses)
             .outcomeDefault(configNodeOutcome)
             .outcomeMissing(configNodeOutcome)
@@ -109,9 +237,9 @@ class ConfigDecisionTreeValidatorImplTest {
   void validateBoolMultiNodeSingleOr() {
     ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
     ConfigBoolQuery configBoolQuery1 =
-        ConfigBoolQuery.builder().field("field1").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field1").operator(EQUALS).value(1).build();
     ConfigBoolQuery configBoolQuery2 =
-        ConfigBoolQuery.builder().field("field2").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
     ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
@@ -121,7 +249,7 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolMultiNode configBoolMultiNode =
         ConfigBoolMultiNode.builder()
             .id("node1")
-            .fields(List.of("field1", "field2"))
+            .fields(List.of("INFO/field1", "INFO/field2"))
             .outcomes(clauses)
             .outcomeDefault(configNodeOutcome)
             .outcomeMissing(configNodeOutcome)
@@ -139,9 +267,9 @@ class ConfigDecisionTreeValidatorImplTest {
   void validateBoolMultiNodeMissingOperator() {
     ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
     ConfigBoolQuery configBoolQuery1 =
-        ConfigBoolQuery.builder().field("field1").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field1").operator(EQUALS).value(1).build();
     ConfigBoolQuery configBoolQuery2 =
-        ConfigBoolQuery.builder().field("field2").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
     ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
@@ -151,7 +279,7 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolMultiNode configBoolMultiNode =
         ConfigBoolMultiNode.builder()
             .id("node1")
-            .fields(List.of("field1", "field2"))
+            .fields(List.of("INFO/field1", "INFO/field2"))
             .outcomes(clauses)
             .outcomeDefault(configNodeOutcome)
             .outcomeMissing(configNodeOutcome)
@@ -169,9 +297,9 @@ class ConfigDecisionTreeValidatorImplTest {
   void validateBoolMultiNodeFieldMismatch() {
     ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
     ConfigBoolQuery configBoolQuery1 =
-        ConfigBoolQuery.builder().field("field1").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field1").operator(EQUALS).value(1).build();
     ConfigBoolQuery configBoolQuery2 =
-        ConfigBoolQuery.builder().field("field2").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
     ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
@@ -181,7 +309,7 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolMultiNode configBoolMultiNode =
         ConfigBoolMultiNode.builder()
             .id("node1")
-            .fields(List.of("field1"))
+            .fields(List.of("INFO/field1"))
             .outcomes(clauses)
             .outcomeDefault(configNodeOutcome)
             .outcomeMissing(configNodeOutcome)
@@ -200,9 +328,9 @@ class ConfigDecisionTreeValidatorImplTest {
   void validateBoolMultiNodeNoQueries() {
     ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
     ConfigBoolQuery configBoolQuery1 =
-        ConfigBoolQuery.builder().field("field1").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field1").operator(EQUALS).value(1).build();
     ConfigBoolQuery configBoolQuery2 =
-        ConfigBoolQuery.builder().field("field2").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
     ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
@@ -212,7 +340,7 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolMultiNode configBoolMultiNode =
         ConfigBoolMultiNode.builder()
             .id("node1")
-            .fields(List.of("field1", "field2"))
+            .fields(List.of("INFO/field1", "INFO/field2"))
             .outcomes(clauses)
             .outcomeDefault(configNodeOutcome)
             .outcomeMissing(configNodeOutcome)
@@ -232,7 +360,7 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
     ConfigCategoricalNode categoricalNode =
         ConfigCategoricalNode.builder()
-            .field("field")
+            .field("INFO/field")
             .outcomeMap(Map.of("option", configNodeOutcome))
             .build();
     ConfigDecisionTree configDecisionTree =
@@ -275,7 +403,7 @@ class ConfigDecisionTreeValidatorImplTest {
   @Test
   void validateBooleanNodeOutcomeTrueNodeUnknown() {
     ConfigBoolQuery configBoolQuery =
-        ConfigBoolQuery.builder().field("field").operator(EQUALS).value(1).build();
+        ConfigBoolQuery.builder().field("INFO/field").operator(EQUALS).value(1).build();
     ConfigNodeOutcome unknownNode = ConfigNodeOutcome.builder().nextNode("unknownNode").build();
     ConfigBoolNode boolNode =
         ConfigBoolNode.builder()

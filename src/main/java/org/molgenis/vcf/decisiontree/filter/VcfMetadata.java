@@ -2,11 +2,10 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.COMMON;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.FORMAT;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.GENOTYPE;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
+import static org.molgenis.vcf.decisiontree.utils.VcfUtils.FIELD_TOKEN_SEPARATOR;
+import static org.molgenis.vcf.decisiontree.utils.VcfUtils.toFieldType;
 
 import htsjdk.variant.vcf.VCFCompoundHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
@@ -30,8 +29,6 @@ import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
  * {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields).
  */
 public class VcfMetadata {
-
-  private static final String FIELD_TOKEN_SEPARATOR = "/";
 
   private final VCFHeader vcfHeader;
   private final boolean strict;
@@ -128,29 +125,6 @@ public class VcfMetadata {
       throw new UnknownFieldException(nestedFieldId, INFO_VEP);
     }
     return nestedField;
-  }
-
-  private static FieldType toFieldType(List<String> fields) {
-    String rootField = fields.get(0);
-
-    FieldType fieldType;
-    switch (rootField) {
-      case "#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER":
-        fieldType = COMMON;
-        break;
-      case "INFO":
-        fieldType = fields.size() > 2 ? INFO_VEP : INFO;
-        break;
-      case "FORMAT":
-        fieldType = fields.size() > 2 ? GENOTYPE : FORMAT;
-        break;
-      case "SAMPLE":
-        fieldType = SAMPLE;
-        break;
-      default:
-        throw new UnsupportedFieldException(rootField);
-    }
-    return fieldType;
   }
 
   private FieldImpl toCommonField(List<String> fieldTokens) {
@@ -272,6 +246,10 @@ public class VcfMetadata {
         throw new UnexpectedEnumException(fieldType);
     }
     return vcfCompoundHeaderLine;
+  }
+
+  public static boolean isSingleValueField(Field field) {
+    return field.getValueCount().getType() == Type.FIXED && field.getValueCount().getCount() == 1;
   }
 
   public Map<String, Integer> getSampleNameToOffset() {

@@ -2,6 +2,12 @@ package org.molgenis.vcf.decisiontree.utils;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.COMMON;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.FORMAT;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.GENOTYPE;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFConstants;
@@ -9,11 +15,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
+import org.molgenis.vcf.decisiontree.filter.UnsupportedFieldException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.springframework.lang.Nullable;
 
 public class VcfUtils {
+
+  public static final String FIELD_TOKEN_SEPARATOR = "/";
 
   private VcfUtils() {
   }
@@ -258,5 +268,28 @@ public class VcfUtils {
       values.add(getTypedVcfValue(field, value));
     }
     return values;
+  }
+
+  public static FieldType toFieldType(List<String> fields) {
+    String rootField = fields.get(0);
+
+    FieldType fieldType;
+    switch (rootField) {
+      case "#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER":
+        fieldType = COMMON;
+        break;
+      case "INFO":
+        fieldType = fields.size() > 2 ? INFO_VEP : INFO;
+        break;
+      case "FORMAT":
+        fieldType = fields.size() > 2 ? GENOTYPE : FORMAT;
+        break;
+      case "SAMPLE":
+        fieldType = SAMPLE;
+        break;
+      default:
+        throw new UnsupportedFieldException(rootField);
+    }
+    return fieldType;
   }
 }
