@@ -25,5 +25,5 @@ public class BoolQuery {
 
   @NonNull Field field;
   @NonNull Operator operator;
-  @NonNull Object value;
+  Object value;
 }
