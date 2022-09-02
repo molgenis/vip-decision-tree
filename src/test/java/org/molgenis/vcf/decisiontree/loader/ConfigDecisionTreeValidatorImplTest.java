@@ -212,9 +212,9 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolQuery configBoolQuery2 =
         ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
-    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
+    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery("",
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
-    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery(
+    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery("",
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, OR);
     List<ConfigBoolMultiQuery> clauses = List.of(clause1, clause2);
     ConfigBoolMultiNode configBoolMultiNode =
@@ -241,9 +241,9 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolQuery configBoolQuery2 =
         ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
-    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
+    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery("",
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
-    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery(List.of(configBoolQuery1),
+    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery("", List.of(configBoolQuery1),
         configNodeOutcome, OR);
     List<ConfigBoolMultiQuery> clauses = List.of(clause1, clause2);
     ConfigBoolMultiNode configBoolMultiNode =
@@ -271,9 +271,9 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolQuery configBoolQuery2 =
         ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
-    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
+    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery("",
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
-    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery(
+    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery("",
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, null);
     List<ConfigBoolMultiQuery> clauses = List.of(clause1, clause2);
     ConfigBoolMultiNode configBoolMultiNode =
@@ -301,9 +301,9 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolQuery configBoolQuery2 =
         ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
-    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
+    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery("",
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
-    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery(
+    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery("",
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
     List<ConfigBoolMultiQuery> clauses = List.of(clause1, clause2);
     ConfigBoolMultiNode configBoolMultiNode =
@@ -332,9 +332,9 @@ class ConfigDecisionTreeValidatorImplTest {
     ConfigBoolQuery configBoolQuery2 =
         ConfigBoolQuery.builder().field("INFO/field2").operator(EQUALS).value(1).build();
     ConfigNodeOutcome configNodeOutcome = ConfigNodeOutcome.builder().nextNode("exit").build();
-    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery(
+    ConfigBoolMultiQuery clause1 = new ConfigBoolMultiQuery("",
         List.of(configBoolQuery1, configBoolQuery2), configNodeOutcome, AND);
-    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery(
+    ConfigBoolMultiQuery clause2 = new ConfigBoolMultiQuery("",
         emptyList(), configNodeOutcome, AND);
     List<ConfigBoolMultiQuery> clauses = List.of(clause1, clause2);
     ConfigBoolMultiNode configBoolMultiNode =

@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Value;
 
 @Value
@@ -15,6 +16,7 @@ import lombok.Value;
 public class ConfigBoolMultiQuery {
 
   String id = UUID.randomUUID().toString();
+  @NonNull String description;
   List<ConfigBoolQuery> queries;
   ConfigNodeOutcome outcomeTrue;
   ConfigClauseOperator operator;

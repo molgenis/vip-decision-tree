@@ -59,13 +59,14 @@
         "nextNode": "exit_remove"
       },
       "outcomeFalse": {
-        "nextNode": "gnomad_hn"
+        "nextNode": "gnomad_af"
       },
       "outcomeMissing": {
-        "nextNode": "gnomad_hn"
+        "nextNode": "gnomad_af"
       }
     },
     "spliceAI": {
+      "description": "SpliceAI",
       "type": "BOOL_MULTI",
       "fields": [
         "INFO/TEST/SpliceAI_pred_DS_AG",
@@ -75,6 +76,7 @@
       ],
       "outcomes": [
         {
+          "description": "Any SpliceAI score  > 0.42",
           "operator": "OR",
           "queries": [
             {
@@ -111,7 +113,7 @@
       }
     },
     "vkgl_mvl": {
-      "description": "MVL or VKGL Consensus -> keep LP/P, remove LB/B, VUS/Missing continue the tree.",
+      "description": "MVL or VKGL Consensus.",
       "type": "BOOL_MULTI",
       "fields": [
         "INFO/CSQ/VKGL_CL",
@@ -119,6 +121,7 @@
       ],
       "outcomes": [
         {
+          "description": "VKGL/MVL == P/LP",
           "operator": "OR",
           "queries": [
             {
@@ -143,6 +146,7 @@
           }
         },
         {
+          "description": "VKGL/MVL == B/LB",
           "operator": "OR",
           "queries": [
             {

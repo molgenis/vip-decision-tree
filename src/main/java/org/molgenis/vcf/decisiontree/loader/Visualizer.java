@@ -40,7 +40,8 @@ public class Visualizer {
     Map<String, Edge> edges = new HashMap<>();
 
     for (Entry<String, ConfigNode> entry : tree.getNodes().entrySet()) {
-      nodes.add(new Node(entry.getKey(), entry.getKey() + ":" + entry.getValue().getDescription(),
+      nodes.add(new Node(entry.getKey(), entry.getValue().getType() == Type.LEAF ? entry.getKey()
+          : entry.getValue().getDescription(),
           getCount(entry.getKey())));
       ConfigNode node = entry.getValue();
       if (node.getType() == Type.BOOL) {
@@ -54,11 +55,8 @@ public class Visualizer {
         ConfigBoolMultiNode boolMultiNode = (ConfigBoolMultiNode) node;
         Map<String, String> boolOutcomes = new HashMap<>();
         for (ConfigBoolMultiQuery configBoolMultiQuery : boolMultiNode.getOutcomes()) {
-          String label = "";
-          for (ConfigBoolQuery query : configBoolMultiQuery.getQueries()) {
-            label += queryToString(query);
-          }
-          boolOutcomes.put(label, configBoolMultiQuery.getOutcomeTrue().getNextNode());
+          boolOutcomes.put(configBoolMultiQuery.getDescription(),
+              configBoolMultiQuery.getOutcomeTrue().getNextNode());
         }
         boolOutcomes.put("default", boolMultiNode.getOutcomeDefault().getNextNode());
         boolOutcomes.put("missing", boolMultiNode.getOutcomeMissing().getNextNode());
@@ -76,11 +74,7 @@ public class Visualizer {
         processOutcomes(edges, entry, categoricalOutcomes);
       }
     }
-    visualize(nodes, edges, paths);
-  }
-
-  private static String queryToString(ConfigBoolQuery query) {
-    return String.format("%s %s %s", query.getField(), query.getOperator(), query.getOperator());
+    visualize(nodes, edges);
   }
 
   private static Integer getCount(String key) {
@@ -94,14 +88,11 @@ public class Visualizer {
     return count;
   }
 
-  private static void visualize(List<Node> nodes, Map<String, Edge> edges,
-      Map<String, AtomicInteger> paths) {
+  private static void visualize(List<Node> nodes, Map<String, Edge> edges) {
     for (String pathString : paths.keySet()) {
-      List<String> path = Arrays.asList(pathString.split("\\|"));
       StringBuilder html = new StringBuilder();
       for (Node node : nodes) {
-        boolean selected = path.contains(node.getId());
-        html.append(nodeToHtml(node, selected));
+        html.append(nodeToHtml(node));
         html.append("\n");
       }
       for (Edge edge : edges.values()) {
@@ -113,9 +104,8 @@ public class Visualizer {
             "C:\\Users\\bartc\\Documents\\git\\vip-decision-tree\\src\\main\\resources\\template.html"));
         String output = template.replace("DAGRE_GOES_HERE", html.toString());
         Files.writeString(Path.of(
-            String.format(
-                "C:\\Users\\bartc\\Documents\\git\\vip-decision-tree\\src\\main\\resources\\%s.html",
-                String.format("Tree_%s", String.join("_", path)))),
+                "C:\\Users\\bartc\\Documents\\git\\vip-decision-tree\\src\\main\\resources\\tree.html"
+            ),
             output);
       } catch (IOException e) {
         e.printStackTrace();
@@ -129,14 +119,9 @@ public class Visualizer {
             edge.getLabel());
   }
 
-  private static String nodeToHtml(Node node, boolean selected) {
-    if (selected) {
-      return String
-          .format("g.setNode(\"%s\", {label: \"%s\", style: \"fill: yellow\"});", node.getId(),
-              String.format("%s(%d)", node.getLabel(), node.getCount()));
-    }
+  private static String nodeToHtml(Node node) {
     return String.format("g.setNode(\"%s\", {label: \"%s\"});", node.getId(),
-        String.format("%s(%d)", node.getLabel(), node.getCount()));
+        String.format("%s", node.getLabel()));
   }
 
   private static void processOutcomes(Map<String, Edge> edges, Entry<String, ConfigNode> entry,
