@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
@@ -47,6 +50,19 @@ public class Visualizer {
         boolOutcomes.put("false", boolNode.getOutcomeFalse().getNextNode());
         boolOutcomes.put("missing", boolNode.getOutcomeMissing().getNextNode());
         processOutcomes(edges, entry, boolOutcomes);
+      } else if (node.getType() == Type.BOOL_MULTI) {
+        ConfigBoolMultiNode boolMultiNode = (ConfigBoolMultiNode) node;
+        Map<String, String> boolOutcomes = new HashMap<>();
+        for (ConfigBoolMultiQuery configBoolMultiQuery : boolMultiNode.getOutcomes()) {
+          String label = "";
+          for (ConfigBoolQuery query : configBoolMultiQuery.getQueries()) {
+            label += queryToString(query);
+          }
+          boolOutcomes.put(label, configBoolMultiQuery.getOutcomeTrue().getNextNode());
+        }
+        boolOutcomes.put("default", boolMultiNode.getOutcomeDefault().getNextNode());
+        boolOutcomes.put("missing", boolMultiNode.getOutcomeMissing().getNextNode());
+        processOutcomes(edges, entry, boolOutcomes);
       } else if (node.getType() == Type.CATEGORICAL) {
         ConfigCategoricalNode categoricalNode = (ConfigCategoricalNode) node;
         Map<String, String> categoricalOutcomes = new HashMap<>();
@@ -61,6 +77,10 @@ public class Visualizer {
       }
     }
     visualize(nodes, edges, paths);
+  }
+
+  private static String queryToString(ConfigBoolQuery query) {
+    return String.format("%s %s %s", query.getField(), query.getOperator(), query.getOperator());
   }
 
   private static Integer getCount(String key) {
