@@ -28,11 +28,10 @@ public class Visualizer {
 
   public static void main(String[] args) {
     paths.put("", new AtomicInteger(0));
-    getPaths();
     ConfigDecisionTreeValidator validator = new ConfigDecisionTreeValidatorImpl();
     ConfigDecisionTreeLoader loader = new ConfigDecisionTreeLoaderImpl(validator);
     ConfigDecisionTree tree = loader.load(Path.of(
-        "C:\\Users\\bartc\\Downloads\\decision_tree.json"));
+        "C:\\Users\\bartc\\Documents\\git\\vip-decision-tree\\src\\test\\resources\\example.json"));
 
     List<Node> nodes = new ArrayList<>();
     Map<String, Edge> edges = new HashMap<>();
@@ -132,26 +131,5 @@ public class Visualizer {
       }
       edges.put(id, new Edge(entry.getKey(), outcome.getValue(), label));
     }
-  }
-
-  private static Map<String, AtomicInteger> getPaths() {
-    VCFFileReader reader = new VCFFileReader(Path.of(
-        "C:\\Users\\bartc\\Documents\\git\\vip-decision-tree\\src\\test\\resources\\test_tree_out.vcf"),
-        false);
-    for (CloseableIterator<VariantContext> it = reader.iterator(); it.hasNext(); ) {
-      VariantContext context = it.next();
-      String path = context.getAttributeAsString("VIPP", "");
-      if (!path.isEmpty()) {
-        AtomicInteger counter;
-        if (!paths.containsKey(path)) {
-          counter = new AtomicInteger(0);
-        } else {
-          counter = paths.get(path);
-        }
-        counter.getAndIncrement();
-        paths.put(path, counter);
-      }
-    }
-    return paths;
   }
 }
