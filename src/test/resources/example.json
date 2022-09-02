@@ -1,139 +1,244 @@
 {
-  "rootNode": "capice_exists",
+  "rootNode": "filter",
   "nodes": {
-    "capice_exists": {
-      "type": "EXISTS",
-      "description": "CAPICE exists",
-      "field": "INFO/CAP",
-      "outcomeTrue": {
-        "nextNode": "capice",
-        "label": "capice_exists"
-      },
-      "outcomeFalse": {
-        "nextNode": "vkgl",
-        "label": "capice_not_exists"
-      }
-    },
-    "capice": {
+    "filter": {
       "type": "BOOL",
-      "description": "CAPICE score >= 0.9",
+      "description": "All filters passed",
       "query": {
-        "field": "INFO/CAP",
-        "operator": ">=",
-        "value": 0.9
+        "field": "FILTER",
+        "operator": "==",
+        "value": [
+          "PASS"
+        ]
       },
       "outcomeTrue": {
-        "nextNode": "done_include",
-        "label": "1"
+        "nextNode": "vkgl_mvl"
       },
       "outcomeFalse": {
-        "nextNode": "vkgl",
-        "label": "3"
+        "nextNode": "exit_remove"
       },
       "outcomeMissing": {
-        "nextNode": "gnomad",
-        "label": "2"
+        "nextNode": "vkgl_mvl"
       }
     },
-    "gnomad": {
+    "artefact": {
+      "type": "BOOL",
+      "description": "Artefact",
+      "query": {
+        "field": "INFO/CSQ/ARTEFACT",
+        "operator": "==",
+        "value": "1"
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_remove"
+      },
+      "outcomeFalse": {
+        "nextNode": "hla"
+      },
+      "outcomeMissing": {
+        "nextNode": "hla"
+      }
+    },
+    "hla": {
+      "type": "BOOL",
+      "description": "Is HLA gene",
+      "query": {
+        "field": "INFO/CSQ/GENE",
+        "operator": "contains_any",
+        "value": [
+          "3105",
+          "3106",
+          "3107",
+          "3123",
+          "3127",
+          "3117",
+          "3119"
+        ]
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_remove"
+      },
+      "outcomeFalse": {
+        "nextNode": "gnomad_hn"
+      },
+      "outcomeMissing": {
+        "nextNode": "gnomad_hn"
+      }
+    },
+    "spliceAI": {
+      "type": "BOOL_MULTI",
+      "fields": [
+        "INFO/TEST/SpliceAI_pred_DS_AG",
+        "INFO/TEST/SpliceAI_pred_DS_AL",
+        "INFO/TEST/SpliceAI_pred_DS_DG",
+        "INFO/TEST/SpliceAI_pred_DS_DL"
+      ],
+      "outcomes": [
+        {
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/TEST/SpliceAI_pred_DS_AG",
+              "operator": ">",
+              "value": 0.42
+            },
+            {
+              "field": "INFO/TEST/SpliceAI_pred_DS_AL",
+              "operator": ">",
+              "value": 0.42
+            },
+            {
+              "field": "INFO/TEST/SpliceAI_pred_DS_DG",
+              "operator": ">",
+              "value": 0.42
+            },
+            {
+              "field": "INFO/TEST/SpliceAI_pred_DS_DL",
+              "operator": ">",
+              "value": 0.42
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_keep"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "capice"
+      },
+      "outcomeMissing": {
+        "nextNode": "capice"
+      }
+    },
+    "vkgl_mvl": {
+      "description": "MVL or VKGL Consensus -> keep LP/P, remove LB/B, VUS/Missing continue the tree.",
+      "type": "BOOL_MULTI",
+      "fields": [
+        "INFO/CSQ/VKGL_CL",
+        "INFO/CSQ/VKGL_UMCG"
+      ],
+      "outcomes": [
+        {
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/CSQ/VKGL_CL",
+              "operator": "in",
+              "value": [
+                "P",
+                "LP"
+              ]
+            },
+            {
+              "field": "INFO/CSQ/VKGL_UMCG",
+              "operator": "in",
+              "value": [
+                "P",
+                "LP"
+              ]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_keep"
+          }
+        },
+        {
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/CSQ/VKGL_CL",
+              "operator": "in",
+              "value": [
+                "B",
+                "LB"
+              ]
+            },
+            {
+              "field": "INFO/CSQ/VKGL_UMCG",
+              "operator": "in",
+              "value": [
+                "B",
+                "LB"
+              ]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_remove"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "artefact"
+      },
+      "outcomeMissing": {
+        "nextNode": "artefact"
+      }
+    },
+    "gnomad_af": {
+      "description": "gnomAD AF < 0.5%",
       "type": "BOOL",
       "query": {
         "field": "INFO/CSQ/gnomAD_AF",
         "operator": "<",
-        "value": 0.01
+        "value": 0.005
       },
       "outcomeTrue": {
-        "nextNode": "snpEff"
+        "nextNode": "gnomad_hn"
       },
       "outcomeFalse": {
-        "nextNode": "done_exclude",
-        "label": "GNOMAD_F"
+        "nextNode": "exit_remove"
       },
       "outcomeMissing": {
-        "nextNode": "snpEff"
+        "nextNode": "gnomad_hn"
       }
     },
-    "snpEff": {
+    "gnomad_hn": {
       "type": "BOOL",
+      "description": "gnomAD Homozygote count > 5",
       "query": {
-        "field": "INFO/ANN/Annotation",
-        "operator": "==",
-        "value": [
-          "missense_variant"
-        ]
+        "field": "INFO/CSQ/gnomAD_HN",
+        "operator": ">",
+        "value": 5
       },
       "outcomeTrue": {
-        "nextNode": "done_include"
+        "nextNode": "exit_remove"
       },
       "outcomeFalse": {
-        "nextNode": "done_exclude"
+        "nextNode": "spliceAI"
       },
       "outcomeMissing": {
-        "nextNode": "done_include"
+        "nextNode": "spliceAI"
       }
     },
-    "vkgl": {
-      "type": "CATEGORICAL",
-      "field": "INFO/VKGL",
-      "outcomeMap": {
-        "LP": {
-          "nextNode": "genPanel"
-        },
-        "LB": {
-          "nextNode": "done_exclude",
-          "label": "LB"
-        },
-        "VUS": {
-          "nextNode": "done_exclude",
-          "label": "VUS"
-        }
-      },
-      "outcomeMissing": {
-        "nextNode": "done_include",
-        "label": "VKLG_MISSING"
-      },
-      "outcomeDefault": {
-        "nextNode": "done_exclude"
-      }
-    },
-    "genPanel": {
+    "capice": {
       "type": "BOOL",
+      "description": "CAPICE score < 0.15",
       "query": {
-        "field": "INFO/CSQ/SYMBOL",
-        "operator": "in",
-        "value": "file:panel"
+        "field": "INFO/CSQ/CAPICE_SC",
+        "operator": "<",
+        "value": 0.15
       },
       "outcomeTrue": {
-        "nextNode": "done_include"
+        "nextNode": "exit_remove"
       },
       "outcomeFalse": {
-        "nextNode": "done_include",
-        "label": "GNOMAD_F"
+        "nextNode": "exit_keep"
       },
       "outcomeMissing": {
-        "nextNode": "snpEff"
+        "nextNode": "exit_missing"
       }
     },
-    "done_include": {
+    "exit_keep": {
       "type": "LEAF",
-      "class": "in"
+      "class": "LP"
     },
-    "done_exclude": {
+    "exit_missing": {
       "type": "LEAF",
-      "class": "out"
-    }
-  },
-  "labels": {
-    "CAP_T": {
-      "description": "Capice filter true"
+      "class": "MISS"
     },
-    "CAP_F": {
-      "description": "Capice filter false"
-    }
-  },
-  "files": {
-    "panel": {
-      "path": "./src/test/resources/example.txt"
+    "exit_remove": {
+      "type": "LEAF",
+      "class": "LB"
     }
   }
 }
