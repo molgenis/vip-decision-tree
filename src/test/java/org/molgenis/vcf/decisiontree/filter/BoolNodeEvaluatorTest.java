@@ -7,11 +7,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
+import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
@@ -593,6 +595,99 @@ class BoolNodeEvaluatorTest {
 
     Variant variant = mock(Variant.class);
     when(variant.getValue(field, null)).thenReturn(List.of());
+    assertEquals(outcomeMissing, boolNodeEvaluator.evaluate(node, variant, null));
+  }
+
+  @Test
+  void evaluateEqualsFieldNullValue() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.EQUALS;
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value("field:INFO/TEST").build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class, "outcomeTrue");
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class, "outcomeFalse");
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    VcfMetadata vcfMetadata = mock(VcfMetadata.class);
+    Field valueField = mock(FieldImpl.class);
+    when(valueField.getValueType()).thenReturn(ValueType.STRING);
+    when(vcfMetadata.getField("INFO/TEST")).thenReturn(valueField);
+    when(variant.getVcfMetadata()).thenReturn(vcfMetadata);
+    when(variant.getValue(field, null)).thenReturn("str0");
+    when(variant.getValue(valueField, null)).thenReturn(null);
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant, null));
+  }
+
+  @Test
+  void evaluateEqualsFieldValue() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.EQUALS;
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value("field:INFO/TEST").build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class, "outcomeTrue");
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class, "outcomeFalse");
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    VcfMetadata vcfMetadata = mock(VcfMetadata.class);
+    Field valueField = mock(FieldImpl.class);
+    when(valueField.getValueType()).thenReturn(ValueType.STRING);
+    when(vcfMetadata.getField("INFO/TEST")).thenReturn(valueField);
+    when(variant.getVcfMetadata()).thenReturn(vcfMetadata);
+    when(variant.getValue(field, null)).thenReturn("str0");
+    when(variant.getValue(valueField, null)).thenReturn("str0");
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
+  }
+
+  @Test
+  void evaluateEqualsFieldMissingValue() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.EQUALS;
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value("field:INFO/TEST").build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class, "outcomeTrue");
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class, "outcomeFalse");
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    VcfMetadata vcfMetadata = mock(VcfMetadata.class);
+    Field valueField = mock(FieldImpl.class);
+    when(valueField.getValueType()).thenReturn(ValueType.STRING);
+    when(vcfMetadata.getField("INFO/TEST")).thenReturn(valueField);
+    when(variant.getVcfMetadata()).thenReturn(vcfMetadata);
+    when(variant.getValue(field, null)).thenReturn(null);
+    when(variant.getValue(valueField, null)).thenReturn("str0");
     assertEquals(outcomeMissing, boolNodeEvaluator.evaluate(node, variant, null));
   }
 }

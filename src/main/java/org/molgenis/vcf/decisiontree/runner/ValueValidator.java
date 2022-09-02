@@ -120,7 +120,7 @@ public class ValueValidator {
       if (!isSingleValueField(field) && List.of(EQUALS, NOT_EQUALS).contains(operator)) {
         throw new ConfigDecisionTreeValidationException(
             format(
-                "Field '%s' in node '%s' contains a collection of values, therefor the '%s' query value should also have a collection as value.",
+                "Field '%s' in node '%s' contains a collection of values, therefore the '%s' query value should also have a collection as value.",
                 field.getId(), nodeId, operator));
       }
       validateSingleValue(nodeId, value, field.getValueType());
