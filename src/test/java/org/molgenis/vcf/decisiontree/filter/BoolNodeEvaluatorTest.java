@@ -15,6 +15,8 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
+import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
+import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 
 class BoolNodeEvaluatorTest {
@@ -48,8 +50,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(-1);
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(-1);
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -74,8 +76,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(0);
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(0);
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -100,8 +102,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(1.23);
-    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(1.23);
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -126,8 +128,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(-1);
-    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(-1);
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -152,8 +154,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(1.23);
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(1.23);
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -178,8 +180,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(0. + 1E-6);
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(0. + 1E-6);
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -204,8 +206,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn("str0");
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn("str0");
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -230,8 +232,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn("str0");
-    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn("str0");
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -256,8 +258,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(List.of("str0", "str1", "str2"));
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(List.of("str0", "str1", "str2"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -282,8 +284,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(List.of("str0", "str1", "str2"));
-    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(List.of("str0", "str1", "str2"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -308,8 +310,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn("str1");
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn("str1");
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -334,8 +336,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(2);
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(2);
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -360,8 +362,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -386,8 +388,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
-    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -412,8 +414,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -438,8 +440,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
-    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -464,8 +466,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
-    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -490,8 +492,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    when(variant.getValue(field)).thenReturn(asList("test1", "test2", "test3"));
-    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant));
+    when(variant.getValue(field, null)).thenReturn(asList("test1", "test2", "test3"));
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -516,7 +518,7 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    assertEquals(outcomeMissing, boolNodeEvaluator.evaluate(node, variant));
+    assertEquals(outcomeMissing, boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -539,7 +541,8 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    assertThrows(EvaluationException.class, () -> boolNodeEvaluator.evaluate(node, variant));
+    assertThrows(EvaluationException.class, () -> boolNodeEvaluator.evaluate(node, variant,
+        null));
   }
 
   @Test
@@ -563,6 +566,33 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    assertEquals(outcomeMissing, boolNodeEvaluator.evaluate(node, variant));
+    assertEquals(outcomeMissing, boolNodeEvaluator.evaluate(node, variant, null));
+  }
+
+  @Test
+  void evaluateMissingValueCountVariable() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+    when(field.getValueCount()).thenReturn(ValueCount.builder().type(Type.VARIABLE).build());
+
+    Operator operator = Operator.EQUALS;
+    List<String> queryValue = List.of("PASS");
+    BoolQuery boolQuery =
+        BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+        BoolNode.builder()
+            .id("bool_node")
+            .query(boolQuery)
+            .outcomeTrue(outcomeTrue)
+            .outcomeFalse(outcomeFalse)
+            .outcomeMissing(outcomeMissing)
+            .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field, null)).thenReturn(List.of());
+    assertEquals(outcomeMissing, boolNodeEvaluator.evaluate(node, variant, null));
   }
 }

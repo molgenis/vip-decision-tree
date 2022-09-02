@@ -5,6 +5,8 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.springframework.lang.Nullable;
 
 @Value
 @Builder
@@ -16,7 +18,11 @@ public class Variant {
   @NonNull Allele allele;
 
   public Object getValue(Field field) {
-    return vcfRecord.getValue(field, allele);
+    return vcfRecord.getValue(field, allele, null);
+  }
+
+  public Object getValue(Field field, @Nullable SampleContext sampleContext) {
+    return vcfRecord.getValue(field, allele, sampleContext);
   }
 
   public String toDisplayString() {

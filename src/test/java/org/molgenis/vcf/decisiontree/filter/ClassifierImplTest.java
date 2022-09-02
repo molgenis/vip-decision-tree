@@ -4,10 +4,10 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.molgenis.vcf.decisiontree.filter.Variant.builder;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,58 +16,107 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
+import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
+import org.molgenis.vcf.decisiontree.filter.model.FieldType;
+import org.molgenis.vcf.decisiontree.filter.model.NestedField;
+import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
+import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
+import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.decisiontree.runner.VepHelper;
+import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 
 @ExtendWith(MockitoExtension.class)
 class ClassifierImplTest {
 
   @Mock
   private DecisionTreeExecutor decisionTreeExecutor;
-  private ClassifierImpl classifier;
+  @Mock
+  private VcfMetadata vcfMetadata;
+  @Mock
+  private VcfReader vcfReader;
+  @Mock
+  private DecisionTree decisionTree;
+  @Mock
+  private RecordWriter recordWriter;
+  @Mock
+  private ConsequenceAnnotator consequenceAnnotator;
+  @Mock
+  private VepHelper vepHelper;
+
+  private Classifier classifier;
+  private FieldImpl parent;
+  private NestedHeaderLine nestedHeaderLine;
 
   @BeforeEach
   void setUp() {
-    classifier = new ClassifierImpl(decisionTreeExecutor);
+    ValueCount valueCount = ValueCount.builder().type(Type.VARIABLE).build();
+    parent = FieldImpl.builder().id("VEP").fieldType(FieldType.INFO)
+        .valueType(ValueType.STRING).valueCount(valueCount).separator('|').build();
+    NestedField nestedField1 = NestedField.nestedBuilder().id("ALLELE_NUM").parent(parent)
+        .fieldType(FieldType.INFO_VEP)
+        .valueType(ValueType.STRING).valueCount(valueCount).build();
+    NestedField nestedField2 = NestedField.nestedBuilder().id("effect").parent(parent)
+        .fieldType(FieldType.INFO_VEP)
+        .valueType(ValueType.STRING).valueCount(valueCount).build();
+    Map<String, NestedField> nestedFields = Map.of("field1", nestedField1, "ALLELE_NUM",
+        nestedField2);
+    nestedHeaderLine = NestedHeaderLine.builder().parentField(parent)
+        .nestedFields(nestedFields).build();
+    when(vcfMetadata.getVepHeaderLine()).thenReturn(nestedHeaderLine);
+    classifier = new ClassifierImpl(decisionTreeExecutor, vepHelper, decisionTree,
+        consequenceAnnotator, recordWriter, vcfMetadata);
   }
 
   @Test
   void classify() {
-    VcfMetadata vcfMetadata = mock(VcfMetadata.class);
+    VcfRecord record0 = mock(VcfRecord.class, "record0");
+    org.molgenis.vcf.decisiontree.filter.Allele allele0_1 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
+        .bases("G").index(0).build();
+    when(record0.getAltAllele(0)).thenReturn(allele0_1);
 
-    VcfReader vcfReader = mock(VcfReader.class);
+    when(record0.getNrAltAlleles()).thenReturn(1);
+    VcfRecord record1 = mock(VcfRecord.class, "record1");
+    when(record1.getNrAltAlleles()).thenReturn(2);
+    org.molgenis.vcf.decisiontree.filter.Allele allele1_1 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
+        .bases("G").index(0).build();
+    org.molgenis.vcf.decisiontree.filter.Allele allele1_2 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
+        .bases("T").index(1).build();
+    when(record1.getAltAllele(0)).thenReturn(allele1_1);
+    when(record1.getAltAllele(1)).thenReturn(allele1_2);
 
-    Allele allele0 = mock(Allele.class);
-    VcfRecord record0 = when(mock(VcfRecord.class).getNrAltAlleles()).thenReturn(1).getMock();
-    when(record0.getAltAllele(0)).thenReturn(allele0);
-
-    Allele allele1 = mock(Allele.class);
-    Allele allele2 = mock(Allele.class);
-    VcfRecord record1 = when(mock(VcfRecord.class).getNrAltAlleles()).thenReturn(2).getMock();
-    doReturn(allele1).when(record1).getAltAllele(0);
-    doReturn(allele2).when(record1).getAltAllele(1);
     when(vcfReader.stream()).thenReturn(Stream.of(record0, record1));
-    when(vcfReader.getMetadata()).thenReturn(vcfMetadata);
 
-    DecisionTree decisionTree = mock(DecisionTree.class);
+    VcfRecord record0a = mock(VcfRecord.class, "record0a");
+    when(record0a.getVepValues(parent)).thenReturn(List.of(""));
+    VcfRecord record1a = mock(VcfRecord.class, "record1a");
+    when(record1a.getVepValues(parent)).thenReturn(List.of(""));
+    VcfRecord record1b = mock(VcfRecord.class, "record1b");
+    when(record1b.getVepValues(parent)).thenReturn(List.of(""));
+    Map<Integer, List<VcfRecord>> recordMap0 = Map.of(1, List.of(record0a));
+    Map<Integer, List<VcfRecord>> recordMap1 = Map.of(1, List.of(record1a), 2,
+        List.of(record1b));
+    when(vepHelper.getRecordPerConsequence(record0,
+        nestedHeaderLine)).thenReturn(recordMap0);
+    when(vepHelper.getRecordPerConsequence(record1,
+        nestedHeaderLine)).thenReturn(recordMap1);
+    Decision decision1a = Decision.builder().clazz("test1a").path(List.of())
+        .labels(Set.of()).build();
+    Decision decision2a = Decision.builder().clazz("test2a").path(List.of())
+        .labels(Set.of()).build();
+    Decision decision2b = Decision.builder().clazz("test2b").path(List.of())
+        .labels(Set.of()).build();
 
-    Variant variant0 =
-        builder().vcfMetadata(vcfMetadata).vcfRecord(record0).allele(allele0).build();
-    Decision decision0 = mock(Decision.class);
-    doReturn(decision0).when(decisionTreeExecutor).execute(decisionTree, variant0);
+    doReturn(decision1a).when(decisionTreeExecutor)
+        .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1));
+    doReturn(decision2a).when(decisionTreeExecutor)
+        .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1));
+    doReturn(decision2b).when(decisionTreeExecutor)
+        .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2));
 
-    Variant variant1 =
-        builder().vcfMetadata(vcfMetadata).vcfRecord(record1).allele(allele1).build();
-    Decision decision1 = mock(Decision.class);
-    doReturn(decision1).when(decisionTreeExecutor).execute(decisionTree, variant1);
+    classifier.classify(vcfReader);
 
-    Variant variant2 =
-        builder().vcfMetadata(vcfMetadata).vcfRecord(record1).allele(allele2).build();
-    Decision decision2 = mock(Decision.class);
-    doReturn(decision2).when(decisionTreeExecutor).execute(decisionTree, variant2);
-
-    DecisionWriter writer = mock(DecisionWriter.class);
-    classifier.classify(vcfReader, decisionTree, writer);
-
-    verify(writer).write(Collections.singletonList(decision0), record0);
-    verify(writer).write(List.of(decision1, decision2), record1);
+    verify(consequenceAnnotator).annotate(decision1a, "");
+    verify(consequenceAnnotator).annotate(decision2a, "");
+    verify(consequenceAnnotator).annotate(decision2b, "");
   }
 }

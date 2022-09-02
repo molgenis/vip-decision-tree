@@ -4,9 +4,12 @@ import static java.lang.String.format;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+import org.molgenis.vcf.decisiontree.filter.model.Mode;
 
 class AppCommandLineOptions {
 
@@ -28,6 +31,14 @@ class AppCommandLineOptions {
   static final String OPT_VERSION_LONG = "version";
   static final String OPT_STRICT = "s";
   static final String OPT_STRICT_LONG = "strict";
+  static final String OPT_PROBANDS = "pb";
+  static final String OPT_PROBANDS_LONG = "probands";
+  static final String OPT_PED = "pd";
+  static final String OPT_PED_LONG = "pedigree";
+  static final String OPT_PHENOTYPES = "ph";
+  static final String OPT_PHENOTYPES_LONG = "phenotypes";
+  static final String OPT_MODE = "m";
+  static final String OPT_MODE_LONG = "mode";
   private static final Options APP_OPTIONS;
   private static final Options APP_VERSION_OPTIONS;
 
@@ -38,7 +49,7 @@ class AppCommandLineOptions {
             .hasArg(true)
             .required()
             .longOpt(OPT_INPUT_LONG)
-            .desc("Input VCF file (.vcf or .vcf.gz).")
+            .desc("VEP* annotated input VCF file.")
             .build());
     appOptions.addOption(
         Option.builder(OPT_CONFIG)
@@ -79,6 +90,32 @@ class AppCommandLineOptions {
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging).")
             .build());
+    appOptions.addOption(
+        Option.builder(OPT_PROBANDS)
+            .hasArg(true)
+            .longOpt(OPT_PROBANDS_LONG)
+            .desc("Comma-separated list of proband names.")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_PED)
+            .hasArg(true)
+            .longOpt(OPT_PED_LONG)
+            .desc("Comma-separated list of pedigree files (.ped).")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_PHENOTYPES)
+            .hasArg(true)
+            .longOpt(OPT_PHENOTYPES_LONG)
+            .desc(
+                "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
+            .build());
+    appOptions.addOption(
+        Option.builder(OPT_MODE)
+            .hasArg(true)
+            .longOpt(OPT_MODE_LONG)
+            .desc(
+                "Run mode: 'variant' (default) or 'sample', 'sample' mode classifies provided probands, or all samples if no probands given.")
+            .build());
     APP_OPTIONS = appOptions;
     Options appVersionOptions = new Options();
     appVersionOptions.addOption(
@@ -104,21 +141,22 @@ class AppCommandLineOptions {
     validateInput(commandLine);
     validateConfig(commandLine);
     validateOutput(commandLine);
+    validateMode(commandLine);
   }
 
   private static void validateInput(CommandLine commandLine) {
     Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
     if (!Files.exists(inputPath)) {
       throw new IllegalArgumentException(
-          format("Input file '%s' does not exist.", inputPath.toString()));
+          format("Input file '%s' does not exist.", inputPath));
     }
     if (Files.isDirectory(inputPath)) {
       throw new IllegalArgumentException(
-          format("Input file '%s' is a directory.", inputPath.toString()));
+          format("Input file '%s' is a directory.", inputPath));
     }
     if (!Files.isReadable(inputPath)) {
       throw new IllegalArgumentException(
-          format("Input file '%s' is not readable.", inputPath.toString()));
+          format("Input file '%s' is not readable.", inputPath));
     }
     String inputPathStr = inputPath.toString();
     if (!inputPathStr.endsWith(".vcf") && !inputPathStr.endsWith(".vcf.gz")) {
@@ -157,7 +195,22 @@ class AppCommandLineOptions {
 
     if (!commandLine.hasOption(OPT_FORCE) && Files.exists(outputPath)) {
       throw new IllegalArgumentException(
-          format("Output file '%s' already exists", outputPath.toString()));
+          format("Output file '%s' already exists", outputPath));
+    }
+  }
+
+  private static void validateMode(CommandLine commandLine) {
+    if (!commandLine.hasOption(OPT_MODE)) {
+      return;
+    }
+
+    String mode = commandLine.getOptionValue(OPT_MODE);
+    List<String> modes = Arrays.stream(Mode.values()).map(Mode::toString)
+        .toList();
+
+    if (!modes.contains(mode.toUpperCase())) {
+      throw new IllegalArgumentException(
+          "Illegal 'mode' argument '%s', only 'variant' and 'sample' are allowed.".formatted(mode));
     }
   }
 }

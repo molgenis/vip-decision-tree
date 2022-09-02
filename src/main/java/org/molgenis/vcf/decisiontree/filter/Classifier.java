@@ -1,7 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
-
 public interface Classifier {
-  void classify(VcfReader vcfReader, DecisionTree decisionTree, DecisionWriter decisionWriter);
+
+  void classify(VcfReader vcfReader);
 }

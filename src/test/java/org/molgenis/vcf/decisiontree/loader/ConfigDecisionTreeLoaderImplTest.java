@@ -31,7 +31,7 @@ class ConfigDecisionTreeLoaderImplTest {
     verify(configDecisionTreeValidator).validate(configDecisionTree);
     Assertions.assertAll(
         () -> assertEquals("my_score", configDecisionTree.getRootNode()),
-        () -> assertEquals(4, configDecisionTree.getNodes().size()),
+        () -> assertEquals(5, configDecisionTree.getNodes().size()),
         () -> assertEquals(1, configDecisionTree.getLabels().size()));
   }
 }

@@ -2,26 +2,35 @@ package org.molgenis.vcf.decisiontree.utils;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.COMMON;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.FORMAT;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.GENOTYPE;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
+import org.molgenis.vcf.decisiontree.filter.UnsupportedFieldException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
+import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.springframework.lang.Nullable;
 
 public class VcfUtils {
+
+  public static final String FIELD_TOKEN_SEPARATOR = "/";
 
   private VcfUtils() {
   }
 
   public static Integer getInfoAsInteger(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
-    return getInfoValueAsInteger(value);
+    return getVcfValueAsInteger(value);
   }
 
   public static List<Integer> getInfoAsIntegerList(VariantContext variantContext, Field field) {
@@ -30,21 +39,20 @@ public class VcfUtils {
     Object value = variantContext.getAttribute(field.getId());
     if (value == null) {
       integerValues = List.of();
-    } else if (value instanceof List<?>) {
-      List<?> objectValues = (List<?>) value;
+    } else if (value instanceof List<?> objectValues) {
       int size = objectValues.size();
       if (size == 0) {
         integerValues = emptyList();
       } else if (size == 1) {
-        integerValues = singletonList(getInfoValueAsInteger(objectValues.get(0)));
+        integerValues = singletonList(getVcfValueAsInteger(objectValues.get(0)));
       } else {
         integerValues = new ArrayList<>(objectValues.size());
         for (Object objValue : objectValues) {
-          integerValues.add(getInfoValueAsInteger(objValue));
+          integerValues.add(getVcfValueAsInteger(objValue));
         }
       }
-    } else if (value instanceof String) {
-      integerValues = singletonList(getInfoStringValueAsInteger((String) value));
+    } else if (value instanceof String stringValue) {
+      integerValues = singletonList(getInfoStringValueAsInteger(stringValue));
     } else {
       throw new TypeConversionException(value, Integer.class);
     }
@@ -53,14 +61,14 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  Integer getInfoValueAsInteger(@Nullable Object objValue) {
+  Integer getVcfValueAsInteger(@Nullable Object objValue) {
     Integer intValue;
     if (objValue == null) {
       intValue = null;
-    } else if (objValue instanceof Integer) {
-      intValue = (Integer) objValue;
-    } else if (objValue instanceof String) {
-      intValue = getInfoStringValueAsInteger((String) objValue);
+    } else if (objValue instanceof Integer integer) {
+      intValue = integer;
+    } else if (objValue instanceof String stringValue) {
+      intValue = getInfoStringValueAsInteger(stringValue);
     } else {
       throw new TypeConversionException(objValue, Integer.class);
     }
@@ -80,7 +88,7 @@ public class VcfUtils {
 
   public static Double getInfoAsDouble(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
-    return getInfoValueAsDouble(value);
+    return getVcfValueAsDouble(value);
   }
 
   public static List<Double> getInfoAsDoubleList(VariantContext variantContext, Field field) {
@@ -89,21 +97,20 @@ public class VcfUtils {
     Object value = variantContext.getAttribute(field.getId());
     if (value == null) {
       doubleValues = List.of();
-    } else if (value instanceof List<?>) {
-      List<?> objectValues = (List<?>) value;
+    } else if (value instanceof List<?> objectValues) {
       int size = objectValues.size();
       if (size == 0) {
         doubleValues = emptyList();
       } else if (size == 1) {
-        doubleValues = singletonList(getInfoValueAsDouble(objectValues.get(0)));
+        doubleValues = singletonList(getVcfValueAsDouble(objectValues.get(0)));
       } else {
         doubleValues = new ArrayList<>(objectValues.size());
         for (Object objValue : objectValues) {
-          doubleValues.add(getInfoValueAsDouble(objValue));
+          doubleValues.add(getVcfValueAsDouble(objValue));
         }
       }
-    } else if (value instanceof String) {
-      doubleValues = singletonList(getInfoStringValueAsDouble((String) value));
+    } else if (value instanceof String string) {
+      doubleValues = singletonList(getInfoStringValueAsDouble(string));
     } else {
       throw new TypeConversionException(value, Double.class);
     }
@@ -112,14 +119,14 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  Double getInfoValueAsDouble(@Nullable Object objValue) {
+  Double getVcfValueAsDouble(@Nullable Object objValue) {
     Double doubleValue;
     if (objValue == null) {
       doubleValue = null;
-    } else if (objValue instanceof Double) {
-      doubleValue = (Double) objValue;
-    } else if (objValue instanceof String) {
-      doubleValue = getInfoStringValueAsDouble((String) objValue);
+    } else if (objValue instanceof Double doubleVal) {
+      doubleValue = doubleVal;
+    } else if (objValue instanceof String string) {
+      doubleValue = getInfoStringValueAsDouble(string);
     } else {
       throw new TypeConversionException(objValue, Double.class);
     }
@@ -139,7 +146,7 @@ public class VcfUtils {
 
   public static String getInfoAsString(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
-    return getInfoValueAsString(value);
+    return getVcfValueAsString(value);
   }
 
   public static List<String> getInfoAsStringList(VariantContext variantContext, Field field) {
@@ -156,21 +163,20 @@ public class VcfUtils {
     Object value = variantContext.getAttribute(id);
     if (value == null) {
       strValues = List.of();
-    } else if (value instanceof List<?>) {
-      List<?> objectValues = (List<?>) value;
+    } else if (value instanceof List<?> objectValues) {
       int size = objectValues.size();
       if (size == 0) {
         strValues = emptyList();
       } else if (size == 1) {
-        strValues = singletonList(getInfoValueAsString(objectValues.get(0)));
+        strValues = singletonList(getVcfValueAsString(objectValues.get(0)));
       } else {
         strValues = new ArrayList<>(objectValues.size());
         for (Object objValue : objectValues) {
-          strValues.add(getInfoValueAsString(objValue));
+          strValues.add(getVcfValueAsString(objValue));
         }
       }
-    } else if (value instanceof String) {
-      strValues = singletonList(getInfoStringValueAsString((String) value));
+    } else if (value instanceof String string) {
+      strValues = singletonList(getInfoStringValueAsString(string));
     } else {
       throw new TypeConversionException(value, String.class);
     }
@@ -179,12 +185,12 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  String getInfoValueAsString(@Nullable Object objValue) {
+  String getVcfValueAsString(@Nullable Object objValue) {
     String strValue;
     if (objValue == null) {
       strValue = null;
-    } else if (objValue instanceof String) {
-      strValue = getInfoStringValueAsString((String) objValue);
+    } else if (objValue instanceof String string) {
+      strValue = getInfoStringValueAsString(string);
     } else {
       throw new TypeConversionException(objValue, String.class);
     }
@@ -204,16 +210,16 @@ public class VcfUtils {
 
   public static boolean getInfoAsBoolean(VariantContext variantContext, Field field) {
     Object objValue = variantContext.getAttribute(field.getId());
-    return getInfoValueAsBoolean(objValue);
+    return getVcfValueAsBoolean(objValue);
   }
 
-  private static boolean getInfoValueAsBoolean(Object objValue) {
+  private static boolean getVcfValueAsBoolean(Object objValue) {
     boolean bool;
 
     if (objValue == null) {
       bool = false;
-    } else if (objValue instanceof Boolean) {
-      bool = (Boolean) objValue;
+    } else if (objValue instanceof Boolean boolVal) {
+      bool = boolVal;
     } else {
       throw new TypeConversionException(objValue, Boolean.class);
     }
@@ -221,37 +227,69 @@ public class VcfUtils {
     return bool;
   }
 
-  public static Object getTypedInfoValue(Field field, String stringValue, String separator) {
+  public static Object getTypedVcfValue(Field field, String stringValue, String separator) {
     Object value;
-    if(separator == null){
-      value = getTypedInfoValue(field, stringValue);
-    }else{
+    if (separator == null) {
+      value = getTypedVcfValue(field, stringValue);
+    } else {
       List<String> values = Arrays.asList(stringValue.split(separator));
-      value = values.stream().map(singleValue -> getTypedInfoValue(field, singleValue)).collect(Collectors.toList());
+      value = values.stream().map(singleValue -> getTypedVcfValue(field, singleValue)).toList();
     }
     return value;
   }
 
-    public static Object getTypedInfoValue(Field field, String stringValue) {
-      Object typedValue;
-      ValueType valueType = field.getValueType();
-      switch (valueType) {
-        case INTEGER:
-          typedValue = VcfUtils.getInfoValueAsInteger(stringValue);
-          break;
-        case FLAG:
-          typedValue = VcfUtils.getInfoValueAsBoolean(stringValue);
-          break;
-        case FLOAT:
-          typedValue = VcfUtils.getInfoValueAsDouble(stringValue);
-          break;
-        case CHARACTER:
-        case STRING:
-          typedValue = VcfUtils.getInfoValueAsString(stringValue);
-          break;
-        default:
-          throw new UnexpectedEnumException(valueType);
-      }
-      return typedValue;
+  public static Object getTypedVcfValue(Field field, String stringValue) {
+    Object typedValue;
+    ValueType valueType = field.getValueType();
+    switch (valueType) {
+      case INTEGER:
+        typedValue = VcfUtils.getVcfValueAsInteger(stringValue);
+        break;
+      case FLAG:
+        typedValue = VcfUtils.getVcfValueAsBoolean(stringValue);
+        break;
+      case FLOAT:
+        typedValue = VcfUtils.getVcfValueAsDouble(stringValue);
+        break;
+      case CHARACTER, STRING:
+        typedValue = VcfUtils.getVcfValueAsString(stringValue);
+        break;
+      default:
+        throw new UnexpectedEnumException(valueType);
     }
+    return typedValue;
+  }
+
+
+  public static Object getTypedVcfListValue(Field field, String stringValue) {
+    String[] stringValues = stringValue.split(",");
+    List<Object> values = new ArrayList<>();
+    for (String value : stringValues) {
+      values.add(getTypedVcfValue(field, value));
+    }
+    return values;
+  }
+
+  public static FieldType toFieldType(List<String> fields) {
+    String rootField = fields.get(0);
+
+    FieldType fieldType;
+    switch (rootField) {
+      case "#CHROM", "POS", "ID", "REF", "ALT", "QUAL", "FILTER":
+        fieldType = COMMON;
+        break;
+      case "INFO":
+        fieldType = fields.size() > 2 ? INFO_VEP : INFO;
+        break;
+      case "FORMAT":
+        fieldType = fields.size() > 2 ? GENOTYPE : FORMAT;
+        break;
+      case "SAMPLE":
+        fieldType = SAMPLE;
+        break;
+      default:
+        throw new UnsupportedFieldException(rootField);
+    }
+    return fieldType;
+  }
 }

@@ -16,6 +16,7 @@ import lombok.experimental.NonFinal;
 @AllArgsConstructor
 @NonFinal
 public class ConfigDecisionTree {
+
   @NonNull String rootNode;
   @NonNull Map<String, ConfigNode> nodes;
   Map<String, ConfigLabel> labels;

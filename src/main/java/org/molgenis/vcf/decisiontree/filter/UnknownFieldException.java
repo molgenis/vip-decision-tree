@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
 
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 
@@ -12,8 +13,8 @@ public class UnknownFieldException extends
   private final FieldType type;
 
   public UnknownFieldException(String field, FieldType type) {
-    this.field = field;
-    this.type = type;
+    this.field = requireNonNull(field);
+    this.type = requireNonNull(type);
   }
 
   @Override

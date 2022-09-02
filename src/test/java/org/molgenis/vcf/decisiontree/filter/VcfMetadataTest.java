@@ -2,7 +2,6 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -11,8 +10,8 @@ import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,8 +28,7 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.runner.info.NestedInfoHeaderLine;
-import org.molgenis.vcf.decisiontree.runner.info.VcfNestedMetadata;
+import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 
 @ExtendWith(MockitoExtension.class)
 class VcfMetadataTest {
@@ -46,12 +44,15 @@ class VcfMetadataTest {
     vepNestedMetadata.put("Allele", createNestedField("Allele"));
     vepNestedMetadata.put("PICK", createNestedField("PICK"));
     vepNestedMetadata.put("consequence", createNestedField("consequence"));
-    NestedInfoHeaderLine nestedInfoHeaderLine = NestedInfoHeaderLine.builder()
-        .nestedFields(vepNestedMetadata).build();
-    vcfMetadata = new VcfMetadata(vcfHeader, VcfNestedMetadata.builder()
-        .nestedLines(Collections.singletonMap("VEP", nestedInfoHeaderLine)).build(), false);
-    vcfMetadataStrict = new VcfMetadata(vcfHeader, VcfNestedMetadata.builder()
-        .nestedLines(Collections.singletonMap("VEP", nestedInfoHeaderLine)).build(), true);
+    Field vepField = FieldImpl.builder().id("VEP").fieldType(FieldType.INFO)
+        .valueType(ValueType.STRING).valueCount(ValueCount.builder()
+            .type(Type.VARIABLE).build()).build();
+    NestedHeaderLine nestedVepHeaderLine = NestedHeaderLine.builder()
+        .nestedFields(vepNestedMetadata).parentField(vepField).build();
+    NestedHeaderLine nestedGtHeaderLine = NestedHeaderLine.builder()
+        .nestedFields(Map.of()).parentField(vepField).build();
+    vcfMetadata = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, false);
+    vcfMetadataStrict = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, true);
   }
 
 @Test
@@ -269,7 +270,7 @@ class VcfMetadataTest {
 
   @Test
   void getNestedFieldInfoUnknownParentStrict() {
-    assertThrows(UnknownFieldException.class,
+    assertThrows(UnsupportedNestedFieldException.class,
         () -> vcfMetadataStrict.getField("INFO/VOP/consequence"));
   }
 
@@ -282,7 +283,12 @@ class VcfMetadataTest {
 
   @Test
   void getFieldFormatUnknown() {
-    assertThrows(UnknownFieldException.class, () -> vcfMetadata.getField("FORMAT/unknown"));
+    assertEquals(new MissingField("unknown"), vcfMetadata.getField("FORMAT/unknown"));
+  }
+
+  @Test
+  void getFieldFormatUnknownStrict() {
+    assertThrows(UnknownFieldException.class, () -> vcfMetadataStrict.getField("FORMAT/unknown"));
   }
 
   @Test
@@ -294,6 +300,7 @@ class VcfMetadataTest {
     ValueCount valueCount = ValueCount.builder().type(Type.VARIABLE).build();
     FieldImpl parent = FieldImpl.builder().id("VEP").fieldType(FieldType.INFO)
         .valueType(ValueType.STRING).valueCount(valueCount).separator('|').build();
-    return NestedField.nestedBuilder().id(field).parent(parent).fieldType(FieldType.INFO_NESTED).valueType(ValueType.STRING).valueCount(valueCount).build();
+    return NestedField.nestedBuilder().id(field).parent(parent).fieldType(FieldType.INFO_VEP)
+        .valueType(ValueType.STRING).valueCount(valueCount).build();
   }
 }

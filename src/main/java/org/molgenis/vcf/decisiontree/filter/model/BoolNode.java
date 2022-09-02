@@ -11,6 +11,7 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class BoolNode implements DecisionNode {
   public static final String FILE_PREFIX = "file:";
+  public static final String FIELD_PREFIX = "field:";
 
   @NonNull NodeType nodeType = NodeType.DECISION;
   @NonNull String id;

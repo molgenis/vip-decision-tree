@@ -25,25 +25,16 @@ public class QueryValidatorImpl implements QueryValidator {
   public void validateBooleanNode(ConfigBoolQuery configBoolQuery, Field field) {
     if (!(field instanceof MissingField)) {
       switch (configBoolQuery.getOperator()) {
-        case GREATER:
-        case LESS:
-        case LESS_OR_EQUAL:
-        case GREATER_OR_EQUAL:
+        case GREATER, LESS, LESS_OR_EQUAL, GREATER_OR_EQUAL:
           validateLesserGreater(field, configBoolQuery);
           break;
-        case IN:
-        case NOT_IN:
+        case IN, NOT_IN:
           validateIn(field);
           break;
-        case CONTAINS:
-        case NOT_CONTAINS:
-        case CONTAINS_ALL:
-        case CONTAINS_ANY:
-        case CONTAINS_NONE:
+        case CONTAINS, NOT_CONTAINS, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_NONE:
           validateContains(field, configBoolQuery);
           break;
-        case EQUALS:
-        case NOT_EQUALS:
+        case EQUALS, NOT_EQUALS:
           validateEquals(field, configBoolQuery);
           break;
         default:
@@ -107,9 +98,11 @@ public class QueryValidatorImpl implements QueryValidator {
 
   @Override
   public void validateCategoricalNode(Field field) {
-    if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
-      throw new UnsupportedValueTypeException(field, DecisionType.CATEGORICAL);
+    if (!(field instanceof MissingField)) {
+      if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
+        throw new UnsupportedValueTypeException(field, DecisionType.CATEGORICAL);
+      }
+      validateSingleOrPerAlleleCount(field, DecisionType.CATEGORICAL);
     }
-    validateSingleOrPerAlleleCount(field, DecisionType.CATEGORICAL);
   }
 }

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
@@ -31,6 +32,9 @@ public class ConfigNodeDeserializer extends JsonDeserializer<ConfigNode> {
       case "BOOL":
         configNode = objectCodec.treeToValue(root, ConfigBoolNode.class);
         break;
+      case "BOOL_MULTI":
+        configNode = objectCodec.treeToValue(root, ConfigBoolMultiNode.class);
+        break;
       case "CATEGORICAL":
         configNode = objectCodec.treeToValue(root, ConfigCategoricalNode.class);
         break;
@@ -43,7 +47,8 @@ public class ConfigNodeDeserializer extends JsonDeserializer<ConfigNode> {
       default:
         throw new JsonMappingException(
             jp,
-            format("illegal 'type' value '%s' (allowed values: BOOL, CATEGORICAL, EXISTS, LEAF).",
+            format(
+                "illegal 'type' value '%s' (allowed values: BOOL, BOOL_MULTI, CATEGORICAL, EXISTS, SAMPLE_PHENOTYPE, LEAF).",
                 type));
     }
     return configNode;
