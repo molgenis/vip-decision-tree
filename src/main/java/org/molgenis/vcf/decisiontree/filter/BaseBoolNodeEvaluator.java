@@ -3,12 +3,12 @@ package org.molgenis.vcf.decisiontree.filter;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FIELD_PREFIX;
 
 import java.util.Collection;
-import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.lang.Nullable;
 
 interface BaseBoolNodeEvaluator<T extends DecisionNode> extends

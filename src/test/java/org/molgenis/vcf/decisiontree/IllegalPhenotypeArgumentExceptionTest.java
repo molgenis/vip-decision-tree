@@ -3,7 +3,7 @@ package org.molgenis.vcf.decisiontree;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.molgenis.vcf.decisiontree.ped.IllegalPhenotypeArgumentException;
+import org.molgenis.vcf.utils.sample.mapper.IllegalPhenotypeArgumentException;
 
 class IllegalPhenotypeArgumentExceptionTest {
 
