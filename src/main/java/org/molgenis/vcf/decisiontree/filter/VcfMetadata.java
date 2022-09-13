@@ -14,7 +14,6 @@ import htsjdk.variant.vcf.VCFHeaderLineType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -24,6 +23,7 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.ValueCountBuilder;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
+import org.molgenis.vcf.utils.UnexpectedEnumException;
 
 /**
  * {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields).

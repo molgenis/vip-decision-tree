@@ -6,8 +6,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.Value;
 import lombok.experimental.NonFinal;
-import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
-import org.molgenis.vcf.decisiontree.ped.model.Sex;
+import org.molgenis.vcf.utils.sample.model.AffectedStatus;
+import org.molgenis.vcf.utils.sample.model.Sex;
 
 @Value
 @Builder

@@ -1,6 +1,5 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
@@ -9,6 +8,7 @@ import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 

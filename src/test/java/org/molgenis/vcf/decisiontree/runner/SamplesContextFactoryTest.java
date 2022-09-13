@@ -18,8 +18,8 @@ import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
-import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
-import org.molgenis.vcf.decisiontree.ped.model.Sex;
+import org.molgenis.vcf.utils.sample.model.AffectedStatus;
+import org.molgenis.vcf.utils.sample.model.Sex;
 import org.springframework.util.ResourceUtils;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,6 +1,5 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -12,7 +11,6 @@ import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.GenotypeBuilder;
 import htsjdk.variant.variantcontext.GenotypesContext;
 import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.variantcontext.VariantContextBuilder;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +18,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
@@ -33,10 +30,10 @@ import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
-import org.molgenis.vcf.decisiontree.ped.model.Sex;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
+import org.molgenis.vcf.utils.sample.model.Sex;
+import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 
 @ExtendWith(MockitoExtension.class)
 class SampleClassifierImplTest {

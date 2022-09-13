@@ -5,7 +5,6 @@ import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.NOT_IN;
 
 import java.util.Collection;
 import java.util.Set;
-import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -14,6 +13,7 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
+import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.stereotype.Component;
 
 @Component

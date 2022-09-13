@@ -19,13 +19,13 @@ import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
-import org.molgenis.vcf.decisiontree.ped.InvalidSamplePhenotypesException;
-import org.molgenis.vcf.decisiontree.ped.MixedPhenotypesException;
-import org.molgenis.vcf.decisiontree.ped.PedIndividual;
-import org.molgenis.vcf.decisiontree.ped.PedIndividual.AffectionStatus;
-import org.molgenis.vcf.decisiontree.ped.PedReader;
-import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
-import org.molgenis.vcf.decisiontree.ped.model.Sex;
+import org.molgenis.vcf.utils.InvalidSamplePhenotypesException;
+import org.molgenis.vcf.utils.MixedPhenotypesException;
+import org.molgenis.vcf.utils.PedIndividual;
+import org.molgenis.vcf.utils.PedIndividual.AffectionStatus;
+import org.molgenis.vcf.utils.PedReader;
+import org.molgenis.vcf.utils.sample.model.AffectedStatus;
+import org.molgenis.vcf.utils.sample.model.Sex;
 
 public class SamplesContextFactory {
 

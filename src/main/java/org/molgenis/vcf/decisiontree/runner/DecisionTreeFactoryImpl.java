@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.Settings;
-import org.molgenis.vcf.decisiontree.UnexpectedEnumException;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
@@ -45,6 +44,7 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
+import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 

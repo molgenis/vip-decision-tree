@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.molgenis.vcf.decisiontree.ped.model.Sex.MALE;
+import static org.molgenis.vcf.utils.sample.model.Sex.MALE;
 
 import htsjdk.variant.variantcontext.Genotype;
 import htsjdk.variant.variantcontext.GenotypeType;
@@ -33,7 +33,7 @@ import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
-import org.molgenis.vcf.decisiontree.ped.model.AffectedStatus;
+import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 
 @ExtendWith(MockitoExtension.class)
 class VcfRecordTest {
