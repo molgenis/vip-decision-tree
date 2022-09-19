@@ -1,29 +1,38 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
-import static java.util.Arrays.asList;
-import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
 import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
 
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField.NestedFieldBuilder;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.utils.UnexpectedEnumException;
+import org.molgenis.vcf.utils.metadata.FieldMetadataService;
+import org.molgenis.vcf.utils.model.FieldMetadata;
+import org.molgenis.vcf.utils.model.NumberType;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
 public class VepInfoMetadataMapper implements VepMetadataMapper {
 
   public static final String ALLELE_NUM = "ALLELE_NUM";
-
   private static final String INFO_DESCRIPTION_PREFIX =
       "Consequence annotations from Ensembl VEP. Format: ";
+
+  private final FieldMetadataService vepMetadataService;
+
+  public VepInfoMetadataMapper(
+      @Qualifier("vepMetadataService") FieldMetadataService metadataService) {
+    this.vepMetadataService = metadataService;
+  }
 
   @Override
   public boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
@@ -35,7 +44,7 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
   @Override
   public NestedHeaderLine map(VCFInfoHeaderLine vcfInfoHeaderLine) {
     Map<String, NestedField> nestedFields = new HashMap<>();
-    int index = 0;
+
     FieldImpl vepField =
         FieldImpl.builder()
             .id(vcfInfoHeaderLine.getID())
@@ -44,67 +53,50 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
             .valueCount(ValueCount.builder().type(VARIABLE).build())
             .separator('|')
             .build();
-    for (String id : getNestedInfoIds(vcfInfoHeaderLine)) {
-      nestedFields.put(id, mapNestedMetadataToField(id, index, vepField));
-      index++;
+
+    FieldMetadata nestedMetadata = vepMetadataService.load(vcfInfoHeaderLine);
+    for (Entry<String, org.molgenis.vcf.utils.model.NestedField> entry : nestedMetadata.getNestedFields()
+        .entrySet()) {
+      NestedField nestedField = mapNested(entry.getKey(), entry.getValue(), vepField);
+      nestedFields.put(entry.getKey(), nestedField);
     }
-    return NestedHeaderLine.builder().parentField(vepField)
-        .nestedFields(nestedFields).build();
+    return NestedHeaderLine.builder().parentField(vepField).nestedFields(nestedFields).build();
+
   }
 
-  protected List<String> getNestedInfoIds(VCFInfoHeaderLine vcfInfoHeaderLine) {
-    String description = vcfInfoHeaderLine.getDescription();
-    String[] infoIds = description.substring(INFO_DESCRIPTION_PREFIX.length()).split("\\|", -1);
-    return asList(infoIds);
+  private NestedField mapNested(String key, org.molgenis.vcf.utils.model.NestedField value,
+      Field parent) {
+    return NestedField.nestedBuilder().id(key).fieldType(FieldType.INFO_VEP)
+        .valueType(mapValueType(value.getType()))
+        .valueCount(
+            mapValueCount(value.getNumberType(), value.getNumberCount(), value.isRequired()))
+        .separator(value.getSeparator()).parent(parent).index(value.getIndex()).build();
   }
 
-  protected NestedField mapNestedMetadataToField(
-      String id, int index, FieldImpl vepField) {
-    NestedFieldBuilder fieldBuilder =
-        NestedField.nestedBuilder()
-            .id(id)
-            .index(index)
-            .parent(vepField)
-            .fieldType(FieldType.INFO_VEP);
-    switch (id) {
-      case "PICK", ALLELE_NUM:
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-            .valueType(ValueType.INTEGER);
-        break;
-      case "Consequence", "Existing_variation", "CLIN_SIG", "FLAGS", "clinVar_CLNSIGINCL", "clinVar_CLNREVSTAT", "HPO":
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
-            .valueType(ValueType.STRING)
-            .separator('&');
-        break;
-      case "clinVar_CLNSIG":
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
-            .valueType(ValueType.STRING)
-            .separator('/');
-        break;
-      case "PHENO", "PUBMED", "SOMATIC", "clinVar":
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
-            .valueType(ValueType.INTEGER)
-            .separator('&');
-        break;
-      case "STRAND", "HGNC_ID", "cDNA_position", "CDS_position", "Protein_position", "gnomAD_HN":
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-            .valueType(ValueType.INTEGER);
-        break;
-      case "gnomAD_AF", "gnomAD_AFR_AF", "gnomAD_AMR_AF", "gnomAD_ASJ_AF", "gnomAD_EAS_AF", "gnomAD_FIN_AF", "gnomAD_NFE_AF", "gnomAD_OTH_AF", "gnomAD_SAS_AF", "SpliceAI_pred_DS_AG", "SpliceAI_pred_DS_AL", "SpliceAI_pred_DS_DG", "SpliceAI_pred_DS_DL", "SIFT", "PolyPhen", "CAPICE_CL", "CAPICE_SC":
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-            .valueType(ValueType.FLOAT);
-        break;
-      default:
-        fieldBuilder
-            .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-            .valueType(ValueType.STRING);
-    }
-    return fieldBuilder.build();
+  private ValueType mapValueType(org.molgenis.vcf.utils.model.ValueType type) {
+    return switch (type) {
+      case INTEGER -> ValueType.INTEGER;
+      case FLOAT -> ValueType.FLOAT;
+      case FLAG -> ValueType.FLAG;
+      case CHARACTER -> ValueType.CHARACTER;
+      case STRING, CATEGORICAL -> ValueType.STRING;
+      default -> throw new UnexpectedEnumException(type);
+    };
+  }
+
+  private ValueCount mapValueCount(NumberType numberType, Integer numberCount, boolean required) {
+    return ValueCount.builder().type(mapNumberType(numberType)).count(numberCount)
+        .nullable(!required).build();
+  }
+
+  private Type mapNumberType(NumberType numberType) {
+    return switch (numberType) {
+      case NUMBER -> Type.FIXED;
+      case PER_ALT -> Type.A;
+      case PER_ALT_AND_REF -> Type.R;
+      case PER_GENOTYPE -> Type.G;
+      case OTHER -> VARIABLE;
+      default -> throw new UnexpectedEnumException(numberType);
+    };
   }
 }
