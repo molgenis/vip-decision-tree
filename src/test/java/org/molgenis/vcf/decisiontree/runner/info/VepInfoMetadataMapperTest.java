@@ -22,6 +22,9 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.utils.metadata.FieldMetadataService;
+import org.molgenis.vcf.utils.model.FieldMetadata;
+import org.molgenis.vcf.utils.model.NumberType;
 
 @ExtendWith(MockitoExtension.class)
 class VepInfoMetadataMapperTest {
@@ -30,12 +33,15 @@ class VepInfoMetadataMapperTest {
 
   @Mock
   VCFInfoHeaderLine headerLine;
+  @Mock
+  FieldMetadataService metadataService;
+
   private FieldImpl vepField;
 
   @BeforeEach
   void setUp() {
 
-    vepInfoMetadataMapper = new VepInfoMetadataMapper();
+    vepInfoMetadataMapper = new VepInfoMetadataMapper(metadataService);
 
     vepField = FieldImpl.builder()
         .id("CSQ")
@@ -62,61 +68,58 @@ class VepInfoMetadataMapperTest {
 
   @Test
   void map() {
-    when(headerLine.getID()).thenReturn("CSQ");
-    when(headerLine.getDescription())
-        .thenReturn(
-            "Consequence annotations from Ensembl VEP. Format: Allele|cDNA_position|FLAGS|PICK|gnomAD_AF|gnomAD_HN|PUBMED|CAPICE_CL|CAPICE_SC|clinVar|clinVar_CLNSIG|clinVar_CLNSIGINCL|clinVar_CLNREVSTAT");
+    when(headerLine.getID()).thenReturn(
+        "CSQ");
+    org.molgenis.vcf.utils.model.Field vepUtilsField = org.molgenis.vcf.utils.model.Field.builder()
+        .type(org.molgenis.vcf.utils.model.ValueType.STRING).numberType(NumberType.OTHER)
+        .separator('|').required(true).label("CSQ").description("CSQ").build();
+    HashMap<String, org.molgenis.vcf.utils.model.NestedField> vepMeta = new HashMap<>();
+    vepMeta.put("Allele", org.molgenis.vcf.utils.model.NestedField.builder().index(4).numberCount(1)
+        .numberType(NumberType.NUMBER)
+        .type(org.molgenis.vcf.utils.model.ValueType.STRING).label("Allele").description("Allele")
+        .build());
+    vepMeta.put("field2", org.molgenis.vcf.utils.model.NestedField.builder().index(3).numberCount(1)
+        .numberType(NumberType.PER_ALT)
+        .type(org.molgenis.vcf.utils.model.ValueType.INTEGER).label("Field2").description("Field2")
+        .build());
+    vepMeta.put("field3", org.molgenis.vcf.utils.model.NestedField.builder().index(2).numberCount(1)
+        .numberType(NumberType.PER_GENOTYPE)
+        .type(org.molgenis.vcf.utils.model.ValueType.CHARACTER).label("Field3")
+        .description("Field3")
+        .build());
+    vepMeta.put("field4", org.molgenis.vcf.utils.model.NestedField.builder().index(1).numberCount(1)
+        .numberType(NumberType.PER_ALT_AND_REF)
+        .type(org.molgenis.vcf.utils.model.ValueType.CATEGORICAL).label("Field4")
+        .description("Field4")
+        .build());
+    when(metadataService.load(headerLine)).thenReturn(
+        FieldMetadata.builder().nestedFields(vepMeta).build());
 
     NestedHeaderLine actual = vepInfoMetadataMapper
         .map(headerLine);
+
     Field vepField = FieldImpl.builder().id("CSQ").fieldType(FieldType.INFO)
         .valueType(ValueType.STRING).valueCount(ValueCount.builder()
             .type(VARIABLE).build()).separator('|').build();
-
     Map<String, NestedField> expectedMap = new HashMap<>();
-    expectedMap.put("Allele", getFixedStringField("Allele", 0));
-    expectedMap.put("cDNA_position", getFixedIntegerField("cDNA_position", 1));
-    expectedMap.put("FLAGS", getVariableIntegerField("FLAGS", 2));
-    expectedMap.put("PICK", getFixedIntegerField("PICK", 3));
-    expectedMap.put("gnomAD_AF", getFixedFloatField("gnomAD_AF", 4));
-    expectedMap.put("gnomAD_HN", getFixedFloatField("gnomAD_HN", 5));
-    expectedMap.put("PUBMED", getVariableIntegerField("PUBMED", 6));
-    expectedMap.put("CAPICE_CL", getFixedStringField("CAPICE_CL", 7));
-    expectedMap.put("CAPICE_SC", getVariableIntegerField("CAPICE_SC", 8));
-    expectedMap.put("clinVar", getVariableIntegerField("clinVar", 9));
-    expectedMap.put("clinVar_CLNSIG", getVariableIntegerField("clinVar_CLNSIG", 10));
-    expectedMap.put("clinVar_CLNSIGINCL", getVariableIntegerField("clinVar_CLNSIGINCL", 11));
-    expectedMap.put("clinVar_CLNREVSTAT", getVariableIntegerField("clinVar_CLNREVSTAT", 12));
+    expectedMap.put("Allele", NestedField.nestedBuilder().id("Allele").index(4).parent(vepField)
+        .fieldType(FieldType.INFO_VEP)
+        .valueCount(ValueCount.builder().type(FIXED).count(1).build())
+        .valueType(ValueType.STRING).build());
+    expectedMap.put("field2", NestedField.nestedBuilder().id("field2").index(3).parent(vepField)
+        .fieldType(FieldType.INFO_VEP)
+        .valueCount(ValueCount.builder().type(Type.R).build())
+        .valueType(ValueType.INTEGER).build());
+    expectedMap.put("field3", NestedField.nestedBuilder().id("field3").index(2).parent(vepField)
+        .fieldType(FieldType.INFO_VEP)
+        .valueCount(ValueCount.builder().type(Type.G).build())
+        .valueType(ValueType.CHARACTER).build());
+    expectedMap.put("field4", NestedField.nestedBuilder().id("field4").index(1).parent(vepField)
+        .fieldType(FieldType.INFO_VEP)
+        .valueCount(ValueCount.builder().type(Type.A).build())
+        .valueType(ValueType.STRING).build());
     assertEquals(NestedHeaderLine.builder().nestedFields(expectedMap).parentField(vepField).build(),
         actual);
   }
 
-  private NestedField getVariableIntegerField(String id, int index) {
-    return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_VEP)
-        .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
-        .valueType(ValueType.INTEGER)
-        .separator('&').build();
-  }
-
-  private NestedField getFixedIntegerField(String id, int index) {
-    return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_VEP)
-        .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-        .valueType(ValueType.INTEGER).build();
-  }
-
-  private NestedField getFixedFloatField(String id, int index) {
-    return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_VEP)
-        .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-        .valueType(ValueType.FLOAT).build();
-  }
-
-  private NestedField getFixedStringField(String id, int index) {
-    return NestedField.nestedBuilder().id(id).index(index).parent(vepField)
-        .fieldType(FieldType.INFO_VEP)
-        .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-        .valueType(ValueType.STRING).build();
-  }
 }
