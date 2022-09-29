@@ -1,11 +1,60 @@
 [![Build Status](https://app.travis-ci.com/molgenis/vip-decision-tree.svg?branch=master)](https://app.travis-ci.com/molgenis/vip-decision-tree)
 [![Quality Status](https://sonarcloud.io/api/project_badges/measure?project=molgenis_vip-decision-tree&metric=alert_status)](https://sonarcloud.io/dashboard?id=molgenis_vip-decision-tree)
+
 # Variant Interpretation Pipeline - VCF Decision Tree
-Command-line application to classify variants in any VCF (Variant Call Format) file based on a decision tree.
+
+Command-line application to classify variants in any VCF (Variant Call Format) file based on a
+decision tree.
+
+# Installation
+
+Generate a personal access token in Github with at least the scope "read:packages".
+
+Then add a settings.xml to your mave .m2 folder, or edit it if you already have one. It should
+contain the following:
+
+```
+<?xml version="1.0"?>
+
+<settings xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+  <activeProfiles>
+    <activeProfile>github</activeProfile>
+  </activeProfiles>
+  <profiles>
+    <profile>
+      <id>github</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+          </repository>
+          <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/molgenis/vip-utils</url>
+            <snapshots>
+              <enabled>true</enabled>
+            </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+
+  <servers>
+    <server>
+      <id>github</id>
+      <username>[YOUR VIP USERNAME]</username>
+      <password>[YOUR PERSONAL ACCESS TOKEN]</password>
+    </server>
+   </servers>
+</settings>
+```
+
 ## Requirements
+
 - Java 17
 
 ## Usage
+
 ```
 usage: java -jar vcf-decision-tree.jar -i <arg> -c <arg> [-o <arg>] [-f]
        [-s] [-l] [-p] [-d] [-pb <arg>] [-pd <arg>] [-ph <arg>] [-m <arg>]
