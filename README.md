@@ -2,17 +2,14 @@
 [![Quality Status](https://sonarcloud.io/api/project_badges/measure?project=molgenis_vip-decision-tree&metric=alert_status)](https://sonarcloud.io/dashboard?id=molgenis_vip-decision-tree)
 
 # Variant Interpretation Pipeline - VCF Decision Tree
-
 Command-line application to classify variants in any VCF (Variant Call Format) file based on a
 decision tree.
 
 # Installation
+Generate a personal access token in GitHub with at least the scope "read:packages".
 
-Generate a personal access token in Github with at least the scope "read:packages".
-
-Then add a settings.xml to your mave .m2 folder, or edit it if you already have one. It should
+Then add a settings.xml to your Maven .m2 folder, or edit it if you already have one. It should
 contain the following:
-
 ```
 <?xml version="1.0"?>
 
