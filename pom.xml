@@ -43,7 +43,7 @@
     <commons.cli.version>1.4</commons.cli.version>
     <samtools.htsjdk.version>2.24.1</samtools.htsjdk.version>
     <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
-    <vip.utils.version>1.1.1</vip.utils.version>
+    <vip.utils.version>1.1.2</vip.utils.version>
   </properties>
 
   <profiles>
