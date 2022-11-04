@@ -19,6 +19,7 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode.Type;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
@@ -50,6 +51,12 @@ public class Visualizer {
         boolOutcomes.put("true", boolNode.getOutcomeTrue().getNextNode());
         boolOutcomes.put("false", boolNode.getOutcomeFalse().getNextNode());
         boolOutcomes.put("missing", boolNode.getOutcomeMissing().getNextNode());
+        processOutcomes(edges, entry, boolOutcomes);
+      } else if (node.getType() == Type.EXISTS) {
+        ConfigExistsNode boolNode = (ConfigExistsNode) node;
+        Map<String, String> boolOutcomes = new HashMap<>();
+        boolOutcomes.put("true", boolNode.getOutcomeTrue().getNextNode());
+        boolOutcomes.put("false", boolNode.getOutcomeFalse().getNextNode());
         processOutcomes(edges, entry, boolOutcomes);
       } else if (node.getType() == Type.BOOL_MULTI) {
         ConfigBoolMultiNode boolMultiNode = (ConfigBoolMultiNode) node;
