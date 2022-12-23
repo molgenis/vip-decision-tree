@@ -45,7 +45,6 @@ class AppCommandLineToSettingsMapper {
   Settings map(CommandLine commandLine, String... args) {
     AppSettings appSettings = createAppSettings(args);
     Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
-    ConfigDecisionTree configDecisionTree = createDecisionTree(commandLine);
     WriterSettings writerSettings = createWriterSettings(commandLine);
     boolean strict = commandLine.hasOption(OPT_STRICT);
     Mode mode = getMode(commandLine);
@@ -54,7 +53,6 @@ class AppCommandLineToSettingsMapper {
     return Settings.builder()
         .mode(mode)
         .inputVcfPath(inputPath)
-        .configDecisionTree(configDecisionTree)
         .appSettings(appSettings)
         .writerSettings(writerSettings)
         .strict(strict)
@@ -89,11 +87,6 @@ class AppCommandLineToSettingsMapper {
     }
 
     return new SampleSettings(probandNames, pedPaths, phenotypesString);
-  }
-
-  private ConfigDecisionTree createDecisionTree(CommandLine commandLine) {
-    Path configPath = Path.of(commandLine.getOptionValue(OPT_CONFIG));
-    return configDecisionTreeLoader.load(configPath);
   }
 
   private AppSettings createAppSettings(String... args) {

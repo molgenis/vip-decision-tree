@@ -19,21 +19,13 @@ public class ClassifierImpl implements Classifier {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ClassifierImpl.class);
 
-  private final DecisionTreeExecutor decisionTreeExecutor;
   private final VepHelper vepHelper;
-  private final DecisionTree decisionTree;
   private final VcfMetadata vcfMetadata;
-  private final ConsequenceAnnotator consequenceAnnotator;
   private final RecordWriter recordWriter;
   private final VipScoreAnnotator vipScoreAnnotator;
 
-  public ClassifierImpl(DecisionTreeExecutor decisionTreeExecutor, VepHelper vepHelper,
-      DecisionTree decisionTree, ConsequenceAnnotator consequenceAnnotator,
-      RecordWriter recordWriter, VcfMetadata vcfMetadata) {
-    this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
+  public ClassifierImpl(VepHelper vepHelper, RecordWriter recordWriter, VcfMetadata vcfMetadata) {
     this.vepHelper = requireNonNull(vepHelper);
-    this.decisionTree = requireNonNull(decisionTree);
-    this.consequenceAnnotator = requireNonNull(consequenceAnnotator);
     this.recordWriter = requireNonNull(recordWriter);
     this.vcfMetadata = requireNonNull(vcfMetadata);
     this.vipScoreAnnotator = new VipScoreAnnotator(false, false);
@@ -67,12 +59,10 @@ public class ClassifierImpl implements Classifier {
             vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, nestedHeaderLine));
       }
       for (VcfRecord singleCsqRecord : singleCsqRecords) {
-        Variant variant = new Variant(vcfMetadata, singleCsqRecord, allele);
-        Decision decision = decisionTreeExecutor.execute(decisionTree, variant);
         String csqString = singleCsqRecord.getVepValues(nestedHeaderLine.getParentField())
             .get(0);
-//        annotatedCsqs.add(consequenceAnnotator.annotate(decision, csqString));
-
+        System.out.println(csqString);
+        System.out.println(csqString.split("\\|").length);
         double constraint = (double) getCustomValue(vcfRecord, allele, "constraint", 64);
         String region = (String) getCustomValue(vcfRecord, allele, "region", 65);
         double fathmm = (double) getCustomValue(vcfRecord, allele, "fathmm_fathmm", 67);
@@ -80,16 +70,12 @@ public class ClassifierImpl implements Classifier {
         double reMM = (double) getCustomValue(vcfRecord, allele, "ReMM", 69);
         String phenotype = (String) getCustomValue(vcfRecord, allele, "phenotype", 70);
         int VIPVaranScore = calculateScore(region, ncER, fathmm, reMM, constraint);
-        System.out.println(constraint);
-        System.out.println(region);
-        System.out.println("---");
-        System.out.println(fathmm);
-        System.out.println("---");
-        System.out.println(ncER);
-        System.out.println("---");
-        System.out.println(reMM);
-        System.out.println("---");
-        System.out.println(phenotype);
+        System.out.println("constraint: " + constraint);
+        System.out.println("region: " + region);
+        System.out.println("fathmm: " +fathmm);
+        System.out.println("ncer: " + ncER);
+        System.out.println("ReMM: " +reMM);
+        System.out.println("phenotype: " + phenotype);
 
         VCFHeader vcfHeader = new VCFHeader(vcfMetadata.unwrap());
         vcfHeader.addMetaDataLine(new VCFInfoHeaderLine(
@@ -117,19 +103,24 @@ public class ClassifierImpl implements Classifier {
     NestedField nestedField = NestedField.nestedBuilder().id(id).parent(parent)
             .fieldType(FieldType.INFO_VEP).index(index)
             .valueType(ValueType.STRING).valueCount(valueCount).build();
+    System.out.println(id);
     switch (id) {
       case "fathmm_fathmm", "ReMM", "ncER", "constraint" -> {
         Object score = vcfRecord.getValue(nestedField, allele);
         if (score == null) {
+          System.out.println("hier in score");
           return 0.000;
         } else {
+          System.out.println("daar in scor");
           return Double.parseDouble((String) score);
         }
       }
       case "region", "phenotype" -> {
         if (vcfRecord.getValue(nestedField, allele) == null) {
+          System.out.println("hier in regio");
           return "";
         } else {
+          System.out.println("daar in regio");
           return vcfRecord.getValue(nestedField, allele);
         }
       }

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
@@ -25,13 +24,9 @@ import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 class ClassifierImplTest {
 
   @Mock
-  private DecisionTreeExecutor decisionTreeExecutor;
-  @Mock
   private VcfMetadata vcfMetadata;
   @Mock
   private VcfReader vcfReader;
-  @Mock
-  private DecisionTree decisionTree;
   @Mock
   private RecordWriter recordWriter;
   @Mock
@@ -60,8 +55,7 @@ class ClassifierImplTest {
     nestedHeaderLine = NestedHeaderLine.builder().parentField(parent)
         .nestedFields(nestedFields).build();
     when(vcfMetadata.getVepHeaderLine()).thenReturn(nestedHeaderLine);
-    classifier = new ClassifierImpl(decisionTreeExecutor, vepHelper, decisionTree,
-        consequenceAnnotator, recordWriter, vcfMetadata);
+    classifier = new ClassifierImpl(vepHelper, recordWriter, vcfMetadata);
   }
 //  @Test
 //  void classify() {

@@ -16,10 +16,9 @@ class VcfReaderFactoryImpl implements VcfReaderFactory {
   private final GenotypeMetadataMapper genotypeMetadataMapper;
   private VepMetadataParser vepMetadataParser;
 
-  VcfReaderFactoryImpl(VepMetadataParser vepMetadataParser,
-      GenotypeMetadataMapper genotypeMetadataMapper) {
+  VcfReaderFactoryImpl(GenotypeMetadataMapper genotypeMetadataMapper, VepMetadataParser vepMetadataParser) {
+    this.genotypeMetadataMapper = genotypeMetadataMapper;
     this.vepMetadataParser = requireNonNull(vepMetadataParser);
-    this.genotypeMetadataMapper = requireNonNull(genotypeMetadataMapper);
   }
 
   @Override

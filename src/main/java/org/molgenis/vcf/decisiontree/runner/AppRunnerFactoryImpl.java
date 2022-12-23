@@ -9,7 +9,6 @@ import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.SampleAnnotator;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
-import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
 import org.slf4j.Logger;
@@ -24,17 +23,14 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
   private final VcfReaderFactory vcfReaderFactory;
   private final ClassifierFactory classifierFactory;
   private final RecordWriterFactory recordWriterFactory;
-  private final DecisionTreeFactory decisionTreeFactory;
 
   AppRunnerFactoryImpl(
       VcfReaderFactory vcfReaderFactory,
       ClassifierFactory classifierFactory,
-      RecordWriterFactory recordWriterFactory,
-      DecisionTreeFactory decisionTreeFactory) {
+      RecordWriterFactory recordWriterFactory) {
     this.vcfReaderFactory = requireNonNull(vcfReaderFactory);
     this.classifierFactory = requireNonNull(classifierFactory);
     this.recordWriterFactory = requireNonNull(recordWriterFactory);
-    this.decisionTreeFactory = requireNonNull(decisionTreeFactory);
   }
 
   // Suppress 'Resources should be closed'
@@ -45,17 +41,15 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
     try {
       VcfMetadata vcfMetadata = vcfReader.getMetadata();
       RecordWriter recordWriter = recordWriterFactory.create(vcfMetadata, settings);
-      DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
-      ValueValidator.validate(settings.getConfigDecisionTree(), vcfMetadata);
       Classifier classifier;
       if (settings.getMode() == Mode.VARIANT) {
         ConsequenceAnnotator consequenceAnnotator = ConsequenceAnnotatorFactory.create(settings);
-        classifier = classifierFactory.create(settings, decisionTree, consequenceAnnotator,
+        classifier = classifierFactory.create(settings, consequenceAnnotator,
             recordWriter, vcfMetadata);
       } else {
         SampleAnnotator sampleAnnotator = SampleAnnotatorFactory.create(settings);
         SamplesContext samplesContext = SamplesContextFactory.create(settings, vcfMetadata);
-        classifier = classifierFactory.create(settings, decisionTree,
+        classifier = classifierFactory.create(settings,
             recordWriter, sampleAnnotator, samplesContext);
       }
 

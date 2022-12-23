@@ -18,29 +18,22 @@ import org.springframework.stereotype.Component;
 @Component
 class ClassifierFactoryImpl implements ClassifierFactory {
 
-  private final DecisionTreeExecutorFactory decisionTreeExecutorFactory;
 
-  ClassifierFactoryImpl(DecisionTreeExecutorFactory decisionTreeExecutorFactory) {
-    this.decisionTreeExecutorFactory = requireNonNull(decisionTreeExecutorFactory);
+  ClassifierFactoryImpl() {
   }
 
   @Override
-  public Classifier create(Settings settings, DecisionTree decisionTree,
+  public Classifier create(Settings settings,
       ConsequenceAnnotator consequenceAnnotator, RecordWriter recordWriter,
       VcfMetadata vcfMetadata) {
-    DecisionTreeExecutor decisionTreeExecutor =
-        decisionTreeExecutorFactory.create(settings.getWriterSettings());
 
-    return new ClassifierImpl(decisionTreeExecutor, new VepHelper(), decisionTree,
-        consequenceAnnotator, recordWriter, vcfMetadata);
+    return new ClassifierImpl(new VepHelper(), recordWriter, vcfMetadata); // add VIPScore annotator here
   }
 
   @Override
-  public Classifier create(Settings settings, DecisionTree decisionTree,
+  public Classifier create(Settings settings,
       RecordWriter recordWriter, SampleAnnotator sampleAnnotator, SamplesContext samplesContext) {
-    DecisionTreeExecutor decisionTreeExecutor =
-        decisionTreeExecutorFactory.create(settings.getWriterSettings());
-    return new SampleClassifierImpl(decisionTreeExecutor, new VepHelper(), decisionTree,
+    return new SampleClassifierImpl(new VepHelper(),
         recordWriter, sampleAnnotator, samplesContext);
   }
 }
