@@ -1,16 +1,13 @@
 package org.molgenis.vcf.decisiontree.runner;
 
-import static java.util.Objects.requireNonNull;
 
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.Classifier;
 import org.molgenis.vcf.decisiontree.filter.ClassifierImpl;
 import org.molgenis.vcf.decisiontree.filter.ConsequenceAnnotator;
-import org.molgenis.vcf.decisiontree.filter.DecisionTreeExecutor;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.SampleAnnotator;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
-import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.SampleClassifierImpl;
 import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
 import org.springframework.stereotype.Component;
