@@ -1,8 +1,6 @@
 package org.molgenis.vcf.decisiontree;
 
 import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_CONFIG;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_FORCE;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_INPUT;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_LABELS;
@@ -20,8 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
-import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -30,16 +26,13 @@ class AppCommandLineToSettingsMapper {
 
   private final String appName;
   private final String appVersion;
-  private final ConfigDecisionTreeLoader configDecisionTreeLoader;
 
 
   AppCommandLineToSettingsMapper(
       @Value("${app.name}") String appName,
-      @Value("${app.version}") String appVersion,
-      ConfigDecisionTreeLoader configDecisionTreeLoader) {
+      @Value("${app.version}") String appVersion) {
     this.appName = appName;
     this.appVersion = appVersion;
-    this.configDecisionTreeLoader = requireNonNull(configDecisionTreeLoader);
   }
 
   Settings map(CommandLine commandLine, String... args) {
