@@ -60,6 +60,13 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
       NestedField nestedField = mapNested(entry.getKey(), entry.getValue(), vepField);
       nestedFields.put(entry.getKey(), nestedField);
     }
+    nestedFields.put("id", NestedField.nestedBuilder().id("id").fieldType(FieldType.INFO_VEP)
+            .valueType(ValueType.INTEGER)
+            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
+            .separator('|')
+            .parent(vepField)
+            .index(69)
+            .build());
     return NestedHeaderLine.builder().parentField(vepField).nestedFields(nestedFields).build();
 
   }
