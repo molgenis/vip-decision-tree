@@ -73,23 +73,23 @@ public class ClassifierImpl implements Classifier {
             .get(0);
 //        annotatedCsqs.add(consequenceAnnotator.annotate(decision, csqString));
 
-        float constraint = Float.parseFloat((String) getCustomValue(vcfRecord, allele, "constraint", 64));
+        double constraint = (double) getCustomValue(vcfRecord, allele, "constraint", 64);
         String region = (String) getCustomValue(vcfRecord, allele, "region", 65);
-        float fathmm = Float.parseFloat((String) getCustomValue(vcfRecord, allele, "fathmm_fathmm", 67));
-        float ncER = Float.parseFloat((String) getCustomValue(vcfRecord, allele, "ncER", 68));
-        float ReMM = Float.parseFloat((String) getCustomValue(vcfRecord, allele, "ReMM", 69));
+        double fathmm = (double) getCustomValue(vcfRecord, allele, "fathmm_fathmm", 67);
+        double ncER = (double) getCustomValue(vcfRecord, allele, "ncER", 68);
+        double reMM = (double) getCustomValue(vcfRecord, allele, "ReMM", 69);
         String phenotype = (String) getCustomValue(vcfRecord, allele, "phenotype", 70);
-        int VIPVaranScore = 999991;
+        int VIPVaranScore = calculateScore(region, ncER, fathmm, reMM, constraint);
         System.out.println(constraint);
-        System.out.printf(region);
+        System.out.println(region);
         System.out.println("---");
-        System.out.printf(String.valueOf(fathmm));
+        System.out.println(fathmm);
         System.out.println("---");
-        System.out.printf(String.valueOf(ncER));
+        System.out.println(ncER);
         System.out.println("---");
-        System.out.printf(String.valueOf(ReMM));
+        System.out.println(reMM);
         System.out.println("---");
-        System.out.printf(phenotype);
+        System.out.println(phenotype);
 
         VCFHeader vcfHeader = new VCFHeader(vcfMetadata.unwrap());
         vcfHeader.addMetaDataLine(new VCFInfoHeaderLine(
@@ -117,11 +117,42 @@ public class ClassifierImpl implements Classifier {
     NestedField nestedField = NestedField.nestedBuilder().id(id).parent(parent)
             .fieldType(FieldType.INFO_VEP).index(index)
             .valueType(ValueType.STRING).valueCount(valueCount).build();
-
-    if (vcfRecord.getValue(nestedField, allele) != null) {
-      return vcfRecord.getValue(nestedField, allele);
-    } else {
-      return "0.000";
+    switch (id) {
+      case "fathmm_fathmm", "ReMM", "ncER", "constraint" -> {
+        Object score = vcfRecord.getValue(nestedField, allele);
+        if (score == null) {
+          return 0.000;
+        } else {
+          return Double.parseDouble((String) score);
+        }
+      }
+      case "region", "phenotype" -> {
+        if (vcfRecord.getValue(nestedField, allele) == null) {
+          return "";
+        } else {
+          return vcfRecord.getValue(nestedField, allele);
+        }
+      }
     }
+    return "";
+  }
+
+  private int calculateScore(String region, double ncER, double fathmm, double reMM, double constraint) {
+    // level 1: overlap with a region
+    // level 2: level 1 + score of ncER(>0.499) fathmm(>0.5) ReMM*(>0.5)
+    // level 3: level 2 + constraint region above or equal to 0.7
+    // level 4: Gado phenotype (something with phenotype)
+    int vipVaranScore  = 0;
+    if (!region.isEmpty()) {
+      vipVaranScore = 1;
+    }
+    if (!region.isEmpty() && ncER > 49 || fathmm > 0.5 || reMM > 0.5) {
+      vipVaranScore = 2;
+    }
+    if (!region.isEmpty() && ncER > 49 || fathmm > 0.5 || reMM > 0.5 & constraint >= 0.7) {
+      vipVaranScore = 3;
+    }
+
+    return vipVaranScore;
   }
 }
