@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import htsjdk.variant.vcf.*;
 import org.molgenis.vcf.decisiontree.filter.model.*;
+import org.molgenis.vcf.decisiontree.runner.ScoreCalculator;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
@@ -67,20 +68,22 @@ public class AnnotateScoreImpl implements Classifier {
         String ncER = (String) getCustomValue(vcfRecord, allele, "ncER", 68);
         String reMM = (String) getCustomValue(vcfRecord, allele, "ReMM", 69);
         String phenotype = (String) getCustomValue(vcfRecord, allele, "phenotype", 70);
-        int VIPVaranScore = calculateScore(region, ncER, fathmm, reMM, constraint);
+        int vIPVaranScore = ScoreCalculator.calculateScore(region, ncER, fathmm, reMM, constraint);
+
         System.out.println("constraint: " + constraint);
         System.out.println("region: " + region);
         System.out.println("fathmm: " +fathmm);
         System.out.println("ncer: " + ncER);
         System.out.println("ReMM: " +reMM);
         System.out.println("phenotype: " + phenotype);
+        System.out.println("VipVaranScore: " + vIPVaranScore);
 
         VCFHeader vcfHeader = new VCFHeader(vcfMetadata.unwrap());
         vcfHeader.addMetaDataLine(new VCFInfoHeaderLine(
                 "VIPVaranScore",
                 VCFHeaderLineCount.UNBOUNDED,
                 VCFHeaderLineType.Integer, "VIP-Varan score"));
-        annotatedCsqs.add(vipScoreAnnotator.annotate(VIPVaranScore, csqString));
+        annotatedCsqs.add(vipScoreAnnotator.annotate(vIPVaranScore, csqString));
       }
     }
     vcfRecord.setAttribute(nestedHeaderLine.getParentField(), annotatedCsqs);
@@ -115,42 +118,5 @@ public class AnnotateScoreImpl implements Classifier {
       }
     }
     return "";
-  }
-
-  private int calculateScore(String region, String ncER, String fathmm, String reMM, String constraint) {
-    // level 1: overlap with a region
-    // level 2: level 1 + score of ncER(>0.499) fathmm(>0.5) ReMM*(>0.5)
-    // level 3: level 2 + constraint region above or equal to 0.7
-    // level 4: Gado phenotype (something with phenotype)
-    int vipVaranScore  = 0;
-    if (!region.isEmpty()) {
-      vipVaranScore = 1;
-    }
-    if (goodToolScore(ncER, fathmm, reMM)) {
-      vipVaranScore = 2;
-    }
-    if (!region.isEmpty() && goodToolScore(ncER, fathmm, reMM) & getMaxScore(constraint.split("&")) >= 0.7) {
-      vipVaranScore = 3;
-    }
-
-    return vipVaranScore;
-  }
-
-  private boolean goodToolScore(String ncER, String fathmm, String reMM) {
-    double ncERscore = getMaxScore(ncER.split("&"));
-    double fathmmScore = getMaxScore(fathmm.split("&"));
-    double reMMScore = getMaxScore(reMM.split("&"));
-
-    return ncERscore > 49 || fathmmScore > 0.5 || reMMScore > 0.5;
-  }
-
-  private double getMaxScore(String[] scoreArray) {
-    // get max score because if one variant in the region is important the whole region is important
-    Set<Double> scores = new HashSet<>(scoreArray.length);
-
-    for(String score : scoreArray) {
-      scores.add(Double.parseDouble(score));
-    }
-    return Collections.max(scores);
   }
 }
