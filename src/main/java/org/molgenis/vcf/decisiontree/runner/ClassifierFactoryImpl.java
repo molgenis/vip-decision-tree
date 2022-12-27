@@ -3,7 +3,7 @@ package org.molgenis.vcf.decisiontree.runner;
 
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.Classifier;
-import org.molgenis.vcf.decisiontree.filter.ClassifierImpl;
+import org.molgenis.vcf.decisiontree.filter.AnnotateScore;
 import org.molgenis.vcf.decisiontree.filter.ConsequenceAnnotator;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.SampleAnnotator;
@@ -24,7 +24,7 @@ class ClassifierFactoryImpl implements ClassifierFactory {
       ConsequenceAnnotator consequenceAnnotator, RecordWriter recordWriter,
       VcfMetadata vcfMetadata) {
 
-    return new ClassifierImpl(new VepHelper(), recordWriter, vcfMetadata); // add VIPScore annotator here
+    return new AnnotateScore(new VepHelper(), recordWriter, vcfMetadata); // add VIPScore annotator here
   }
 
   @Override
