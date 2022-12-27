@@ -21,7 +21,7 @@ import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 
 @ExtendWith(MockitoExtension.class)
-class AnnotateScoreTest {
+class AnnotateScoreImplTest {
 
   @Mock
   private VcfMetadata vcfMetadata;
@@ -55,7 +55,7 @@ class AnnotateScoreTest {
     nestedHeaderLine = NestedHeaderLine.builder().parentField(parent)
         .nestedFields(nestedFields).build();
     when(vcfMetadata.getVepHeaderLine()).thenReturn(nestedHeaderLine);
-    classifier = new AnnotateScore(vepHelper, recordWriter, vcfMetadata);
+    classifier = new AnnotateScoreImpl(vepHelper, recordWriter, vcfMetadata, vipScoreAnnotator);
   }
 //  @Test
 //  void classify() {

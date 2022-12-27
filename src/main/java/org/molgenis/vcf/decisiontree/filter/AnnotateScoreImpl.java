@@ -13,20 +13,20 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AnnotateScore implements Classifier {
+public class AnnotateScoreImpl implements Classifier {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AnnotateScore.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AnnotateScoreImpl.class);
 
   private final VepHelper vepHelper;
   private final VcfMetadata vcfMetadata;
   private final RecordWriter recordWriter;
   private final VipScoreAnnotator vipScoreAnnotator;
 
-  public AnnotateScore(VepHelper vepHelper, RecordWriter recordWriter, VcfMetadata vcfMetadata) {
+  public AnnotateScoreImpl(VepHelper vepHelper, RecordWriter recordWriter, VcfMetadata vcfMetadata, VipScoreAnnotator vipScoreAnnotator) {
     this.vepHelper = requireNonNull(vepHelper);
     this.recordWriter = requireNonNull(recordWriter);
     this.vcfMetadata = requireNonNull(vcfMetadata);
-    this.vipScoreAnnotator = new VipScoreAnnotator(false, false);
+    this.vipScoreAnnotator = vipScoreAnnotator;
   }
 
   @Override
