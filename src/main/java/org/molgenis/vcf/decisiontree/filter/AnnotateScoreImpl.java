@@ -46,6 +46,11 @@ public class AnnotateScoreImpl implements Classifier {
   private VcfRecord processRecord(
       VcfRecord vcfRecord) {
     NestedHeaderLine nestedHeaderLine = vcfMetadata.getVepHeaderLine();
+//    VCFHeader vcfHeader = new VCFHeader(vcfMetadata.unwrap());
+//    vcfHeader.addMetaDataLine(new VCFInfoHeaderLine(
+//            "VIPVaranScore",
+//            VCFHeaderLineCount.UNBOUNDED,
+//            VCFHeaderLineType.Integer, "VIP-Varan_score"));
     Map<Integer, List<VcfRecord>> alleleCsqMap = vepHelper.getRecordPerConsequence(vcfRecord,
         nestedHeaderLine);
     List<String> annotatedCsqs = new ArrayList<>();
@@ -60,29 +65,16 @@ public class AnnotateScoreImpl implements Classifier {
       for (VcfRecord singleCsqRecord : singleCsqRecords) {
         String csqString = singleCsqRecord.getVepValues(nestedHeaderLine.getParentField())
             .get(0);
-        System.out.println(csqString);
-        System.out.println(csqString.split("\\|").length);
-        String constraint = (String) getCustomValue(vcfRecord, allele, "constraint", 64);
-        String region = (String) getCustomValue(vcfRecord, allele, "region", 65);
-        String fathmm = (String) getCustomValue(vcfRecord, allele, "fathmm_fathmm", 67);
-        String ncER = (String) getCustomValue(vcfRecord, allele, "ncER", 68);
-        String reMM = (String) getCustomValue(vcfRecord, allele, "ReMM", 69);
-        String phenotype = (String) getCustomValue(vcfRecord, allele, "phenotype", 70);
+
+        int csqStringLength = csqString.split("\\|").length;
+        String constraint = (String) getCustomValue(vcfRecord, allele, "constraint", csqStringLength - 15);
+        String region = (String) getCustomValue(vcfRecord, allele, "region", csqStringLength - 14);
+        String fathmm = (String) getCustomValue(vcfRecord, allele, "fathmm_fathmm", csqStringLength - 12);
+        String ncER = (String) getCustomValue(vcfRecord, allele, "ncER", csqStringLength - 11);
+        String reMM = (String) getCustomValue(vcfRecord, allele, "ReMM", csqStringLength - 10);
+        String phenotype = (String) getCustomValue(vcfRecord, allele, "phenotype", csqStringLength - 9);
         int vIPVaranScore = ScoreCalculator.calculateScore(region, ncER, fathmm, reMM, constraint);
 
-        System.out.println("constraint: " + constraint);
-        System.out.println("region: " + region);
-        System.out.println("fathmm: " +fathmm);
-        System.out.println("ncer: " + ncER);
-        System.out.println("ReMM: " +reMM);
-        System.out.println("phenotype: " + phenotype);
-        System.out.println("VipVaranScore: " + vIPVaranScore);
-
-        VCFHeader vcfHeader = new VCFHeader(vcfMetadata.unwrap());
-        vcfHeader.addMetaDataLine(new VCFInfoHeaderLine(
-                "VIPVaranScore",
-                VCFHeaderLineCount.UNBOUNDED,
-                VCFHeaderLineType.Integer, "VIP-Varan score"));
         annotatedCsqs.add(vipScoreAnnotator.annotate(vIPVaranScore, csqString));
       }
     }
