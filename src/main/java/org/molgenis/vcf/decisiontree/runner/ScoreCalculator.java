@@ -6,9 +6,8 @@ public class ScoreCalculator {
 
     public static int calculateScore(String region, String ncER, String fathmm, String reMM, String constraint) {
         // level 1: overlap with a region
-        // level 2: level 1 + score of ncER(>49.9) fathmm(>0.5) ReMM*(>0.5)
+        // level 2: score of ncER(>49.9) fathmm(>0.5) ReMM*(>0.5)
         // level 3: level 2 + constraint region above or equal to 0.7
-        // level 4: Gado phenotype (something with phenotype)
         int vipVaranScore  = 0;
         if (!region.isEmpty() ) {
             vipVaranScore = 1;
