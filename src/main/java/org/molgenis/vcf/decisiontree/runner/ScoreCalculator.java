@@ -13,7 +13,7 @@ public class ScoreCalculator {
         if (!region.isEmpty() ) {
             vipVaranScore = 1;
         }
-        if (goodToolScore(ncER, fathmm, reMM) || getMaxScore(constraint.split("&")) >= 0.7) {
+        if (goodToolScore(ncER, fathmm, reMM)) {
             vipVaranScore = 2;
         }
         if (goodToolScore(ncER, fathmm, reMM) & getMaxScore(constraint.split("&")) >= 0.7) {
