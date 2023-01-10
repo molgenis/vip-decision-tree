@@ -6,11 +6,11 @@ public class ScoreCalculator {
 
     public static int calculateScore(String region, String ncER, String fathmm, String reMM, String constraint) {
         // level 0: nothing
-        // level 1: overlap with a region
+        // level 1: overlap with a region or a constraint value above or equal to 0.7
         // level 2: score of ncER(>49.9) fathmm(>0.5) ReMM*(>0.5)
         // level 3: level 2 + constraint region above or equal to 0.7
         int vipVaranScore  = 0;
-        if (!region.isEmpty() ) {
+        if (!region.isEmpty() || getMaxScore(constraint.split("&")) >= 0.7) {
             vipVaranScore = 1;
         }
         if (goodToolScore(ncER, fathmm, reMM)) {

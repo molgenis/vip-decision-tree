@@ -94,6 +94,6 @@ class ScoreCalculatorTest {
     void calculateScore_onlyConstraint() {
         int score = ScoreCalculator.calculateScore("", "", "", "", "0.9");
 
-        assertEquals(2, score);
+        assertEquals(1, score);
     }
 }
