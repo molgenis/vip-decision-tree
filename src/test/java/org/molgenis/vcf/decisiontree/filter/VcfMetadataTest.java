@@ -11,7 +11,6 @@ import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,6 @@ class VcfMetadataTest {
   @Mock
   VCFHeader vcfHeader;
   private VcfMetadata vcfMetadata;
-  private VcfMetadata vcfMetadataStrict;
 
   @BeforeEach
   void setUp() {
@@ -51,8 +49,7 @@ class VcfMetadataTest {
         .nestedFields(vepNestedMetadata).parentField(vepField).build();
     NestedHeaderLine nestedGtHeaderLine = NestedHeaderLine.builder()
         .nestedFields(Map.of()).parentField(vepField).build();
-    vcfMetadata = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, false);
-    vcfMetadataStrict = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, true);
+    vcfMetadata = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine);
   }
 
 @Test
@@ -229,10 +226,6 @@ class VcfMetadataTest {
         vcfMetadata.getField(fieldId));
   }
 
-  @Test
-  void getFieldInfoUnknown() {
-    assertThrows(UnknownFieldException.class, () -> vcfMetadataStrict.getField("INFO/unknown"));
-  }
 
   @Test
   void getFieldFormatInfo() {
@@ -264,17 +257,6 @@ class VcfMetadataTest {
   }
 
   @Test
-  void getNestedFieldInfoUnknownStrict() {
-    assertThrows(UnknownFieldException.class, () -> vcfMetadataStrict.getField("INFO/VEP/unknown"));
-  }
-
-  @Test
-  void getNestedFieldInfoUnknownParentStrict() {
-    assertThrows(UnsupportedNestedFieldException.class,
-        () -> vcfMetadataStrict.getField("INFO/VOP/consequence"));
-  }
-
-  @Test
   void getNestedFieldInfoString() {
     String fieldId = "INFO/VEP/consequence";
     assertEquals(createNestedField("consequence"),
@@ -286,10 +268,6 @@ class VcfMetadataTest {
     assertEquals(new MissingField("unknown"), vcfMetadata.getField("FORMAT/unknown"));
   }
 
-  @Test
-  void getFieldFormatUnknownStrict() {
-    assertThrows(UnknownFieldException.class, () -> vcfMetadataStrict.getField("FORMAT/unknown"));
-  }
 
   @Test
   void unwrap() {

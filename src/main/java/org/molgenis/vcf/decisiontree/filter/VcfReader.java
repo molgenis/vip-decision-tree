@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import htsjdk.variant.vcf.VCFFileReader;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.molgenis.vcf.decisiontree.runner.info.GenotypeMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.molgenis.vcf.decisiontree.runner.info.VepMetadataParser;
 
@@ -16,25 +15,18 @@ public class VcfReader implements AutoCloseable {
 
   private final VCFFileReader vcfFileReader;
   private final VepMetadataParser vepMetadataParser;
-  private final boolean strict;
-  private final GenotypeMetadataMapper genotypeMetadataMapper;
   private boolean inited = false;
   private NestedHeaderLine vepNestedHeaderLine = null;
   private NestedHeaderLine gtNestedHeaderLine = null;
 
-  public VcfReader(VCFFileReader vcfFileReader, VepMetadataParser vepMetadataParser,
-      GenotypeMetadataMapper genotypeMetadataMapper,
-      boolean strict) {
+  public VcfReader(VCFFileReader vcfFileReader, VepMetadataParser vepMetadataParser) {
     this.vcfFileReader = requireNonNull(vcfFileReader);
     this.vepMetadataParser = requireNonNull(vepMetadataParser);
-    this.genotypeMetadataMapper = requireNonNull(genotypeMetadataMapper);
-    this.strict = strict;
   }
 
   private void initNestedMeta() {
     if (!inited) {
       vepNestedHeaderLine = vepMetadataParser.map(vcfFileReader.getFileHeader());
-      gtNestedHeaderLine = genotypeMetadataMapper.map();
       inited = true;
     }
   }
@@ -45,8 +37,7 @@ public class VcfReader implements AutoCloseable {
 
   public VcfMetadata getMetadata() {
     initNestedMeta();
-    return new VcfMetadata(vcfFileReader.getFileHeader(), vepNestedHeaderLine, gtNestedHeaderLine,
-        strict);
+    return new VcfMetadata(vcfFileReader.getFileHeader(), vepNestedHeaderLine, gtNestedHeaderLine);
   }
 
   @Override

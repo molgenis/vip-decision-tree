@@ -5,7 +5,6 @@ import static java.util.Objects.requireNonNull;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import htsjdk.variant.vcf.*;
 import org.molgenis.vcf.decisiontree.filter.model.*;
 import org.molgenis.vcf.decisiontree.runner.ScoreCalculator;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;

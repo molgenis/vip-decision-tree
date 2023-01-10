@@ -5,9 +5,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,14 +33,14 @@ class AnnotateScoreImplTest {
   @Mock
   private RecordWriter recordWriter;
   @Mock
-  private ConsequenceAnnotator consequenceAnnotator;
+  private VipScoreAnnotator vipScoreAnnotator;
   @Mock
   private VepHelper vepHelper;
 
   private Classifier classifier;
   private FieldImpl parent;
   private NestedHeaderLine nestedHeaderLine;
-  private VipScoreAnnotator vipScoreAnnotator;
+
 
   @BeforeEach
   void setUp() {
@@ -57,6 +60,7 @@ class AnnotateScoreImplTest {
     when(vcfMetadata.getVepHeaderLine()).thenReturn(nestedHeaderLine);
     classifier = new AnnotateScoreImpl(vepHelper, recordWriter, vcfMetadata, vipScoreAnnotator);
   }
+
 //  @Test
 //  void classify() {
 //    VcfRecord record0 = mock(VcfRecord.class, "record0");
@@ -89,25 +93,11 @@ class AnnotateScoreImplTest {
 //            nestedHeaderLine)).thenReturn(recordMap0);
 //    when(vepHelper.getRecordPerConsequence(record1,
 //            nestedHeaderLine)).thenReturn(recordMap1);
-//    Decision decision1a = Decision.builder().clazz("test1a").path(List.of())
-//            .labels(Set.of()).build();
-//    Decision decision2a = Decision.builder().clazz("test2a").path(List.of())
-//            .labels(Set.of()).build();
-//    Decision decision2b = Decision.builder().clazz("test2b").path(List.of())
-//            .labels(Set.of()).build();
-//
-//    doReturn(decision1a).when(decisionTreeExecutor)
-//            .execute(decisionTree, new Variant(vcfMetadata, record0a, allele0_1));
-//    doReturn(decision2a).when(decisionTreeExecutor)
-//            .execute(decisionTree, new Variant(vcfMetadata, record1a, allele1_1));
-//    doReturn(decision2b).when(decisionTreeExecutor)
-//            .execute(decisionTree, new Variant(vcfMetadata, record1b, allele1_2));
 //
 //    classifier.classify(vcfReader);
 //
-//    verify(consequenceAnnotator).annotate(decision1a, "");
-//    verify(consequenceAnnotator).annotate(decision2a, "");
-//    verify(consequenceAnnotator).annotate(decision2b, "");
+//    verify(vipScoreAnnotator).annotate(0, "");
+//    verify(vipScoreAnnotator).annotate(0, "");
+//    verify(vipScoreAnnotator).annotate(0, "");
 //  }
-
 }

@@ -2,7 +2,6 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.COMMON;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.FIELD_TOKEN_SEPARATOR;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.toFieldType;
@@ -31,16 +30,12 @@ import org.molgenis.vcf.utils.UnexpectedEnumException;
 public class VcfMetadata {
 
   private final VCFHeader vcfHeader;
-  private final boolean strict;
   private final NestedHeaderLine nestedVepHeaderLine;
-  private final NestedHeaderLine nestedGenotypeHeaderLine;
 
   public VcfMetadata(VCFHeader vcfHeader, NestedHeaderLine nestedVepHeaderLine,
-      NestedHeaderLine nestedGenotypeHeaderLine, boolean strict) {
+      NestedHeaderLine nestedGenotypeHeaderLine) {
     this.vcfHeader = requireNonNull(vcfHeader);
     this.nestedVepHeaderLine = requireNonNull(nestedVepHeaderLine);
-    this.nestedGenotypeHeaderLine = requireNonNull(nestedGenotypeHeaderLine);
-    this.strict = requireNonNull(strict);
   }
 
   public Field getField(String fieldId) {
@@ -60,9 +55,6 @@ public class VcfMetadata {
         break;
       case INFO_VEP:
         field = toNestedField(fieldTokens, fieldType, nestedVepHeaderLine);
-        break;
-      case GENOTYPE:
-        field = toNestedField(fieldTokens, fieldType, nestedGenotypeHeaderLine);
         break;
       default:
         throw new UnexpectedEnumException(fieldType);
@@ -113,18 +105,10 @@ public class VcfMetadata {
     String nestedFieldId = fieldTokens.get(2);
 
     if (!field.equals(nestedHeaderLine.getParentField().getId())) {
-      if (strict) {
-        throw new UnsupportedNestedFieldException(field);
-      } else {
         return new MissingField(field);
-      }
     }
 
-    Field nestedField = nestedHeaderLine.getField(nestedFieldId);
-    if (nestedField instanceof MissingField && strict) {
-      throw new UnknownFieldException(nestedFieldId, INFO_VEP);
-    }
-    return nestedField;
+    return nestedHeaderLine.getField(nestedFieldId);
   }
 
   private FieldImpl toCommonField(List<String> fieldTokens) {
@@ -232,24 +216,14 @@ public class VcfMetadata {
     switch (fieldType) {
       case FORMAT:
         vcfCompoundHeaderLine = vcfHeader.getFormatHeaderLine(field);
-        if (vcfCompoundHeaderLine == null && strict) {
-          throw new UnknownFieldException(field, fieldType);
-        }
         break;
       case INFO:
         vcfCompoundHeaderLine = vcfHeader.getInfoHeaderLine(field);
-        if (vcfCompoundHeaderLine == null && strict) {
-          throw new UnknownFieldException(field, INFO_VEP);
-        }
         break;
       default:
         throw new UnexpectedEnumException(fieldType);
     }
     return vcfCompoundHeaderLine;
-  }
-
-  public static boolean isSingleValueField(Field field) {
-    return field.getValueCount().getType() == Type.FIXED && field.getValueCount().getCount() == 1;
   }
 
   public Map<String, Integer> getSampleNameToOffset() {

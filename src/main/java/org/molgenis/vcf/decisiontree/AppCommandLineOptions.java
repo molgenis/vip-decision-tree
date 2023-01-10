@@ -15,28 +15,14 @@ class AppCommandLineOptions {
 
   static final String OPT_INPUT = "i";
   static final String OPT_INPUT_LONG = "input";
-  static final String OPT_CONFIG = "c";
-  static final String OPT_CONFIG_LONG = "config";
   static final String OPT_OUTPUT = "o";
   static final String OPT_OUTPUT_LONG = "output";
-  static final String OPT_LABELS = "l";
-  static final String OPT_LABELS_LONG = "labels";
-  static final String OPT_PATH = "p";
-  static final String OPT_PATH_LONG = "path";
   static final String OPT_FORCE = "f";
   static final String OPT_FORCE_LONG = "force";
   static final String OPT_DEBUG = "d";
   static final String OPT_DEBUG_LONG = "debug";
   static final String OPT_VERSION = "v";
   static final String OPT_VERSION_LONG = "version";
-  static final String OPT_STRICT = "s";
-  static final String OPT_STRICT_LONG = "strict";
-  static final String OPT_PROBANDS = "pb";
-  static final String OPT_PROBANDS_LONG = "probands";
-  static final String OPT_PED = "pd";
-  static final String OPT_PED_LONG = "pedigree";
-  static final String OPT_PHENOTYPES = "ph";
-  static final String OPT_PHENOTYPES_LONG = "phenotypes";
   static final String OPT_MODE = "m";
   static final String OPT_MODE_LONG = "mode";
   private static final Options APP_OPTIONS;
@@ -52,13 +38,6 @@ class AppCommandLineOptions {
             .desc("VEP* annotated input VCF file.")
             .build());
     appOptions.addOption(
-        Option.builder(OPT_CONFIG)
-            .hasArg(true)
-            .required()
-            .longOpt(OPT_CONFIG_LONG)
-            .desc("Input decision tree file (.json).")
-            .build());
-    appOptions.addOption(
         Option.builder(OPT_OUTPUT)
             .hasArg(true)
             .longOpt(OPT_OUTPUT_LONG)
@@ -70,44 +49,9 @@ class AppCommandLineOptions {
             .desc("Override the output file if it already exists.")
             .build());
     appOptions.addOption(
-        Option.builder(OPT_STRICT)
-            .longOpt(OPT_STRICT_LONG)
-            .desc(
-                "Throw exception if field from the decision tree is missing entirely in the input VCF.")
-            .build());
-    appOptions.addOption(
-        Option.builder(OPT_LABELS)
-            .longOpt(OPT_LABELS_LONG)
-            .desc("Write decision tree outcome labels to output VCF file.")
-            .build());
-    appOptions.addOption(
-        Option.builder(OPT_PATH)
-            .longOpt(OPT_PATH_LONG)
-            .desc("Write decision tree node path to output VCF file.")
-            .build());
-    appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging).")
-            .build());
-    appOptions.addOption(
-        Option.builder(OPT_PROBANDS)
-            .hasArg(true)
-            .longOpt(OPT_PROBANDS_LONG)
-            .desc("Comma-separated list of proband names.")
-            .build());
-    appOptions.addOption(
-        Option.builder(OPT_PED)
-            .hasArg(true)
-            .longOpt(OPT_PED_LONG)
-            .desc("Comma-separated list of pedigree files (.ped).")
-            .build());
-    appOptions.addOption(
-        Option.builder(OPT_PHENOTYPES)
-            .hasArg(true)
-            .longOpt(OPT_PHENOTYPES_LONG)
-            .desc(
-                "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
             .build());
     appOptions.addOption(
         Option.builder(OPT_MODE)
@@ -139,7 +83,6 @@ class AppCommandLineOptions {
 
   static void validateCommandLine(CommandLine commandLine) {
     validateInput(commandLine);
-    validateConfig(commandLine);
     validateOutput(commandLine);
     validateMode(commandLine);
   }
@@ -162,27 +105,6 @@ class AppCommandLineOptions {
     if (!inputPathStr.endsWith(".vcf") && !inputPathStr.endsWith(".vcf.gz")) {
       throw new IllegalArgumentException(
           format("Input file '%s' is not a .vcf or .vcf.gz file.", inputPathStr));
-    }
-  }
-
-  private static void validateConfig(CommandLine commandLine) {
-    Path configPath = Path.of(commandLine.getOptionValue(OPT_CONFIG));
-    if (!Files.exists(configPath)) {
-      throw new IllegalArgumentException(
-          format("Config file '%s' does not exist.", configPath.toString()));
-    }
-    if (Files.isDirectory(configPath)) {
-      throw new IllegalArgumentException(
-          format("Config file '%s' is a directory.", configPath.toString()));
-    }
-    if (!Files.isReadable(configPath)) {
-      throw new IllegalArgumentException(
-          format("Config file '%s' is not readable.", configPath.toString()));
-    }
-    String inputPathStr = configPath.toString();
-    if (!inputPathStr.endsWith(".json")) {
-      throw new IllegalArgumentException(
-          format("Config file '%s' is not a .json file.", inputPathStr));
     }
   }
 

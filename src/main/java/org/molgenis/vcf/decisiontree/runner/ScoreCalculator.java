@@ -5,6 +5,7 @@ import java.util.*;
 public class ScoreCalculator {
 
     public static int calculateScore(String region, String ncER, String fathmm, String reMM, String constraint) {
+        // level 0: nothing
         // level 1: overlap with a region
         // level 2: score of ncER(>49.9) fathmm(>0.5) ReMM*(>0.5)
         // level 3: level 2 + constraint region above or equal to 0.7
