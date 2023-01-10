@@ -66,7 +66,7 @@ class ScoreCalculatorTest {
     void calculateScore_MultipleToolScoresOneHigh() {
         int score = ScoreCalculator.calculateScore("", "0.105&0.88&1.09&90.0", "", "", "");
 
-        assertEquals(2, score);
+        assertEquals(1, score);
     }
 
     @Test
@@ -80,14 +80,14 @@ class ScoreCalculatorTest {
     void calculateScore_fathmmHighScore() {
         int score = ScoreCalculator.calculateScore("", "0", "0.9", "0", "");
 
-        assertEquals(2, score);
+        assertEquals(1, score);
     }
 
     @Test
     void calculateScore_reMMHighScore() {
         int score = ScoreCalculator.calculateScore("", "0", "0", "0.9", "");
 
-        assertEquals(2, score);
+        assertEquals(1, score);
     }
 
     @Test
