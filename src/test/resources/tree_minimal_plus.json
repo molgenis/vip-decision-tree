@@ -1,9 +1,0 @@
-{
-  "rootNode": "all",
-  "nodes": {
-    "all": {
-      "type": "LEAF",
-      "class": "all"
-    }
-  }
-}
