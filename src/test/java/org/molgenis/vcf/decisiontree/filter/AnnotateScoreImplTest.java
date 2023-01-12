@@ -1,10 +1,5 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -20,8 +15,11 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.decisiontree.runner.ScoreCalculator;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
+
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AnnotateScoreImplTest {
@@ -61,43 +59,43 @@ class AnnotateScoreImplTest {
     classifier = new AnnotateScoreImpl(vepHelper, recordWriter, vcfMetadata, vipScoreAnnotator);
   }
 
-//  @Test
-//  void classify() {
-//    VcfRecord record0 = mock(VcfRecord.class, "record0");
-//    org.molgenis.vcf.decisiontree.filter.Allele allele0_1 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
-//            .bases("G").index(0).build();
-//    when(record0.getAltAllele(0)).thenReturn(allele0_1);
-//
-//    when(record0.getNrAltAlleles()).thenReturn(1);
-//    VcfRecord record1 = mock(VcfRecord.class, "record1");
-//    when(record1.getNrAltAlleles()).thenReturn(2);
-//    org.molgenis.vcf.decisiontree.filter.Allele allele1_1 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
-//            .bases("G").index(0).build();
-//    org.molgenis.vcf.decisiontree.filter.Allele allele1_2 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
-//            .bases("T").index(1).build();
-//    when(record1.getAltAllele(0)).thenReturn(allele1_1);
-//    when(record1.getAltAllele(1)).thenReturn(allele1_2);
-//
-//    when(vcfReader.stream()).thenReturn(Stream.of(record0, record1));
-//
-//    VcfRecord record0a = mock(VcfRecord.class, "record0a");
-//    when(record0a.getVepValues(parent)).thenReturn(List.of(""));
-//    VcfRecord record1a = mock(VcfRecord.class, "record1a");
-//    when(record1a.getVepValues(parent)).thenReturn(List.of(""));
-//    VcfRecord record1b = mock(VcfRecord.class, "record1b");
-//    when(record1b.getVepValues(parent)).thenReturn(List.of(""));
-//    Map<Integer, List<VcfRecord>> recordMap0 = Map.of(1, List.of(record0a));
-//    Map<Integer, List<VcfRecord>> recordMap1 = Map.of(1, List.of(record1a), 2,
-//            List.of(record1b));
-//    when(vepHelper.getRecordPerConsequence(record0,
-//            nestedHeaderLine)).thenReturn(recordMap0);
-//    when(vepHelper.getRecordPerConsequence(record1,
-//            nestedHeaderLine)).thenReturn(recordMap1);
-//
-//    classifier.classify(vcfReader);
-//
-//    verify(vipScoreAnnotator).annotate(0, "");
-//    verify(vipScoreAnnotator).annotate(0, "");
-//    verify(vipScoreAnnotator).annotate(0, "");
-//  }
+  @Test
+  void classify() {
+    VcfRecord record0 = mock(VcfRecord.class, "record0");
+    org.molgenis.vcf.decisiontree.filter.Allele allele0_1 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
+            .bases("G").index(0).build();
+    when(record0.getAltAllele(0)).thenReturn(allele0_1);
+
+    when(record0.getNrAltAlleles()).thenReturn(1);
+    VcfRecord record1 = mock(VcfRecord.class, "record1");
+    when(record1.getNrAltAlleles()).thenReturn(2);
+    org.molgenis.vcf.decisiontree.filter.Allele allele1_1 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
+            .bases("G").index(0).build();
+    org.molgenis.vcf.decisiontree.filter.Allele allele1_2 = org.molgenis.vcf.decisiontree.filter.Allele.builder()
+            .bases("T").index(1).build();
+    when(record1.getAltAllele(0)).thenReturn(allele1_1);
+    when(record1.getAltAllele(1)).thenReturn(allele1_2);
+
+    when(vcfReader.stream()).thenReturn(Stream.of(record0, record1));
+
+    VcfRecord record0a = mock(VcfRecord.class, "record0a");
+    when(record0a.getVepValues(parent)).thenReturn(List.of(""));
+    VcfRecord record1a = mock(VcfRecord.class, "record1a");
+    when(record1a.getVepValues(parent)).thenReturn(List.of(""));
+    VcfRecord record1b = mock(VcfRecord.class, "record1b");
+    when(record1b.getVepValues(parent)).thenReturn(List.of(""));
+    Map<Integer, List<VcfRecord>> recordMap0 = Map.of(1, List.of(record0a));
+    Map<Integer, List<VcfRecord>> recordMap1 = Map.of(1, List.of(record1a), 2,
+            List.of(record1b));
+    when(vepHelper.getRecordPerConsequence(record0,
+            nestedHeaderLine)).thenReturn(recordMap0);
+    when(vepHelper.getRecordPerConsequence(record1,
+            nestedHeaderLine)).thenReturn(recordMap1);
+
+    int score1 = ScoreCalculator.calculateScore("", "", "", "", "");
+
+    classifier.classify(vcfReader);
+
+    verify(vipScoreAnnotator, times(3)).annotate(score1, "");
+  }
 }
