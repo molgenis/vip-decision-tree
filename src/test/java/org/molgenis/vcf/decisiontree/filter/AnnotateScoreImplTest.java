@@ -92,8 +92,7 @@ class AnnotateScoreImplTest {
     when(vepHelper.getRecordPerConsequence(record1,
             nestedHeaderLine)).thenReturn(recordMap1);
 
-    int score1 = ScoreCalculator.calculateScore("", "", "", "", "");
-
+    int score1 = ScoreCalculator.calculateScore("", "", "", "", "", "0.001");
     classifier.classify(vcfReader);
 
     verify(vipScoreAnnotator, times(3)).annotate(score1, "");

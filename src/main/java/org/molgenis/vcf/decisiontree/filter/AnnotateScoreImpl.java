@@ -72,7 +72,9 @@ public class AnnotateScoreImpl implements Classifier {
         String ncER = (String) getCustomValue(vcfRecord, allele, "ncER", csqStringLength - 11);
         String reMM = (String) getCustomValue(vcfRecord, allele, "ReMM", csqStringLength - 10);
         String phenotype = (String) getCustomValue(vcfRecord, allele, "phenotype", csqStringLength - 9);
-        int vIPVaranScore = ScoreCalculator.calculateScore(region, ncER, fathmm, reMM, constraint);
+        String gnomad = (String) getCustomValue(vcfRecord, allele, "gnomad", csqStringLength - 7);
+
+        int vIPVaranScore = ScoreCalculator.calculateScore(region, fathmm, ncER, reMM, constraint, gnomad);
 
         annotatedCsqs.add(vipScoreAnnotator.annotate(vIPVaranScore, csqString));
       }
@@ -106,6 +108,11 @@ public class AnnotateScoreImpl implements Classifier {
         } else {
           return vcfRecord.getValue(nestedField, allele);
         }
+      }
+      case "gnomad" -> {
+        Object score = vcfRecord.getValue(nestedField, allele);
+        return Objects.requireNonNullElse(score, "");
+
       }
     }
     return "";
