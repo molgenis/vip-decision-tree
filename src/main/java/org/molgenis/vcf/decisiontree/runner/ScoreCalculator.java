@@ -9,9 +9,9 @@ public class ScoreCalculator {
         // level -1: if everything is empty
         // level 0: GNOMAD above 1%, scores below FDR50, no region, constraint below 0.7
         // level 1: GNOMAD Rare variant population AF < 1% (0.01)
-        // level 2: overlap with a region
-        // level 3: score of ncER(>49.9) fathmm(>0.5) ReMM*(>0.5) and overlap with a region or a constraint value above or equal to 0.7
-        // level 4: level 2 + constraint region above or equal to 0.7
+        // level 2: level 1 + overlap with a region
+        // level 3: level 2 + score of ncER(>49.9) fathmm(>0.5) ReMM*(>0.5)
+        // level 4: level 3 + constraint region above or equal to 0.7
         int vipVaranScore = -2;
 
         if (!goodGnomad(gnomad)) {
