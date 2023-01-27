@@ -1,13 +1,11 @@
 package org.molgenis.vcf.decisiontree.loader;
 
-import htsjdk.samtools.util.CloseableIterator;
-import htsjdk.variant.variantcontext.VariantContext;
-import htsjdk.variant.vcf.VCFFileReader;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigNode.Type.LEAF;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
@@ -31,19 +28,22 @@ public class Visualizer {
   static Map<String, AtomicInteger> paths = new HashMap<>();
 
   public static void main(String[] args) {
+    Path path = Path.of(args[0]);
+    String filename = path.getFileName().toString();
     paths.put("", new AtomicInteger(0));
     ConfigDecisionTreeValidator validator = new ConfigDecisionTreeValidatorImpl();
     ConfigDecisionTreeLoader loader = new ConfigDecisionTreeLoaderImpl(validator);
-    ConfigDecisionTree tree = loader.load(Path.of(
-        "C:\\Users\\bartc\\Documents\\git\\vip-decision-tree\\src\\test\\resources\\example.json"));
+    ConfigDecisionTree tree = loader.load(
+        path);
 
     List<Node> nodes = new ArrayList<>();
     Map<String, Edge> edges = new HashMap<>();
 
     for (Entry<String, ConfigNode> entry : tree.getNodes().entrySet()) {
-      nodes.add(new Node(entry.getKey(), entry.getValue().getType() == Type.LEAF ? entry.getKey()
-          : entry.getValue().getDescription(),
-          getCount(entry.getKey())));
+      nodes.add(
+          new Node(entry.getKey(),
+              entry.getValue().getDescription() != null ? entry.getValue().getDescription()
+                  : entry.getKey(), entry.getValue().getType() == LEAF));
       ConfigNode node = entry.getValue();
       if (node.getType() == Type.BOOL) {
         ConfigBoolNode boolNode = (ConfigBoolNode) node;
@@ -81,54 +81,52 @@ public class Visualizer {
         processOutcomes(edges, entry, categoricalOutcomes);
       }
     }
-    visualize(nodes, edges);
+    visualize(nodes, edges, filename);
   }
 
-  private static Integer getCount(String key) {
-    int count = 0;
-    for (Entry<String, AtomicInteger> entry : paths.entrySet()) {
-      List<String> path = Arrays.asList(entry.getKey().split("\\|"));
-      if (path.contains(key)) {
-        count += entry.getValue().get();
-      }
+  private static void visualize(List<Node> nodes, Map<String, Edge> edges, String filename) {
+    StringBuilder html = new StringBuilder();
+    for (Node node : nodes) {
+      html.append(nodeToHtml(node));
+      html.append("\n");
     }
-    return count;
-  }
-
-  private static void visualize(List<Node> nodes, Map<String, Edge> edges) {
-    for (String pathString : paths.keySet()) {
-      StringBuilder html = new StringBuilder();
-      for (Node node : nodes) {
-        html.append(nodeToHtml(node));
-        html.append("\n");
-      }
-      for (Edge edge : edges.values()) {
-        html.append(edgeToHtml(edge));
-        html.append("\n");
-      }
-      try {
-        String template = Files.readString(Path.of(
-            "C:\\Users\\bartc\\Documents\\git\\vip-decision-tree\\src\\main\\resources\\template.html"));
-        String output = template.replace("DAGRE_GOES_HERE", html.toString());
-        Files.writeString(Path.of(
-                "C:\\Users\\bartc\\Documents\\git\\vip-decision-tree\\src\\main\\resources\\tree.html"
-            ),
-            output);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+    for (Edge edge : edges.values()) {
+      html.append(edgeToHtml(edge));
+      html.append("\n");
+    }
+    try {
+      String template = Files.readString(Path.of(
+          "src\\main\\resources\\template.html"));
+      String output = template.replace("DAGRE_GOES_HERE", html.toString());
+      Files.writeString(Path.of(
+              "src\\main\\resources\\" + filename + ".html"
+          ),
+          output);
+    } catch (IOException e) {
+      e.printStackTrace();
     }
   }
 
   private static String edgeToHtml(Edge edge) {
+    String label =
+        edge.getLabel() != null ? edge.getLabel() : "Add description to visualize a label.";
     return String
         .format("g.setEdge(\"%s\", \"%s\", {label: \"%s\"});", edge.getNode1(), edge.getNode2(),
-            edge.getLabel());
+            label);
   }
 
   private static String nodeToHtml(Node node) {
-    return String.format("g.setNode(\"%s\", {label: \"%s\"});", node.getId(),
-        String.format("%s", node.getLabel()));
+    String htmlNode;
+    if (node.isLeaf()) {
+      htmlNode = String.format("g.setNode(\"%s\", {label: \"%s\", style: \"fill: #00ff00\"});",
+          node.getId(),
+          String.format("%s", node.getLabel()));
+    } else {
+      htmlNode = String.format("g.setNode(\"%s\", {label: \"%s\", style: \"fill: #33ccff\"});",
+          node.getId(),
+          String.format("%s", node.getLabel()));
+    }
+    return htmlNode;
   }
 
   private static void processOutcomes(Map<String, Edge> edges, Entry<String, ConfigNode> entry,
