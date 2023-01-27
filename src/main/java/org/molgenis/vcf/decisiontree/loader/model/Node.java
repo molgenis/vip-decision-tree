@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigNode.Type;
 
 @Value
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
@@ -12,5 +13,5 @@ public class Node {
 
   String id;
   String label;
-  Integer count;
+  boolean leaf;
 }
