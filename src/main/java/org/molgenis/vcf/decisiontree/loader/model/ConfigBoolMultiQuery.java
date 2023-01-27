@@ -5,8 +5,10 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import org.springframework.lang.Nullable;
 
 @Value
 @Builder
@@ -15,6 +17,7 @@ import lombok.Value;
 public class ConfigBoolMultiQuery {
 
   String id = UUID.randomUUID().toString();
+  String description;
   List<ConfigBoolQuery> queries;
   ConfigNodeOutcome outcomeTrue;
   ConfigClauseOperator operator;
