@@ -15,6 +15,7 @@ import lombok.Value;
 public class ConfigBoolMultiQuery {
 
   String id = UUID.randomUUID().toString();
+  String description;
   List<ConfigBoolQuery> queries;
   ConfigNodeOutcome outcomeTrue;
   ConfigClauseOperator operator;
