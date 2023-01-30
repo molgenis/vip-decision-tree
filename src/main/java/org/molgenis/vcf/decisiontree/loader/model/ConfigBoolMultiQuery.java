@@ -5,10 +5,8 @@ import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.NoArgsConstructor;
 import lombok.Value;
-import org.springframework.lang.Nullable;
 
 @Value
 @Builder
