@@ -22,7 +22,7 @@ usage: java -jar vcf-decision-tree.jar -v
  -v,--version   Print version.
 ```
 
-*:[VIP-non-coding](https://github.com/molgenis/vip/tree/feat/non-coding)
+*: [VIP-non-coding](https://github.com/molgenis/vip/tree/feat/non-coding)
 
 ## Examples
 
@@ -33,7 +33,7 @@ java -jar vcf-decision-tree.jar -i /Users/jonathan/Documents/Afstudeeropdracht/D
 
 ##### Variant annotation
 
-The tool will calculate a score of 0 to 3 based on vallues that are annotated by [VIP-non-coding](https://github.com/molgenis/vip/tree/feat/non-coding)
+The tool will calculate a score of 0 to 4 based on vallues that are annotated by [VIP-non-coding](https://github.com/molgenis/vip/tree/feat/non-coding)
 The scoring system is based on the scoring table from [GREEN-DB](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8934622/) 
 
 The scoring system works as follows:
