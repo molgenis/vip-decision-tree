@@ -81,10 +81,11 @@ public class Visualizer {
         processOutcomes(edges, entry, categoricalOutcomes);
       }
     }
-    visualize(nodes, edges, filename);
+    visualizeHtml(nodes, edges, filename);
+    visualizeMermaid(nodes, edges, filename);
   }
 
-  private static void visualize(List<Node> nodes, Map<String, Edge> edges, String filename) {
+  private static void visualizeHtml(List<Node> nodes, Map<String, Edge> edges, String filename) {
     StringBuilder html = new StringBuilder();
     for (Node node : nodes) {
       html.append(nodeToHtml(node));
@@ -102,6 +103,27 @@ public class Visualizer {
               "src\\main\\resources\\" + filename + ".html"
           ),
           output);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static void visualizeMermaid(List<Node> nodes, Map<String, Edge> edges, String filename) {
+    StringBuilder mmiContent = new StringBuilder();
+    mmiContent.append("flowchart TD\n");
+    for (Node node : nodes) {
+      mmiContent.append(nodeToMmi(node));
+      mmiContent.append("\n");
+    }
+    for (Edge edge : edges.values()) {
+      mmiContent.append(edgeToMmi(edge));
+      mmiContent.append("\n");
+    }
+    try {
+      Files.writeString(Path.of(
+              "src\\main\\resources\\" + filename + ".mmi"
+          ),
+          mmiContent.toString());
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -127,6 +149,17 @@ public class Visualizer {
           String.format("%s", node.getLabel()));
     }
     return htmlNode;
+  }
+
+  private static String edgeToMmi(Edge edge) {
+    String label =
+        edge.getLabel() != null ? edge.getLabel() : "Add description to visualize a label.";
+    return String
+        .format("%s_ -->|%s| %s_", edge.getNode1(), label, edge.getNode2());
+  }
+
+  private static String nodeToMmi(Node node) {
+    return String.format("%s_([%s])", node.getId(), node.getLabel());
   }
 
   private static void processOutcomes(Map<String, Edge> edges, Entry<String, ConfigNode> entry,
