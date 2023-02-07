@@ -109,21 +109,21 @@ public class Visualizer {
   }
 
   private static void visualizeMermaid(List<Node> nodes, Map<String, Edge> edges, String filename) {
-    StringBuilder mmiContent = new StringBuilder();
-    mmiContent.append("flowchart TD\n");
+    StringBuilder mmdContent = new StringBuilder();
+    mmdContent.append("flowchart TD\n");
     for (Node node : nodes) {
-      mmiContent.append(nodeToMmi(node));
-      mmiContent.append("\n");
+      mmdContent.append(nodeToMmd(node));
+      mmdContent.append("\n");
     }
     for (Edge edge : edges.values()) {
-      mmiContent.append(edgeToMmi(edge));
-      mmiContent.append("\n");
+      mmdContent.append(edgeToMmd(edge));
+      mmdContent.append("\n");
     }
     try {
       Files.writeString(Path.of(
-              "src\\main\\resources\\" + filename + ".mmi"
+              "src\\main\\resources\\" + filename + ".mmd"
           ),
-          mmiContent.toString());
+          mmdContent.toString());
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -151,14 +151,14 @@ public class Visualizer {
     return htmlNode;
   }
 
-  private static String edgeToMmi(Edge edge) {
+  private static String edgeToMmd(Edge edge) {
     String label =
         edge.getLabel() != null ? edge.getLabel() : "Add description to visualize a label.";
     return String
         .format("%s_ -->|%s| %s_", edge.getNode1(), label, edge.getNode2());
   }
 
-  private static String nodeToMmi(Node node) {
+  private static String nodeToMmd(Node node) {
     return String.format("%s_([%s])", node.getId(), node.getLabel());
   }
 
