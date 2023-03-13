@@ -1,7 +1,10 @@
 ##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description="All filters passed">
-##INFO=<ID=CLINVAR,Number=.,Type=String,Description="Clinvar prediction">
+##FORMAT=<ID=FORMAT1,Number=.,Type=String,Description="\"format1\"">
+##FORMAT=<ID=FORMAT2,Number=1,Type=String,Description="\"format2\"">
+##INFO=<ID=CLINVAR,Number=.,Type=String,Description="\"Clinvar prediction\"">
 ##INFO=<ID=CSQ,Number=.,Type=String,Description="Consequence annotations from Ensembl VEP. Format: VKGL_CL|Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation|ALLELE_NUM|DISTANCE|STRAND|FLAGS|PICK|SYMBOL_SOURCE|HGNC_ID|GENE_PHENO|gnomAD_AF|gnomAD_AFR_AF|gnomAD_AMR_AF|gnomAD_ASJ_AF|gnomAD_EAS_AF|gnomAD_FIN_AF|gnomAD_NFE_AF|gnomAD_OTH_AF|gnomAD_SAS_AF|CLIN_SIG|SOMATIC|PHENO|PUBMED|CHECK_REF|SpliceAI_pred_DS_AG|SpliceAI_pred_DS_AL|SpliceAI_pred_DS_DG|SpliceAI_pred_DS_DL|VIPC|VIPP|VIPL">
+##INFO=<ID=TEST2,Number=1,Type=String,Description="\"Test\"">
 ##SnpEffCmd="SnpEff  GRCh37.75 ../vip-decision-tree/src/CSQ/resources/test_annotated.vcf "
 ##SnpEffVersion="4.3t (build 2017-11-24 10:18), by Pablo Cingolani"
 ##VEP="v100" time="2020-09-29 12:32:32" cache="/apps/data/Ensembl/VEP/100/homo_sapiens/100_GRCh37" ensembl=100.171092c ensembl-variation=100.b220ff4 ensembl-funcgen=100.f0c3948 ensembl-io=100.f87ae4f 1000genomes="phase3" COSMIC="90" ClinVar="201912" ESP="20141103" HGMD-PUBLIC="20194" assembly="GRCh37.p13" dbSNP="153" gencode="GENCODE 19" genebuild="2011-04" gnomAD="r2.1" polyphen="2.2.2" regbuild="1.0" sift="sift5.2.2"

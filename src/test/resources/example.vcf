@@ -25,7 +25,10 @@
 ##contig=<ID=Y,length=59373566,assembly=b37>
 ##contig=<ID=MT,assembly=b37,length=16569>
 ##FILTER=<ID=PASS,Description="All filters passed">
-##INFO=<ID=CLINVAR,Number=.,Type=String,Description="Clinvar prediction">
+##INFO=<ID=CLINVAR,Number=.,Type=String,Description="\"Clinvar prediction\"">
+##INFO=<ID=TEST2,Number=1,Type=String,Description="\"Test\"">
+##FORMAT=<ID=FORMAT1,Number=.,Type=String,Description="\"format1\"">
+##FORMAT=<ID=FORMAT2,Number=1,Type=String,Description="\"format2\"">
 ##fileDate=20200320
 ##bcftools_normVersion=1.10.2+htslib-1.10.2
 ##bcftools_normCommand=norm -m -both -s -o /vip/test_annotated_pipeline_out/step0_preprocess/test_annotated.vcf --threads 4 /vip/CSQ.vcf; Date=Thu Sep 24 13:48:54 2020
