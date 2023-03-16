@@ -4,10 +4,12 @@ import static java.lang.String.format;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPC_S;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPP_S;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPL_S;
+import static org.molgenis.vcf.utils.utils.HeaderUtils.fixVcfFilterHeaderLines;
+import static org.molgenis.vcf.utils.utils.HeaderUtils.fixVcfFormatHeaderLines;
+import static org.molgenis.vcf.utils.utils.HeaderUtils.fixVcfInfoHeaderLines;
 
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
-import htsjdk.variant.vcf.VCFFilterHeaderLine;
 import htsjdk.variant.vcf.VCFFormatHeaderLine;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFHeaderLine;
@@ -157,67 +159,5 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
     headerLines.addAll(additionalInfoLines);
     vcfHeader = new VCFHeader(headerLines, vcfHeader.getGenotypeSamples());
     return vcfHeader;
-  }
-
-  private static Collection<VCFFormatHeaderLine> fixVcfFormatHeaderLines(VCFHeader vcfHeader) {
-    Collection<VCFFormatHeaderLine> formatHeaderLines = new HashSet<>(
-        vcfHeader.getFormatHeaderLines());
-    for (VCFFormatHeaderLine vcfHeaderLine : vcfHeader.getFormatHeaderLines()) {
-      String description = vcfHeaderLine.getDescription();
-      if (description.startsWith("\"")) {
-        formatHeaderLines.remove(vcfHeaderLine);
-        description = "\\" + description;
-        if (vcfHeaderLine.getCountType() == VCFHeaderLineCount.INTEGER) {
-          formatHeaderLines.add(
-              new VCFFormatHeaderLine(vcfHeaderLine.getID(), vcfHeaderLine.getCount(),
-                  vcfHeaderLine.getType(),
-                  description));
-        } else {
-          formatHeaderLines.add(
-              new VCFFormatHeaderLine(vcfHeaderLine.getID(), vcfHeaderLine.getCountType(),
-                  vcfHeaderLine.getType(),
-                  description));
-        }
-      }
-    }
-    return formatHeaderLines;
-  }
-
-  private static Collection<VCFFilterHeaderLine> fixVcfFilterHeaderLines(VCFHeader vcfHeader) {
-    Collection<VCFFilterHeaderLine> filterHeaderLines = new HashSet<>(
-        vcfHeader.getFilterLines());
-    for (VCFFilterHeaderLine vcfHeaderLine : vcfHeader.getFilterLines()) {
-      String description = vcfHeaderLine.getDescription();
-      if (description.startsWith("\"")) {
-        filterHeaderLines.remove(vcfHeaderLine);
-        description = "\\" + description;
-        filterHeaderLines.add(
-            new VCFFilterHeaderLine(vcfHeaderLine.getID(),
-                description));
-      }
-    }
-    return filterHeaderLines;
-  }
-
-  private static Set<VCFInfoHeaderLine> fixVcfInfoHeaderLines(VCFHeader vcfHeader) {
-    Set<VCFInfoHeaderLine> infoHeaderLines = new HashSet<>(vcfHeader.getInfoHeaderLines());
-    for (VCFInfoHeaderLine vcfHeaderLine : vcfHeader.getInfoHeaderLines()) {
-      String description = vcfHeaderLine.getDescription();
-      if (description.startsWith("\"")) {
-        infoHeaderLines.remove(vcfHeaderLine);
-        description = "\\" + description;
-        if (vcfHeaderLine.getCountType() == VCFHeaderLineCount.INTEGER) {
-          infoHeaderLines.add(new VCFInfoHeaderLine(vcfHeaderLine.getID(), vcfHeaderLine.getCount(),
-              vcfHeaderLine.getType(),
-              description, vcfHeaderLine.getSource(), vcfHeaderLine.getVersion()));
-        } else {
-          infoHeaderLines.add(
-              new VCFInfoHeaderLine(vcfHeaderLine.getID(), vcfHeaderLine.getCountType(),
-                  vcfHeaderLine.getType(),
-                  description, vcfHeaderLine.getSource(), vcfHeaderLine.getVersion()));
-        }
-      }
-    }
-    return infoHeaderLines;
   }
 }
