@@ -29,7 +29,7 @@ class VepHelperTest {
   private NestedHeaderLine vepHeader;
 
   @BeforeEach
-  private void setUp() {
+  void setUp() {
     vepHelper = new VepHelper();
     ValueCount valueCount = ValueCount.builder().type(Type.VARIABLE).build();
     FieldImpl parent = FieldImpl.builder().id("VEP").fieldType(
