@@ -4,6 +4,9 @@ import static java.lang.String.format;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPC_S;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPP_S;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPL_S;
+import static org.molgenis.vcf.utils.utils.HeaderUtils.fixVcfFilterHeaderLines;
+import static org.molgenis.vcf.utils.utils.HeaderUtils.fixVcfFormatHeaderLines;
+import static org.molgenis.vcf.utils.utils.HeaderUtils.fixVcfInfoHeaderLines;
 
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 import htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder;
@@ -114,7 +117,7 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
       VCFHeader vcfHeader) {
     VCFInfoHeaderLine vepHeader = null;
 
-    Collection<VCFInfoHeaderLine> infoHeaderLines = vcfHeader.getInfoHeaderLines();
+    Collection<VCFInfoHeaderLine> infoHeaderLines = fixVcfInfoHeaderLines(vcfHeader);
 
     for (VCFInfoHeaderLine infoHeaderLine : infoHeaderLines) {
       if (infoHeaderLine.getID().equals(vcfMetadata.getVepHeaderLine().getParentField().getId())) {
@@ -148,8 +151,8 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
     headerLines.add(
         new VCFInfoHeaderLine(vepHeader.getID(), vepHeader.getCountType(), vepHeader.getType(),
             vepDescriptionBuilder.toString(), vepHeader.getSource(), vepHeader.getVersion()));
-    headerLines.addAll(vcfHeader.getFormatHeaderLines());
-    headerLines.addAll(vcfHeader.getFilterLines());
+    headerLines.addAll(fixVcfFormatHeaderLines(vcfHeader));
+    headerLines.addAll(fixVcfFilterHeaderLines(vcfHeader));
     headerLines.addAll(vcfHeader.getOtherHeaderLines());
     headerLines.addAll(vcfHeader.getContigLines());
     headerLines.addAll(infoHeaderLines);
