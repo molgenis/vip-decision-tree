@@ -1,6 +1,58 @@
 {
-  "rootNode": "depth",
+  "rootNode": "family",
   "nodes": {
+    "family": {
+      "type": "BOOL",
+      "query": {
+        "field": "SAMPLE/FAMILY_ID",
+        "operator": "==",
+        "value": "FAM001"
+      },
+      "outcomeTrue": {
+        "nextNode": "proband_hom_ref"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_false"
+      },
+      "outcomeMissing": {
+        "nextNode": "proband_hom_ref"
+      }
+    },
+    "proband_hom_ref": {
+      "description": "Proband homozygous reference call",
+      "type": "BOOL_MULTI",
+      "fields": [
+        "SAMPLE/PROBAND",
+        "FORMAT/TYPE"
+      ],
+      "outcomes": [
+        {
+          "description": "Proband homozygous reference call",
+          "operator": "AND",
+          "queries": [
+            {
+              "field": "SAMPLE/PROBAND",
+              "operator": "==",
+              "value": true
+            },
+            {
+              "field": "FORMAT/TYPE",
+              "operator": "==",
+              "value": "HOM_REF"
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_false"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "depth"
+      },
+      "outcomeMissing": {
+        "nextNode": "depth"
+      }
+    },
     "depth": {
       "type": "BOOL",
       "query": {
