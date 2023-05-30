@@ -48,30 +48,19 @@ public class VcfMetadata {
 
     Field field;
     FieldType fieldType = toFieldType(fieldTokens);
-    switch (fieldType) {
-      case COMMON:
-        field = toCommonField(fieldTokens);
-        break;
-      case INFO, FORMAT:
-        field = toCompoundField(fieldTokens, fieldType);
-        break;
-      case SAMPLE:
-        field = toSampleField(fieldTokens);
-        break;
-      case INFO_VEP:
-        field = toNestedField(fieldTokens, fieldType, nestedVepHeaderLine);
-        break;
-      case GENOTYPE:
-        field = toNestedField(fieldTokens, fieldType, nestedGenotypeHeaderLine);
-        break;
-      default:
-        throw new UnexpectedEnumException(fieldType);
-    }
+    field = switch (fieldType) {
+      case COMMON -> toCommonField(fieldTokens);
+      case INFO, FORMAT -> toCompoundField(fieldTokens, fieldType);
+      case SAMPLE -> toSampleField(fieldTokens);
+      case INFO_VEP -> toNestedField(fieldTokens, fieldType, nestedVepHeaderLine);
+      case GENOTYPE -> toNestedField(fieldTokens, fieldType, nestedGenotypeHeaderLine);
+      default -> throw new UnexpectedEnumException(fieldType);
+    };
 
     return field;
   }
 
-  private Field toSampleField(List<String> fieldTokens) {
+  private static Field toSampleField(List<String> fieldTokens) {
     if (fieldTokens.size() != 2) {
       throw new InvalidNumberOfTokensException(fieldTokens, SAMPLE, 2);
     }
@@ -80,20 +69,19 @@ public class VcfMetadata {
     ValueCount valueCount;
     String field = fieldTokens.get(1);
     switch (field.toUpperCase()) {
-      case "PROBAND":
+      case "PROBAND" -> {
         valueType = ValueType.FLAG;
         valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
-        break;
-      case "AFFECTED_STATUS", "SEX", "FATHER", "MOTHER", "FAMILY":
+      }
+      case "ID", "AFFECTED_STATUS", "SEX", "FATHER_ID", "MOTHER_ID", "FAMILY_ID" -> {
         valueType = ValueType.STRING;
         valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
-        break;
-      case "PHENOTYPES":
+      }
+      case "PHENOTYPES" -> {
         valueType = ValueType.STRING;
         valueCount = ValueCount.builder().type(Type.VARIABLE).nullable(true).build();
-        break;
-      default:
-        throw new UnsupportedFieldException(field);
+      }
+      default -> throw new UnsupportedFieldException(field);
     }
     return FieldImpl.builder()
         .id(field)
