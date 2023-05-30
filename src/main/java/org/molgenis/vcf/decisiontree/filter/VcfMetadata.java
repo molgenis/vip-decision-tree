@@ -40,7 +40,7 @@ public class VcfMetadata {
     this.vcfHeader = requireNonNull(vcfHeader);
     this.nestedVepHeaderLine = requireNonNull(nestedVepHeaderLine);
     this.nestedGenotypeHeaderLine = requireNonNull(nestedGenotypeHeaderLine);
-    this.strict = requireNonNull(strict);
+    this.strict = strict;
   }
 
   public Field getField(String fieldId) {
@@ -54,6 +54,7 @@ public class VcfMetadata {
       case SAMPLE -> toSampleField(fieldTokens);
       case INFO_VEP -> toNestedField(fieldTokens, fieldType, nestedVepHeaderLine);
       case GENOTYPE -> toNestedField(fieldTokens, fieldType, nestedGenotypeHeaderLine);
+      //noinspection UnnecessaryDefault
       default -> throw new UnexpectedEnumException(fieldType);
     };
 
@@ -124,24 +125,23 @@ public class VcfMetadata {
     ValueCount valueCount;
     String field = fieldTokens.get(0);
     switch (field) {
-      case "#CHROM", "REF":
+      case "#CHROM", "REF" -> {
         valueType = ValueType.STRING;
         valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
-        break;
-      case "POS":
+      }
+      case "POS" -> {
         valueType = ValueType.INTEGER;
         valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
-        break;
-      case "ID", "FILTER", "ALT":
+      }
+      case "ID", "FILTER", "ALT" -> {
         valueType = ValueType.STRING;
         valueCount = ValueCount.builder().type(Type.VARIABLE).nullable(true).build();
-        break;
-      case "QUAL":
+      }
+      case "QUAL" -> {
         valueType = ValueType.FLOAT;
         valueCount = ValueCount.builder().type(Type.FIXED).count(1).nullable(true).build();
-        break;
-      default:
-        throw new UnsupportedFieldException(field);
+      }
+      default -> throw new UnsupportedFieldException(field);
     }
     return FieldImpl.builder()
         .id(field)
@@ -164,47 +164,28 @@ public class VcfMetadata {
 
     ValueType valueType;
     VCFHeaderLineType lineType = vcfCompoundHeaderLine.getType();
-    switch (lineType) {
-      case Integer:
-        valueType = ValueType.INTEGER;
-        break;
-      case Float:
-        valueType = ValueType.FLOAT;
-        break;
-      case String:
-        valueType = ValueType.STRING;
-        break;
-      case Character:
-        valueType = ValueType.CHARACTER;
-        break;
-      case Flag:
-        valueType = ValueType.FLAG;
-        break;
-      default:
-        throw new UnexpectedEnumException(lineType);
-    }
+    valueType = switch (lineType) {
+      case Integer -> ValueType.INTEGER;
+      case Float -> ValueType.FLOAT;
+      case String -> ValueType.STRING;
+      case Character -> ValueType.CHARACTER;
+      case Flag -> ValueType.FLAG;
+      //noinspection UnnecessaryDefault
+      default -> throw new UnexpectedEnumException(lineType);
+    };
 
     ValueCountBuilder builder = ValueCount.builder();
     VCFHeaderLineCount countType = vcfCompoundHeaderLine.getCountType();
     switch (countType) {
-      case INTEGER:
+      case INTEGER -> {
         int count = vcfCompoundHeaderLine.getCount();
         builder.type(Type.FIXED).count(count).nullable(valueType != ValueType.FLAG);
-        break;
-      case A:
-        builder.type(Type.A).nullable(true);
-        break;
-      case R:
-        builder.type(Type.R).nullable(true);
-        break;
-      case G:
-        builder.type(Type.G).nullable(true);
-        break;
-      case UNBOUNDED:
-        builder.type(Type.VARIABLE).nullable(true);
-        break;
-      default:
-        throw new UnexpectedEnumException(countType);
+      }
+      case A -> builder.type(Type.A).nullable(true);
+      case R -> builder.type(Type.R).nullable(true);
+      case G -> builder.type(Type.G).nullable(true);
+      case UNBOUNDED -> builder.type(Type.VARIABLE).nullable(true);
+      default -> throw new UnexpectedEnumException(countType);
     }
 
     return FieldImpl.builder()
@@ -218,20 +199,19 @@ public class VcfMetadata {
   private VCFCompoundHeaderLine getVcfCompoundHeaderLine(FieldType fieldType, String field) {
     VCFCompoundHeaderLine vcfCompoundHeaderLine;
     switch (fieldType) {
-      case FORMAT:
+      case FORMAT -> {
         vcfCompoundHeaderLine = vcfHeader.getFormatHeaderLine(field);
         if (vcfCompoundHeaderLine == null && strict) {
           throw new UnknownFieldException(field, fieldType);
         }
-        break;
-      case INFO:
+      }
+      case INFO -> {
         vcfCompoundHeaderLine = vcfHeader.getInfoHeaderLine(field);
         if (vcfCompoundHeaderLine == null && strict) {
           throw new UnknownFieldException(field, INFO_VEP);
         }
-        break;
-      default:
-        throw new UnexpectedEnumException(fieldType);
+      }
+      default -> throw new UnexpectedEnumException(fieldType);
     }
     return vcfCompoundHeaderLine;
   }
