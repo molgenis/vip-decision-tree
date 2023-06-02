@@ -114,6 +114,9 @@ public class Visualizer {
     for (Node node : nodes) {
       mmdContent.append(nodeToMmd(node));
       mmdContent.append("\n");
+      if(node.isLeaf()){
+        mmdContent.append(String.format("style %s_ fill:#00ff00\n", node.getId()));
+      }
     }
     for (Edge edge : edges.values()) {
       mmdContent.append(edgeToMmd(edge));
@@ -155,11 +158,11 @@ public class Visualizer {
     String label =
         edge.getLabel() != null ? edge.getLabel() : "Add description to visualize a label.";
     return String
-        .format("%s_ -->|%s| %s_", edge.getNode1(), label, edge.getNode2());
+        .format("%s_ -->|\"%s\"| %s_", edge.getNode1(), label, edge.getNode2());
   }
 
   private static String nodeToMmd(Node node) {
-    return String.format("%s_([%s])", node.getId(), node.getLabel());
+    return String.format("%s_(\"%s\")", node.getId(), node.getLabel());
   }
 
   private static void processOutcomes(Map<String, Edge> edges, Entry<String, ConfigNode> entry,
