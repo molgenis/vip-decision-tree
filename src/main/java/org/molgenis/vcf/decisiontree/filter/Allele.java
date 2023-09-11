@@ -11,5 +11,5 @@ import lombok.experimental.NonFinal;
 public class Allele {
 
   @NonNull String bases;
-  @NonNull int index;
+  int index;
 }
