@@ -5,9 +5,12 @@ import static java.util.Objects.requireNonNull;
 
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 
+import java.io.Serial;
+
 public class UnknownFieldException extends
     RuntimeException {
-
+  @Serial
+  private static final long serialVersionUID = 1L;
   private static final String MESSAGE = "Unknown '%s' field '%s'.";
   private final String field;
   private final FieldType type;

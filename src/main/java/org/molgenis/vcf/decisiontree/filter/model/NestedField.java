@@ -11,7 +11,6 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class NestedField extends FieldImpl implements Comparable<NestedField> {
 
-  @NonNull
   final int index;
   @NonNull
   final Field parent;
