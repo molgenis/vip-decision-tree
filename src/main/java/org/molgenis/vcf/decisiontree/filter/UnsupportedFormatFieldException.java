@@ -1,10 +1,13 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import java.io.Serial;
+
 import static java.util.Objects.requireNonNull;
 
 public class UnsupportedFormatFieldException extends
     RuntimeException {
-
+  @Serial
+  private static final long serialVersionUID = 1L;
   private final Class<?> clazz;
 
   public UnsupportedFormatFieldException(Class<?> clazz) {

@@ -4,8 +4,11 @@ import static java.lang.String.format;
 
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
 
-public class FileValueNotAllowedException extends RuntimeException {
+import java.io.Serial;
 
+public class FileValueNotAllowedException extends RuntimeException {
+  @Serial
+  private static final long serialVersionUID = 1L;
   public FileValueNotAllowedException(ConfigOperator operator, String allowedFileOperators,
       String field) {
     super(

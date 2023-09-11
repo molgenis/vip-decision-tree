@@ -5,8 +5,11 @@ import static java.lang.String.format;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 
-public class UnsupportedValueCountException extends RuntimeException {
+import java.io.Serial;
 
+public class UnsupportedValueCountException extends RuntimeException {
+  @Serial
+  private static final long serialVersionUID = 1L;
   public UnsupportedValueCountException(Field field, DecisionType decisionType) {
     super(
         format(

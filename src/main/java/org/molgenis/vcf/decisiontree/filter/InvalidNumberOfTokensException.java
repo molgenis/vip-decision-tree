@@ -2,11 +2,13 @@ package org.molgenis.vcf.decisiontree.filter;
 
 import static java.lang.String.format;
 
+import java.io.Serial;
 import java.util.List;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 
 public class InvalidNumberOfTokensException extends RuntimeException {
-
+  @Serial
+  private static final long serialVersionUID = 1L;
   private static final String MESSAGE = "Unsupported number of tokens for input '%s' expecting %d tokens for fieldtype '%s'.";
   private final List<String> fieldTokens;
   private final FieldType type;

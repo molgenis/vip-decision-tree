@@ -6,8 +6,11 @@ import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
 
-public class UnsupportedOperatorException extends RuntimeException {
+import java.io.Serial;
 
+public class UnsupportedOperatorException extends RuntimeException {
+  @Serial
+  private static final long serialVersionUID = 1L;
   public UnsupportedOperatorException(ConfigOperator operator, Field field,
       DecisionType decisionType) {
     super(
