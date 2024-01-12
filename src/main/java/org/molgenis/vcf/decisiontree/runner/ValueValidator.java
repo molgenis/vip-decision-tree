@@ -21,12 +21,7 @@ import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeValidationException;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
+import org.molgenis.vcf.decisiontree.loader.model.*;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 import org.molgenis.vcf.utils.sample.model.Sex;
@@ -56,7 +51,7 @@ public class ValueValidator {
             configBoolMultiQuery -> configBoolMultiQuery.getQueries()
                 .forEach(query -> validateQueryValue(nodeId, query, vcfMetadata)));
         break;
-      case CATEGORICAL, EXISTS, LEAF:
+      case CATEGORICAL, EXISTS, LEAF, EXPRESSION:
         break;
       default:
         throw new UnexpectedEnumException(node.getType());

@@ -12,10 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
-import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
-import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
-import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
+import org.molgenis.vcf.decisiontree.filter.model.*;
 
 @ExtendWith(MockitoExtension.class)
 class NodeEvaluatorServiceImplTest {
@@ -27,6 +24,8 @@ class NodeEvaluatorServiceImplTest {
   private CategoricalNodeEvaluator categoricalNodeEvaluator;
   @Mock
   private ExistsNodeEvaluator existsNodeEvaluator;
+  @Mock
+  private ExpressionNodeEvaluator expressionNodeEvaluator;
   private NodeEvaluatorServiceImpl nodeEvaluatorService;
 
   @BeforeEach
@@ -34,7 +33,7 @@ class NodeEvaluatorServiceImplTest {
     nodeEvaluatorService =
         new NodeEvaluatorServiceImpl(boolNodeEvaluator, boolMultiNodeEvaluator,
             categoricalNodeEvaluator,
-            existsNodeEvaluator);
+            existsNodeEvaluator, expressionNodeEvaluator);
   }
 
   @Test
