@@ -1,25 +1,23 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
-import static java.util.Objects.requireNonNull;
-
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
-import org.springframework.stereotype.Component;
 
-@Component
+import static java.util.Objects.requireNonNull;
+
 public class VepMetadataParserImpl implements VepMetadataParser {
 
-  private final VepMetadataMapper mapper;
+  private final VepMetadataMapper vepMetadataMapper;
 
-  public VepMetadataParserImpl(VepMetadataMapper mapper) {
-    this.mapper = requireNonNull(mapper);
+  public VepMetadataParserImpl(VepMetadataMapper vepMetadataMapper) {
+    this.vepMetadataMapper = requireNonNull(vepMetadataMapper);
   }
 
   @Override
   public NestedHeaderLine map(VCFHeader header) {
     for (VCFInfoHeaderLine headerLine : header.getInfoHeaderLines()) {
-      if (mapper.canMap(headerLine)) {
-        return mapper.map(headerLine);
+      if (vepMetadataMapper.canMap(headerLine)) {
+        return vepMetadataMapper.map(headerLine);
       }
     }
     throw new MissingVepException();

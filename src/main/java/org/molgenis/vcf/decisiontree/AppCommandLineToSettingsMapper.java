@@ -1,29 +1,20 @@
 package org.molgenis.vcf.decisiontree;
 
-import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_CONFIG;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_FORCE;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_INPUT;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_LABELS;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_MODE;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_OUTPUT;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PATH;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PED;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PHENOTYPES;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_PROBANDS;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_STRICT;
-
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.*;
 
 @Component
 class AppCommandLineToSettingsMapper {
@@ -45,15 +36,17 @@ class AppCommandLineToSettingsMapper {
   Settings map(CommandLine commandLine, String... args) {
     AppSettings appSettings = createAppSettings(args);
     Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
+    Path metadataPath = Path.of(commandLine.getOptionValue(OPT_METADATA));
     ConfigDecisionTree configDecisionTree = createDecisionTree(commandLine);
     WriterSettings writerSettings = createWriterSettings(commandLine);
     boolean strict = commandLine.hasOption(OPT_STRICT);
-    Mode mode = getMode(commandLine);
+    Mode mode = getType(commandLine);
     SampleSettings sampleSettings = createSampleSettings(commandLine);
 
     return Settings.builder()
         .mode(mode)
         .inputVcfPath(inputPath)
+        .metadataPath(metadataPath)
         .configDecisionTree(configDecisionTree)
         .appSettings(appSettings)
         .writerSettings(writerSettings)
@@ -62,10 +55,10 @@ class AppCommandLineToSettingsMapper {
         .build();
   }
 
-  private Mode getMode(CommandLine commandLine) {
+  private Mode getType(CommandLine commandLine) {
     Mode mode;
-    if (commandLine.hasOption(OPT_MODE)) {
-      mode = Mode.valueOf(commandLine.getOptionValue(OPT_MODE).toUpperCase());
+    if (commandLine.hasOption(OPT_TYPE)) {
+      mode = Mode.valueOf(commandLine.getOptionValue(OPT_TYPE).toUpperCase());
     } else {
       mode = Mode.VARIANT;
     }

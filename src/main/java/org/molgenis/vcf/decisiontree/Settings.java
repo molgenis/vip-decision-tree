@@ -12,6 +12,7 @@ public class Settings {
 
   Mode mode;
   Path inputVcfPath;
+  Path metadataPath;
   ConfigDecisionTree configDecisionTree;
   AppSettings appSettings;
   WriterSettings writerSettings;
