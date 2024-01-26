@@ -1,37 +1,30 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
-import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
-
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
-import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
-import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
+import org.molgenis.vcf.decisiontree.filter.model.*;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.molgenis.vcf.utils.metadata.FieldMetadataService;
 import org.molgenis.vcf.utils.model.FieldMetadata;
 import org.molgenis.vcf.utils.model.NumberType;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 
-@Component
-public class VepInfoMetadataMapper implements VepMetadataMapper {
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
+
+public class VepMetadataMapperImpl implements VepMetadataMapper {
 
   public static final String ALLELE_NUM = "ALLELE_NUM";
   private static final String INFO_DESCRIPTION_PREFIX =
       "Consequence annotations from Ensembl VEP. Format: ";
 
-  private final FieldMetadataService vepMetadataService;
+  private final FieldMetadataService fieldMetadataService;
 
-  public VepInfoMetadataMapper(
-      @Qualifier("vepMetadataService") FieldMetadataService metadataService) {
-    this.vepMetadataService = metadataService;
+  public VepMetadataMapperImpl(FieldMetadataService fieldMetadataService) {
+    this.fieldMetadataService = requireNonNull(fieldMetadataService);
   }
 
   @Override
@@ -54,7 +47,7 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
             .separator('|')
             .build();
 
-    FieldMetadata nestedMetadata = vepMetadataService.load(vcfInfoHeaderLine);
+    FieldMetadata nestedMetadata = fieldMetadataService.load(vcfInfoHeaderLine);
     for (Entry<String, org.molgenis.vcf.utils.model.NestedField> entry : nestedMetadata.getNestedFields()
         .entrySet()) {
       NestedField nestedField = mapNested(entry.getKey(), entry.getValue(), vepField);
@@ -80,6 +73,7 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
       case FLAG -> ValueType.FLAG;
       case CHARACTER -> ValueType.CHARACTER;
       case STRING, CATEGORICAL -> ValueType.STRING;
+      //noinspection UnnecessaryDefault
       default -> throw new UnexpectedEnumException(type);
     };
   }
@@ -96,6 +90,7 @@ public class VepInfoMetadataMapper implements VepMetadataMapper {
       case PER_ALT_AND_REF -> Type.R;
       case PER_GENOTYPE -> Type.G;
       case OTHER -> VARIABLE;
+      //noinspection UnnecessaryDefault
       default -> throw new UnexpectedEnumException(numberType);
     };
   }

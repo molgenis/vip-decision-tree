@@ -24,10 +24,11 @@ class AppIT {
   @Test
   void test() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
     String treeConfigFile = ResourceUtils.getFile("classpath:example.json").toString();
     String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
 
-    String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile};
+    String[] args = {"-i", inputFile, "-m", metadataFile, "-c", treeConfigFile, "-o", outputFile};
     SpringApplication.run(App.class, args);
 
     String outputVcf = Files.readString(Path.of(outputFile));
@@ -45,10 +46,11 @@ class AppIT {
   @Test
   void testIncludePathsAndLabels() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:example.vcf").toString();
+    String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
     String treeConfigFile = ResourceUtils.getFile("classpath:example.json").toString();
     String outputFile = sharedTempDir.resolve("example-classified_paths-labels.vcf").toString();
 
-    String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile, "-l", "-p"};
+    String[] args = {"-i", inputFile, "-m", metadataFile, "-c", treeConfigFile, "-o", outputFile, "-l", "-p"};
     SpringApplication.run(App.class, args);
 
     String outputVcf =
@@ -68,12 +70,13 @@ class AppIT {
   @Test
   void testSamples() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:example_samples.vcf").toString();
+    String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
     String treeConfigFile = ResourceUtils.getFile("classpath:example_sample.json").toString();
     String pedFile = ResourceUtils.getFile("classpath:example_samples.ped").toString();
     String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
 
-    String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
-        "-m", "samPlE", "-ph", "HP:0000951;HP:0003124", "-pd", pedFile
+    String[] args = {"-i", inputFile, "-m", metadataFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
+        "-t", "samPlE", "-ph", "HP:0000951;HP:0003124", "-pd", pedFile
     };
     SpringApplication.run(App.class, args);
 
@@ -93,11 +96,12 @@ class AppIT {
   @Test
   void testSamplesPathLabels() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:example_samples.vcf").toString();
+    String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
     String treeConfigFile = ResourceUtils.getFile("classpath:example_sample.json").toString();
     String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
 
-    String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
-        "-l", "-p", "-m", "sAMPlE", "-ph", "HP:0000951;HP:0003124",};
+    String[] args = {"-i", inputFile, "-m", metadataFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
+        "-l", "-p", "-t", "sAMPlE", "-ph", "HP:0000951;HP:0003124",};
     SpringApplication.run(App.class, args);
 
     String outputVcf = Files.readString(Path.of(outputFile));
@@ -117,11 +121,12 @@ class AppIT {
   @Test
   void testSamplesNoProbandPhenoPed() throws IOException {
     String inputFile = ResourceUtils.getFile("classpath:example_samples.vcf").toString();
+    String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
     String treeConfigFile = ResourceUtils.getFile("classpath:example_sample.json").toString();
     String outputFile = sharedTempDir.resolve("example-classified-noPPP.vcf").toString();
 
-    String[] args = {"-i", inputFile, "-c", treeConfigFile, "-o", outputFile,
-        "-m", "samPlE", "-l", "-p",
+    String[] args = {"-i", inputFile, "-m", metadataFile, "-c", treeConfigFile, "-o", outputFile,
+        "-t", "samPlE", "-l", "-p",
     };
     SpringApplication.run(App.class, args);
 

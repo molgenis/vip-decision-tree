@@ -27,52 +27,38 @@ import org.molgenis.vcf.utils.model.FieldMetadata;
 import org.molgenis.vcf.utils.model.NumberType;
 
 @ExtendWith(MockitoExtension.class)
-class VepInfoMetadataMapperTest {
+class VepMetadataMapperImplTest {
 
-  private VepInfoMetadataMapper vepInfoMetadataMapper;
+  private VepMetadataMapperImpl vepMetadataMapperImpl;
 
   @Mock
   VCFInfoHeaderLine headerLine;
   @Mock
   FieldMetadataService metadataService;
 
-  private FieldImpl vepField;
-
   @BeforeEach
   void setUp() {
-
-    vepInfoMetadataMapper = new VepInfoMetadataMapper(metadataService);
-
-    vepField = FieldImpl.builder()
-        .id("CSQ")
-        .fieldType(FieldType.INFO)
-        .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(VARIABLE).build())
-        .separator('|')
-        .build();
+    vepMetadataMapperImpl = new VepMetadataMapperImpl(metadataService);
   }
 
   @Test
   void canMap() {
     when(headerLine.getDescription()).thenReturn(
         "Consequence annotations from Ensembl VEP. Format: Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation|DISTANCE|STRAND|FLAGS|PICK|SYMBOL_SOURCE|HGNC_ID|GENE_PHENO|gnomAD_AF|gnomAD_AFR_AF|gnomAD_AMR_AF|gnomAD_ASJ_AF|gnomAD_EAS_AF|gnomAD_FIN_AF|gnomAD_NFE_AF|gnomAD_OTH_AF|gnomAD_SAS_AF|CLIN_SIG|SOMATIC|PHENO|PUBMED|CHECK_REF");
-    assertTrue(vepInfoMetadataMapper.canMap(headerLine));
+    assertTrue(vepMetadataMapperImpl.canMap(headerLine));
   }
 
   @Test
   void cantMapDesc() {
     when(headerLine.getDescription()).thenReturn(
         "Other annotations not from Ensembl VEP. Format: Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation|DISTANCE|STRAND|FLAGS|PICK|SYMBOL_SOURCE|HGNC_ID|GENE_PHENO|gnomAD_AF|gnomAD_AFR_AF|gnomAD_AMR_AF|gnomAD_ASJ_AF|gnomAD_EAS_AF|gnomAD_FIN_AF|gnomAD_NFE_AF|gnomAD_OTH_AF|gnomAD_SAS_AF|CLIN_SIG|SOMATIC|PHENO|PUBMED|CHECK_REF");
-    assertFalse(vepInfoMetadataMapper.canMap(headerLine));
+    assertFalse(vepMetadataMapperImpl.canMap(headerLine));
   }
 
   @Test
   void map() {
     when(headerLine.getID()).thenReturn(
         "CSQ");
-    org.molgenis.vcf.utils.model.Field vepUtilsField = org.molgenis.vcf.utils.model.Field.builder()
-        .type(org.molgenis.vcf.utils.model.ValueType.STRING).numberType(NumberType.OTHER)
-        .separator('|').required(true).label("CSQ").description("CSQ").build();
     HashMap<String, org.molgenis.vcf.utils.model.NestedField> vepMeta = new HashMap<>();
     vepMeta.put("Allele", org.molgenis.vcf.utils.model.NestedField.builder().index(4).numberCount(1)
         .numberType(NumberType.NUMBER)
@@ -95,7 +81,7 @@ class VepInfoMetadataMapperTest {
     when(metadataService.load(headerLine)).thenReturn(
         FieldMetadata.builder().nestedFields(vepMeta).build());
 
-    NestedHeaderLine actual = vepInfoMetadataMapper
+    NestedHeaderLine actual = vepMetadataMapperImpl
         .map(headerLine);
 
     Field vepField = FieldImpl.builder().id("CSQ").fieldType(FieldType.INFO)
