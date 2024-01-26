@@ -53,9 +53,10 @@ contain the following:
 ## Usage
 
 ```
-usage: java -jar vcf-decision-tree.jar -i <arg> -c <arg> [-o <arg>] [-f]
+usage: java -jar vcf-decision-tree.jar -i <arg> -c <arg> [-m <arg>] [-o <arg>] [-f]
        [-s] [-l] [-p] [-d] [-pb <arg>] [-pd <arg>] [-ph <arg>] [-m <arg>]
  -i,--input <arg>         VEP* annotated input VCF file.
+ -m,--metadata <arg>      VCF metadata file (.json).
  -c,--config <arg>        Input decision tree file (.json).
  -o,--output <arg>        Output VCF file (.vcf or .vcf.gz).
  -f,--force               Override the output file if it already exists.
@@ -85,9 +86,9 @@ usage: java -jar vcf-decision-tree.jar -v
 
 ## Examples
 ```
-java -jar vcf-decision-tree.jar -i my.vcf -c decision_tree.json -o out.vcf
-java -jar vcf-decision-tree.jar -i my.vcf.gz -c decision_tree.json -o out.vcf.gz
-java -jar vcf-decision-tree.jar -i my.vcf.gz -c decision_tree.json -o out.vcf.gz -f -l -p
+java -jar vcf-decision-tree.jar -i my.vcf -m field_metadata.json -c decision_tree.json -o out.vcf
+java -jar vcf-decision-tree.jar -i my.vcf.gz -m field_metadata.json -c decision_tree.json -o out.vcf.gz
+java -jar vcf-decision-tree.jar -i my.vcf.gz -m field_metadata.json -c decision_tree.json -o out.vcf.gz -f -l -p
 java -jar vcf-decision-tree.jar -v
 ```
 
