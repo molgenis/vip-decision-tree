@@ -9,7 +9,7 @@ import static java.util.Objects.requireNonNull;
 public class VepMetadataParserFactoryImpl implements VepMetadataParserFactory {
     private final VepMetadataMapperFactory vepMetadataMapperFactory;
 
-    private VepMetadataParserFactoryImpl(VepMetadataMapperFactory vepMetadataMapperFactory) {
+    public VepMetadataParserFactoryImpl(VepMetadataMapperFactory vepMetadataMapperFactory) {
         this.vepMetadataMapperFactory = requireNonNull(vepMetadataMapperFactory);
     }
 
