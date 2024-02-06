@@ -81,6 +81,9 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
       case LEAF:
         validateLeafNode(id, (ConfigLeafNode) node);
         break;
+      case EXPRESSION:
+        //FIXME
+        break;
       default:
         throw new UnexpectedEnumException(node.getType());
     }

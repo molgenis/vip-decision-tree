@@ -1,5 +1,5 @@
 {
-  "rootNode": "filter",
+  "rootNode": "gnomad",
   "nodes": {
     "filter": {
       "type": "BOOL",
@@ -117,13 +117,15 @@
       }
     },
     "gnomad": {
-      "type": "BOOL",
-      "description": "gnomAD_AF < 0.02",
-      "query": {
-        "field": "INFO/CSQ/gnomAD_AF",
-        "operator": "<",
-        "value": 0.02
-      },
+      "type": "EXPRESSION",
+      "description": "a*b>10",
+      "fields": "a=INFO/CSQ/gnomAD_AF,b=INFO/CSQ/SpliceAI_pred_DS_DL",
+      "expression":
+        {
+          "expression": "$a*$b",
+          "operator": ">",
+          "value": 1
+        },
       "outcomeTrue": {
         "nextNode": "effect"
       },

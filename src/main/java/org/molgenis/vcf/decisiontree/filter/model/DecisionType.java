@@ -4,5 +4,6 @@ public enum DecisionType {
   BOOL,
   BOOL_MULTI,
   CATEGORICAL,
-  EXISTS
+  EXISTS,
+  EXPRESSION
 }

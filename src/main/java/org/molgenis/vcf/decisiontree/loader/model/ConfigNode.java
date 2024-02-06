@@ -9,6 +9,7 @@ public interface ConfigNode {
     BOOL_MULTI,
     CATEGORICAL,
     EXISTS,
+    EXPRESSION,
     LEAF
   }
 

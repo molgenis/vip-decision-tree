@@ -1,0 +1,512 @@
+{
+  "files": {
+    "panel" : {
+      "path" : "/groups/umcg-hlhs/tmp01/projects/104522/runs/001/resources/HLHS_gene_list_v2.tsv"
+    }
+  },
+  "rootNode": "chrom",
+  "nodes": {
+    "chrom": {
+      "description": "Chromosome 1-22-X-Y-MT",
+      "type": "BOOL",
+      "query": {
+        "field": "#CHROM",
+        "operator": "in",
+        "value": [
+          "chr1",
+          "chr2",
+          "chr3",
+          "chr4",
+          "chr5",
+          "chr6",
+          "chr7",
+          "chr8",
+          "chr9",
+          "chr10",
+          "chr11",
+          "chr12",
+          "chr13",
+          "chr14",
+          "chr15",
+          "chr16",
+          "chr17",
+          "chr18",
+          "chr19",
+          "chr20",
+          "chr21",
+          "chr22",
+          "chrX",
+          "chrY",
+          "chrM"
+        ]
+      },
+      "outcomeTrue": {
+        "nextNode": "gene"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_rm"
+      },
+      "outcomeMissing": {
+        "nextNode": "gene"
+      }
+    },
+    "gene": {
+      "description": "Gene exists",
+      "type": "EXISTS",
+      "field": "INFO/CSQ/Gene",
+      "outcomeTrue": {
+        "nextNode": "consequence"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_rm"
+      }
+    },
+    "consequence": {
+      "description": "Filter consequences",
+      "type": "BOOL_MULTI",
+      "fields": [
+        "INFO/CSQ/Consequence"
+      ],
+      "outcomes": [
+        {
+          "description": "",
+          "queries": [
+            {
+              "field": "INFO/CSQ/Consequence",
+              "operator": "==",
+              "value": ["non_coding_transcript_variant"]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_rm"
+          }
+        },
+        {
+          "description": "",
+          "queries": [
+            {
+              "field": "INFO/CSQ/Consequence",
+              "operator": "==",
+              "value": ["upstream_gene_variant"]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_rm"
+          }
+        },
+        {
+          "description": "",
+          "queries": [
+            {
+              "field": "INFO/CSQ/Consequence",
+              "operator": "==",
+              "value": ["downstream_gene_variant"]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_rm"
+          }
+        },
+        {
+          "description": "",
+          "queries": [
+            {
+              "field": "INFO/CSQ/Consequence",
+              "operator": "==",
+              "value": ["non_coding_transcript_exon_variant"]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_rm"
+          }
+        },
+        {
+          "description": "",
+          "queries": [
+            {
+              "field": "INFO/CSQ/Consequence",
+              "operator": "==",
+              "value": ["3_prime_UTR_variant"]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_rm"
+          }
+        },
+        {
+          "description": "",
+          "queries": [
+            {
+              "field": "INFO/CSQ/Consequence",
+              "operator": "==",
+              "value": ["coding_sequence_variant"]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_rm"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "filter"
+      },
+      "outcomeMissing": {
+        "nextNode": "filter"
+      }
+    },
+    "filter": {
+      "description": "Filter pass",
+      "type": "BOOL",
+      "query": {
+        "field": "FILTER",
+        "operator": "==",
+        "value": [
+          "PASS"
+        ]
+      },
+      "outcomeTrue": {
+        "nextNode": "vkgl"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_rm"
+      },
+      "outcomeMissing": {
+        "nextNode": "vkgl"
+      }
+    },
+    "vkgl": {
+      "description": "VKGL classification",
+      "type": "CATEGORICAL",
+      "field": "INFO/CSQ/VKGL_CL",
+      "outcomeMap": {
+        "P": {
+          "nextNode": "exit_p"
+        },
+        "LP": {
+          "nextNode": "exit_lp"
+        },
+        "VUS": {
+          "nextNode": "clinVar"
+        },
+        "LB": {
+          "nextNode": "exit_lb"
+        },
+        "B": {
+          "nextNode": "exit_b"
+        }
+      },
+      "outcomeMissing": {
+        "nextNode": "clinVar"
+      },
+      "outcomeDefault": {
+        "nextNode": "clinVar"
+      }
+    },
+    "clinVar": {
+      "description": "ClinVar classification",
+      "type": "BOOL_MULTI",
+      "fields": [
+        "INFO/CSQ/clinVar_CLNSIG"
+      ],
+      "outcomes": [
+        {
+          "description": "Conflict",
+          "queries": [
+            {
+              "field": "INFO/CSQ/clinVar_CLNSIG",
+              "operator": "contains_any",
+              "value": [ "Conflicting_interpretations_of_pathogenicity" ]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "gnomAD"
+          }
+        },
+        {
+          "description": "LP/P",
+          "queries": [
+            {
+              "field": "INFO/CSQ/clinVar_CLNSIG",
+              "operator": "contains_any",
+              "value": [ "Likely_pathogenic", "Pathogenic" ]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_lp"
+          }
+        },
+        {
+          "description": "VUS",
+          "queries": [
+            {
+              "field": "INFO/CSQ/clinVar_CLNSIG",
+              "operator": "contains_any",
+              "value": [ "Uncertain_significance" ]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "gnomAD"
+          }
+        },
+        {
+          "description": "B/LB",
+          "queries": [
+            {
+              "field": "INFO/CSQ/clinVar_CLNSIG",
+              "operator": "contains_any",
+              "value": [ "Likely_benign", "Benign" ]
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_lb"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "gnomAD"
+      },
+      "outcomeMissing": {
+        "nextNode": "gnomAD"
+      }
+    },
+    "gnomAD": {
+      "description": "gnomAD",
+      "type": "BOOL_MULTI",
+      "fields": [
+        "INFO/CSQ/gnomAD_AF",
+        "INFO/CSQ/gnomAD_HN"
+      ],
+      "outcomes": [
+        {
+          "description": "Allele Frequency >= 0.02 or Number of Homozygotes > 5",
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/CSQ/gnomAD_AF",
+              "operator": ">=",
+              "value": 0.02
+            },
+            {
+              "field": "INFO/CSQ/gnomAD_HN",
+              "operator": ">=",
+              "value": 5
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_lb"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "annotSV"
+      },
+      "outcomeMissing": {
+        "nextNode": "annotSV"
+      }
+    },
+    "annotSV": {
+      "description": "AnnotSV classification",
+      "type": "CATEGORICAL",
+      "field": "INFO/CSQ/ASV_ACMG_class",
+      "outcomeMap": {
+        "5": {
+          "nextNode": "exit_p"
+        },
+        "4": {
+          "nextNode": "exit_lp"
+        },
+        "3": {
+          "nextNode": "exit_vus"
+        },
+        "2": {
+          "nextNode": "exit_lb"
+        },
+        "1": {
+          "nextNode": "exit_b"
+        }
+      },
+      "outcomeMissing": {
+        "nextNode": "spliceAI"
+      },
+      "outcomeDefault": {
+        "nextNode": "spliceAI"
+      }
+    },
+    "spliceAI": {
+      "description": "SpliceAI prediction",
+      "type": "BOOL_MULTI",
+      "fields": [
+        "INFO/CSQ/SpliceAI_pred_DS_AG",
+        "INFO/CSQ/SpliceAI_pred_DS_AL",
+        "INFO/CSQ/SpliceAI_pred_DS_DG",
+        "INFO/CSQ/SpliceAI_pred_DS_DL"
+      ],
+      "outcomes": [
+        {
+          "description": "Delta score (acceptor/donor gain/loss) > 0.42",
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/CSQ/SpliceAI_pred_DS_AG",
+              "operator": ">",
+              "value": 0.42
+            },
+            {
+              "field": "INFO/CSQ/SpliceAI_pred_DS_AL",
+              "operator": ">",
+              "value": 0.42
+            },
+            {
+              "field": "INFO/CSQ/SpliceAI_pred_DS_DG",
+              "operator": ">",
+              "value": 0.42
+            },
+            {
+              "field": "INFO/CSQ/SpliceAI_pred_DS_DL",
+              "operator": ">",
+              "value": 0.42
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_lp"
+          }
+        },
+        {
+          "description": "Delta score (acceptor/donor gain/loss) > 0.13",
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/CSQ/SpliceAI_pred_DS_AG",
+              "operator": ">",
+              "value": 0.13
+            },
+            {
+              "field": "INFO/CSQ/SpliceAI_pred_DS_AL",
+              "operator": ">",
+              "value": 0.13
+            },
+            {
+              "field": "INFO/CSQ/SpliceAI_pred_DS_DG",
+              "operator": ">",
+              "value": 0.13
+            },
+            {
+              "field": "INFO/CSQ/SpliceAI_pred_DS_DL",
+              "operator": ">",
+              "value": 0.13
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "exit_vus"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "isUtr5"
+      },
+      "outcomeMissing": {
+        "nextNode": "isUtr5"
+      }
+    },
+    "isUtr5": {
+      "description": "is 5' UTR",
+      "type": "BOOL",
+      "query": {
+        "field": "INFO/CSQ/Consequence",
+        "operator": "==",
+        "value": ["5_prime_UTR_variant"]
+      },
+      "outcomeTrue": {
+        "nextNode": "utrAnnotator"
+      },
+      "outcomeFalse": {
+        "nextNode": "capice"
+      },
+      "outcomeMissing": {
+        "nextNode": "capice"
+      }
+    },
+    "utrAnnotator": {
+      "description": "has 5' UTR annotation",
+      "type": "EXISTS",
+      "field": "INFO/CSQ/five_prime_UTR_variant_consequence",
+      "outcomeTrue": {
+        "nextNode": "exit_vus"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_lb"
+      }
+    },
+    "capice": {
+      "description": "CAPICE prediction > 0.53",
+      "type": "BOOL",
+      "query": {
+        "field": "INFO/CSQ/CAPICE_SC",
+        "operator": ">",
+        "value": 0.53
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_lp"
+      },
+      "outcomeFalse": {
+        "nextNode": "hlhs_gene"
+      },
+      "outcomeMissing": {
+        "nextNode": "exit_vus"
+      }
+    },
+    "hlhs_gene": {
+      "description": "Gene is on the HLHS gene list",
+      "type": "BOOL",
+      "query": {
+        "field": "INFO/CSQ/Gene",
+        "operator": "in",
+        "value": "file:panel"
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_g"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_lb"
+      },
+      "outcomeMissing": {
+        "nextNode": "exit_lb"
+      }
+    },
+    "exit_g": {
+      "description": "HLHS Gene",
+      "type": "LEAF",
+      "class": "G"
+    },
+    "exit_rm": {
+      "description": "Remove",
+      "type": "LEAF",
+      "class": "LQ"
+    },
+    "exit_b": {
+      "description": "Benign",
+      "type": "LEAF",
+      "class": "B"
+    },
+    "exit_lb": {
+      "description": "Likely Benign",
+      "type": "LEAF",
+      "class": "LB"
+    },
+    "exit_vus": {
+      "description": "Uncertain Significance",
+      "type": "LEAF",
+      "class": "VUS"
+    },
+    "exit_lp": {
+      "description": "Likely Pathogenic",
+      "type": "LEAF",
+      "class": "LP"
+    },
+    "exit_p": {
+      "description": "Pathogenic",
+      "type": "LEAF",
+      "class": "P"
+    }
+  }
+}

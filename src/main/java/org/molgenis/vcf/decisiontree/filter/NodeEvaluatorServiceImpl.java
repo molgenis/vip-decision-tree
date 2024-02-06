@@ -1,13 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
-import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
-import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
-import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
-import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
-import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
-import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
-import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
+import org.molgenis.vcf.decisiontree.filter.model.*;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -20,7 +13,10 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
   private final ExistsNodeEvaluator existsNodeEvaluator;
   private final BoolMultiNodeEvaluator boolMultiNodeEvaluator;
 
+  private final ExpressionNodeEvaluator expressionNodeEvaluator;
   NodeEvaluatorServiceImpl() {
+
+    expressionNodeEvaluator = new ExpressionNodeEvaluator();
     boolNodeEvaluator = new BoolNodeEvaluator();
     boolMultiNodeEvaluator = new BoolMultiNodeEvaluator();
     categoricalNodeEvaluator = new CategoricalNodeEvaluator();
@@ -29,13 +25,14 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
 
   // Testability
   NodeEvaluatorServiceImpl(
-      BoolNodeEvaluator boolNodeEvaluator, BoolMultiNodeEvaluator boolMultiNodeEvaluator,
-      CategoricalNodeEvaluator categoricalNodeEvaluator,
-      ExistsNodeEvaluator existsNodeEvaluator) {
+          BoolNodeEvaluator boolNodeEvaluator, BoolMultiNodeEvaluator boolMultiNodeEvaluator,
+          CategoricalNodeEvaluator categoricalNodeEvaluator,
+          ExistsNodeEvaluator existsNodeEvaluator, ExpressionNodeEvaluator expressionNodeEvaluator) {
     this.boolNodeEvaluator = boolNodeEvaluator;
     this.boolMultiNodeEvaluator = boolMultiNodeEvaluator;
     this.categoricalNodeEvaluator = categoricalNodeEvaluator;
     this.existsNodeEvaluator = existsNodeEvaluator;
+    this.expressionNodeEvaluator = expressionNodeEvaluator;
   }
 
   @Override
@@ -49,6 +46,9 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
         break;
       case BOOL:
         nodeOutcome = boolNodeEvaluator.evaluate((BoolNode) node, variant, sampleContext);
+        break;
+      case EXPRESSION:
+        nodeOutcome = expressionNodeEvaluator.evaluate((ExpressionNode) node, variant, sampleContext);
         break;
       case BOOL_MULTI:
         nodeOutcome = boolMultiNodeEvaluator.evaluate((BoolMultiNode) node, variant, sampleContext);

@@ -9,12 +9,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
+
+import org.molgenis.vcf.decisiontree.loader.model.*;
 
 public class ConfigNodeDeserializer extends JsonDeserializer<ConfigNode> {
   @Override
@@ -41,6 +37,9 @@ public class ConfigNodeDeserializer extends JsonDeserializer<ConfigNode> {
       case "EXISTS":
         configNode = objectCodec.treeToValue(root, ConfigExistsNode.class);
         break;
+      case "EXPRESSION":
+        configNode = objectCodec.treeToValue(root, ConfigExpressionNode.class);
+        break;
       case "LEAF":
         configNode = objectCodec.treeToValue(root, ConfigLeafNode.class);
         break;
@@ -48,7 +47,7 @@ public class ConfigNodeDeserializer extends JsonDeserializer<ConfigNode> {
         throw new JsonMappingException(
             jp,
             format(
-                "illegal 'type' value '%s' (allowed values: BOOL, BOOL_MULTI, CATEGORICAL, EXISTS, SAMPLE_PHENOTYPE, LEAF).",
+                "illegal 'type' value '%s' (allowed values: BOOL, BOOL_MULTI, CATEGORICAL, EXISTS, EXPRESSION, SAMPLE_PHENOTYPE, LEAF).",
                 type));
     }
     return configNode;
