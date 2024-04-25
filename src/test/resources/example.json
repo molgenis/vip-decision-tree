@@ -307,6 +307,24 @@
         }
       },
       "outcomeMissing": {
+        "nextNode": "flag"
+      }
+    },
+    "flag": {
+      "type": "BOOL",
+      "description": "flag exists",
+      "query": {
+        "field": "INFO/FLAG1",
+        "operator": "==",
+        "value": true
+      },
+      "outcomeTrue": {
+        "nextNode": "exit_lp"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_lb"
+      },
+      "outcomeMissing": {
         "nextNode": "exit_vus"
       }
     },

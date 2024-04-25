@@ -353,7 +353,7 @@ public class VcfRecord {
         value = getInfoList(field);
         break;
       case FIXED:
-        value = valueCount.getCount() == 1 ? getInfo(field) : getInfoList(field);
+        value = valueCount.getCount() <= 1 ? getInfo(field) : getInfoList(field);
         break;
       default:
         throw new UnexpectedEnumException(valueCountType);

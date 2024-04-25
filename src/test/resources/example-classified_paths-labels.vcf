@@ -4,6 +4,7 @@
 ##FORMAT=<ID=FORMAT2,Number=1,Type=String,Description="\"format2\"">
 ##INFO=<ID=CLINVAR,Number=.,Type=String,Description="\"Clinvar prediction\"">
 ##INFO=<ID=CSQ,Number=.,Type=String,Description="Consequence annotations from Ensembl VEP. Format: VKGL_CL|Allele|Consequence|IMPACT|SYMBOL|Gene|Feature_type|Feature|BIOTYPE|EXON|INTRON|HGVSc|HGVSp|cDNA_position|CDS_position|Protein_position|Amino_acids|Codons|Existing_variation|ALLELE_NUM|DISTANCE|STRAND|FLAGS|PICK|SYMBOL_SOURCE|HGNC_ID|GENE_PHENO|gnomAD_AF|gnomAD_AFR_AF|gnomAD_AMR_AF|gnomAD_ASJ_AF|gnomAD_EAS_AF|gnomAD_FIN_AF|gnomAD_NFE_AF|gnomAD_OTH_AF|gnomAD_SAS_AF|CLIN_SIG|SOMATIC|PHENO|PUBMED|CHECK_REF|SpliceAI_pred_DS_AG|SpliceAI_pred_DS_AL|SpliceAI_pred_DS_DG|SpliceAI_pred_DS_DL|VIPC|VIPP|VIPL">
+##INFO=<ID=FLAG1,Number=0,Type=Flag,Description="\"Flag field\"">
 ##INFO=<ID=TEST2,Number=1,Type=String,Description="\"Test\"">
 ##SnpEffCmd="SnpEff  GRCh37.75 ../vip-decision-tree/src/CSQ/resources/test_annotated.vcf "
 ##SnpEffVersion="4.3t (build 2017-11-24 10:18), by Pablo Cingolani"
@@ -47,5 +48,6 @@
 1	10042538	.	C	T	.	PASS	CSQ=LP|T|missense_variant|MODERATE|NMNAT1|ENSG00000173614|Transcript|ENST00000377205|protein_coding|5/5||||763|619|207|R/W|Cgg/Tgg|rs142968179&CM127756|1||1||1|HGNC|17877|1|3.58e-05|0|2.891e-05|0|0|0|6.157e-05|0.0001629|0|pathogenic||1&1|26103963&22842229&22842230||0|0|0|0|LP|filter&vkgl&exit_lp|,|T|NMD_transcript_variant|MODERATE|NMNAT1|ENSG00000173614|Transcript|ENST00000462686|nonsense_mediated_decay|5/6||||762|619|207|R/W|Cgg/Tgg|rs142968179&CM127756|1||1|||HGNC|17877|1|0.0001|0|0.0001|0|0|0|0.0001|0.0001629|0|pathogenic||1&1|26103963&22842229&22842230||0|0.43|0|0.41|LP|filter&vkgl&clinVar&gnomad&effect&spliceAI&exit_lp|
 1	10042539	.	C	A,T	.	PASS	CSQ=LP|A|missense_variant|MODERATE|NMNAT1|ENSG00000173614|Transcript|ENST00000377205|protein_coding|5/5||||763|619|207|R/W|Cgg/Tgg|rs142968179&CM127756|1||1||1|HGNC|17877|1|3.58e-05|0|2.891e-05|0|0|0|6.157e-05|0.0001629|0|pathogenic||1&1|26103963&22842229&22842230||0|0|0|0|LP|filter&vkgl&exit_lp|,LB|T|missense_variant&NMD_transcript_variant|MODERATE|NMNAT1|ENSG00000173614|Transcript|ENST00000462686|nonsense_mediated_decay|5/6||||762|619|207|R/W|Cgg/Tgg|rs142968179&CM127756|2||2|||HGNC|17877|2|3.58e-05|0|2.891e-05|0|0|0|6.157e-05|0.0001629|0|pathogenic||1&1|26103963&22842229&22842230||0|0|0|0|LB|filter&vkgl&exit_lb|
 1	10042540	.	C	G	.	PASS	CLINVAR=LP;CSQ=|||||||||||||||||||1||||||||||||||||||||||||||LP|filter&vkgl&clinVar&exit_lp|
-1	10042541	.	C	G	.	PASS	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||VUS|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&exit_vus|
-1	10042542	.	C	G	.	.	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||VUS|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&exit_vus|
+1	10042541	.	C	G	.	PASS	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||LB|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&flag&exit_lb|
+1	10042542	.	C	G	.	.	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||LB|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&flag&exit_lb|
+1	10042543	.	C	G	.	PASS	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||LP|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&flag&exit_lp|;FLAG1

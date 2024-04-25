@@ -3,10 +3,7 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.utils.sample.model.Sex.MALE;
@@ -259,6 +256,18 @@ class VcfRecordTest {
     assertEquals(asList(1, 2), vcfRecord.getValue(field, createAllele()));
   }
 
+  @Test
+  void getValueInfoFlag() {
+    FieldImpl field =
+            FieldImpl.builder()
+                    .id("my_field")
+                    .fieldType(FieldType.INFO)
+                    .valueCount(ValueCount.builder().type(Type.FIXED).count(0).build())
+                    .valueType(ValueType.FLAG)
+                    .build();
+    Allele allele = createAllele();
+    assertFalse((Boolean) vcfRecord.getValue(field, allele));
+  }
   @Test
   void getValueInfoVariableFlag() {
     FieldImpl field =

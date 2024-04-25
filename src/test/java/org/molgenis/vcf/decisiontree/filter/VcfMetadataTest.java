@@ -217,7 +217,7 @@ class VcfMetadataTest {
         VCFInfoHeaderLine vcfInfoHeaderLine = mock(VCFInfoHeaderLine.class);
         when(vcfInfoHeaderLine.getType()).thenReturn(VCFHeaderLineType.Flag);
         when(vcfInfoHeaderLine.getCountType()).thenReturn(VCFHeaderLineCount.INTEGER);
-        when(vcfInfoHeaderLine.getCount()).thenReturn(1);
+        when(vcfInfoHeaderLine.getCount()).thenReturn(0);
         when(vcfHeader.getInfoHeaderLine("my_field")).thenReturn(vcfInfoHeaderLine);
         String fieldId = "INFO/my_field";
         assertEquals(
@@ -225,7 +225,7 @@ class VcfMetadataTest {
                         .id("my_field")
                         .fieldType(FieldType.INFO)
                         .valueType(ValueType.FLAG)
-                        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+                        .valueCount(ValueCount.builder().type(Type.FIXED).count(0).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
