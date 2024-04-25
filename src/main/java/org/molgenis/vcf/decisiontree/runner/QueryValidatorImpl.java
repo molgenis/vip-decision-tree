@@ -1,8 +1,5 @@
 package org.molgenis.vcf.decisiontree.runner;
 
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.NOT_IN;
-
 import java.util.Collection;
 import java.util.Set;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
@@ -16,10 +13,12 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.stereotype.Component;
 
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.*;
+
 @Component
 public class QueryValidatorImpl implements QueryValidator {
 
-  public static final Set<ConfigOperator> ALLOWED_FILE_OPERATORS = Set.of(IN, NOT_IN);
+  public static final Set<ConfigOperator> ALLOWED_FILE_OPERATORS = Set.of(IN, NOT_IN, CONTAINS, NOT_CONTAINS, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_NONE);
 
   @Override
   public void validateBooleanNode(ConfigBoolQuery configBoolQuery, Field field) {
@@ -57,7 +56,7 @@ public class QueryValidatorImpl implements QueryValidator {
     if (field.getValueType() != ValueType.FLOAT && field.getValueType() != ValueType.INTEGER) {
       throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
     }
-    validateSingleOrPerAlleleCount(field, DecisionType.BOOL);
+    validateSingleOrPerAlleleCount(field, DecisionType.BOOL, IN);
   }
 
   private void validateEquals(Field field, ConfigBoolQuery configBoolQuery) {
@@ -72,7 +71,7 @@ public class QueryValidatorImpl implements QueryValidator {
     if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
       throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
     } else {
-      validateSingleOrPerAlleleCount(field, DecisionType.BOOL);
+      validateSingleOrPerAlleleCount(field, DecisionType.BOOL, IN);
     }
   }
 
@@ -82,17 +81,17 @@ public class QueryValidatorImpl implements QueryValidator {
       throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
     } else if (field.getValueCount().getType() == Type.FIXED
         && field.getValueCount().getCount() == 1) {
-      throw new UnsupportedValueCountException(field, DecisionType.BOOL);
+      throw new UnsupportedValueCountException(field, DecisionType.BOOL, CONTAINS);
     }
   }
 
-  private void validateSingleOrPerAlleleCount(Field field, DecisionType decisionType) {
+  private void validateSingleOrPerAlleleCount(Field field, DecisionType decisionType, ConfigOperator configOperator) {
     if (field.getValueCount().getType() == Type.G ||
         field.getValueCount().getType() == Type.VARIABLE) {
-      throw new UnsupportedValueCountTypeException(field, decisionType);
+      throw new UnsupportedValueCountTypeException(field, decisionType, configOperator);
     } else if (field.getValueCount().getType() == Type.FIXED
         && field.getValueCount().getCount() != 1) {
-      throw new UnsupportedValueCountException(field, decisionType);
+      throw new UnsupportedValueCountException(field, decisionType, configOperator);
     }
   }
 
@@ -102,7 +101,7 @@ public class QueryValidatorImpl implements QueryValidator {
       if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
         throw new UnsupportedValueTypeException(field, DecisionType.CATEGORICAL);
       }
-      validateSingleOrPerAlleleCount(field, DecisionType.CATEGORICAL);
+      validateSingleOrPerAlleleCount(field, DecisionType.CATEGORICAL, IN);
     }
   }
 }

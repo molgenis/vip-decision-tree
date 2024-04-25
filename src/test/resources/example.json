@@ -1,4 +1,9 @@
 {
+  "files": {
+    "clinvar" : {
+      "path" : "src/test/resources/clinvar.txt"
+    }
+  },
   "rootNode": "filter",
   "nodes": {
     "filter": {
@@ -163,11 +168,7 @@
             {
               "field": "INFO/CLINVAR",
               "operator": "contains_any",
-              "value": [
-                "conflicting_interpretations_of_pathogenicity",
-                "conflicting_data_from_submitters",
-                "uncertain_significance"
-              ]
+              "value": "file:clinvar"
             }
           ],
           "outcomeTrue": {
