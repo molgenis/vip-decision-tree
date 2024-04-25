@@ -217,7 +217,7 @@ public class VcfMetadata {
   }
 
   public static boolean isSingleValueField(Field field) {
-    return field.getValueCount().getType() == Type.FIXED && field.getValueCount().getCount() == 1;
+    return field.getValueCount().getType() == Type.FIXED && field.getValueCount().getCount() <= 1;
   }
 
   public Map<String, Integer> getSampleNameToOffset() {

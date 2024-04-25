@@ -27,6 +27,7 @@
 ##FILTER=<ID=PASS,Description="All filters passed">
 ##INFO=<ID=CLINVAR,Number=.,Type=String,Description="\"Clinvar prediction\"">
 ##INFO=<ID=TEST2,Number=1,Type=String,Description="\"Test\"">
+##INFO=<ID=FLAG1,Number=0,Type=Flag,Description="\"Flag field\"">
 ##FORMAT=<ID=FORMAT1,Number=.,Type=String,Description="\"format1\"">
 ##FORMAT=<ID=FORMAT2,Number=1,Type=String,Description="\"format2\"">
 ##fileDate=20200320
@@ -44,3 +45,4 @@
 1	10042540	.	C	G	.	PASS	CLINVAR=LP
 1	10042541	.	C	G	.	PASS	.
 1	10042542	.	C	G	.	.	.
+1	10042543	.	C	G	.	PASS	FLAG1
