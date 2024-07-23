@@ -60,6 +60,14 @@ class VepHelperTest {
   }
 
   @Test
+  void getRecordPerConsequenceEmptyCSQ() {
+    VcfRecord record = mock(VcfRecord.class);
+    when(record.getVepValues(vepHeader.getParentField())).thenReturn(List.of("."));
+    assertEquals(Map.of(0, singletonList(record)),
+            vepHelper.getRecordPerConsequence(record, vepHeader));
+  }
+
+  @Test
   void createEmptyCsqRecord() {
     VcfRecord record = mock(VcfRecord.class);
     VariantContext variantContext = mock(VariantContext.class);
