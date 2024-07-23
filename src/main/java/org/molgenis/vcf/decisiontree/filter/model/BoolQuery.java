@@ -10,6 +10,8 @@ public class BoolQuery {
   public enum Operator {
     EQUALS,
     NOT_EQUALS,
+    EQUALS_SEQUENCE,
+    NOT_EQUALS_SEQUENCE,
     LESS,
     LESS_OR_EQUAL,
     GREATER,

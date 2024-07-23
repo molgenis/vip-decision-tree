@@ -7,6 +7,10 @@ public enum ConfigOperator {
   EQUALS,
   @JsonProperty("!=")
   NOT_EQUALS,
+  @JsonProperty("eq_seq")
+  EQUALS_SEQUENCE,
+  @JsonProperty("!eq_seq")
+  NOT_EQUALS_SEQUENCE,
   @JsonProperty("<")
   LESS,
   @JsonProperty("<=")

@@ -317,6 +317,110 @@ class BoolNodeEvaluatorTest {
   }
 
   @Test
+  void evaluateEqualsSequenceString() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.EQUALS_SEQUENCE;
+    String queryValue = "ATCG";
+    BoolQuery boolQuery =
+            BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+            BoolNode.builder()
+                    .id("bool_node")
+                    .query(boolQuery)
+                    .outcomeTrue(outcomeTrue)
+                    .outcomeFalse(outcomeFalse)
+                    .outcomeMissing(outcomeMissing)
+                    .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field, null)).thenReturn("ATCG");
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
+  }
+
+  @Test
+  void evaluateNotEqualsSequenceString() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.NOT_EQUALS_SEQUENCE;
+    String queryValue = "ATCG";
+    BoolQuery boolQuery =
+            BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+            BoolNode.builder()
+                    .id("bool_node")
+                    .query(boolQuery)
+                    .outcomeTrue(outcomeTrue)
+                    .outcomeFalse(outcomeFalse)
+                    .outcomeMissing(outcomeMissing)
+                    .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field, null)).thenReturn("ATCG");
+    assertEquals(outcomeFalse, boolNodeEvaluator.evaluate(node, variant, null));
+  }
+
+  @Test
+  void evaluateEqualsSequenceStringShifted() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.EQUALS_SEQUENCE;
+    String queryValue = "GATC";
+    BoolQuery boolQuery =
+            BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+            BoolNode.builder()
+                    .id("bool_node")
+                    .query(boolQuery)
+                    .outcomeTrue(outcomeTrue)
+                    .outcomeFalse(outcomeFalse)
+                    .outcomeMissing(outcomeMissing)
+                    .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field, null)).thenReturn("ATCG");
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
+  }
+
+  @Test
+  void evaluateEqualsSequenceStringIupac() {
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getValueType()).thenReturn(ValueType.STRING);
+
+    Operator operator = Operator.EQUALS_SEQUENCE;
+    String queryValue = "ATNG";
+    BoolQuery boolQuery =
+            BoolQuery.builder().field(field).operator(operator).value(queryValue).build();
+    NodeOutcome outcomeTrue = mock(NodeOutcome.class);
+    NodeOutcome outcomeFalse = mock(NodeOutcome.class);
+    NodeOutcome outcomeMissing = mock(NodeOutcome.class);
+    BoolNode node =
+            BoolNode.builder()
+                    .id("bool_node")
+                    .query(boolQuery)
+                    .outcomeTrue(outcomeTrue)
+                    .outcomeFalse(outcomeFalse)
+                    .outcomeMissing(outcomeMissing)
+                    .build();
+
+    Variant variant = mock(Variant.class);
+    when(variant.getValue(field, null)).thenReturn("ATCG");
+    assertEquals(outcomeTrue, boolNodeEvaluator.evaluate(node, variant, null));
+  }
+
+  @Test
   void evaluateNotEqualsInteger() {
     FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);

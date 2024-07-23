@@ -238,6 +238,12 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       case EQUALS:
         operator = Operator.EQUALS;
         break;
+      case EQUALS_SEQUENCE:
+        operator = Operator.EQUALS_SEQUENCE;
+        break;
+      case NOT_EQUALS_SEQUENCE:
+        operator = Operator.NOT_EQUALS_SEQUENCE;
+      break;
       case NOT_EQUALS:
         operator = Operator.NOT_EQUALS;
         break;
