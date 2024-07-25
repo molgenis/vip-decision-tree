@@ -30,12 +30,15 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
+import org.molgenis.vcf.utils.metadata.MetadataService;
 
 @ExtendWith(MockitoExtension.class)
 class VcfMetadataTest {
 
     @Mock
     VCFHeader vcfHeader;
+    @Mock
+    MetadataService metadataService;
     private VcfMetadata vcfMetadata;
     private VcfMetadata vcfMetadataStrict;
 
@@ -52,8 +55,8 @@ class VcfMetadataTest {
                 .nestedFields(vepNestedMetadata).parentField(vepField).build();
         NestedHeaderLine nestedGtHeaderLine = NestedHeaderLine.builder()
                 .nestedFields(Map.of()).parentField(vepField).build();
-        vcfMetadata = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, false);
-        vcfMetadataStrict = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, true);
+        vcfMetadata = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, metadataService, false);
+        vcfMetadataStrict = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, metadataService, true);
     }
 
     @Test
