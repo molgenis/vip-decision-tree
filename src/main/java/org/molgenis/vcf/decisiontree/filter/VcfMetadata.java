@@ -159,7 +159,7 @@ public class VcfMetadata {
     }
     String field = fieldTokens.get(1);
     if(fieldType == INFO){
-      if(metadataService.getFieldMetadatas().getInfo().containsKey(field)){
+      if(metadataService.getFieldMetadatas() != null && metadataService.getFieldMetadatas().getInfo().containsKey(field)){
         FieldMetadata fieldMetadata = metadataService.getFieldMetadatas().getInfo().get(field);
         return FieldImpl.builder().id(field).fieldType(INFO)
                 .valueType(mapValueType(fieldMetadata.getField().getType()))
@@ -169,7 +169,7 @@ public class VcfMetadata {
       }
     }
     if(fieldType == FORMAT) {
-      if (metadataService.getFieldMetadatas().getFormat().containsKey(field)) {
+      if (metadataService.getFieldMetadatas() != null && metadataService.getFieldMetadatas().getFormat().containsKey(field)) {
         org.molgenis.vcf.utils.model.Field formatFieldMetadata = metadataService.getFieldMetadatas().getFormat().get(field);
         return FieldImpl.builder().id(field).fieldType(FORMAT)
                 .valueType(mapValueType(formatFieldMetadata.getType()))

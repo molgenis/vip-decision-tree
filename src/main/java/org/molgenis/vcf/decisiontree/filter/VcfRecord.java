@@ -263,7 +263,7 @@ public class VcfRecord {
         ValueCount valueCount = field.getValueCount();
         Type valueCountType = valueCount.getType();
         switch (valueCountType) {
-            case A, R, VARIABLE:
+            case A, R, VARIABLE, G:
                 typedValue =
                         value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
                 break;

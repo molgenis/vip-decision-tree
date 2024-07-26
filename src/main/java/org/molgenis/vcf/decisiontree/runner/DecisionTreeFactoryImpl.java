@@ -17,33 +17,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
-import org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery;
-import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
-import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
-import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
+import org.molgenis.vcf.decisiontree.filter.model.*;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
-import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
-import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
-import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
-import org.molgenis.vcf.decisiontree.filter.model.Label;
-import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
-import org.molgenis.vcf.decisiontree.filter.model.Node;
-import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
-import org.molgenis.vcf.decisiontree.filter.model.NodeType;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigClauseOperator;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigLabel;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
+import org.molgenis.vcf.decisiontree.loader.model.*;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -176,6 +152,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   private BoolQuery toBoolQuery(VcfMetadata vcfMetadata, ConfigBoolQuery configBoolQuery,
       Map<String, Set<String>> files) {
     Operator operator = toOperator(configBoolQuery.getOperator());
+    MultiMode multiMode = toMultiMode(configBoolQuery.getMultiMode());
     Field field = vcfMetadata.getField(configBoolQuery.getField());
     queryValidator.validateBooleanNode(configBoolQuery, field);
     Object value = configBoolQuery.getValue();
@@ -183,6 +160,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       value = files.get(((String) value).substring(FILE_PREFIX.length()));
     }
     return BoolQuery.builder()
+        .multiMode(multiMode)
         .field(field)
         .operator(operator)
         .value(value)
@@ -232,6 +210,27 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     return operator;
   }
 
+  private MultiMode toMultiMode(ConfigMultiMode configMultiMode) {
+    MultiMode multiMode;
+    if (configMultiMode == null) {
+      return null;
+    }
+    switch (configMultiMode) {
+      case ALL:
+        multiMode = MultiMode.ALL;
+        break;
+      case ANY:
+        multiMode = MultiMode.ANY;
+        break;
+      case SINGLE:
+        multiMode = MultiMode.SINGLE;
+        break;
+      default:
+        throw new UnexpectedEnumException(configMultiMode);
+    }
+    return multiMode;
+  }
+
   private Operator toOperator(ConfigOperator configOperator) {
     Operator operator;
     switch (configOperator) {
@@ -279,6 +278,15 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         break;
       case CONTAINS_NONE:
         operator = Operator.CONTAINS_NONE;
+        break;
+      case RANGE_OVERLAPS:
+        operator = Operator.RANGE_OVERLAPS;
+        break;
+      case RANGE_BELOW:
+        operator = Operator.RANGE_BELOW;
+        break;
+      case RANGE_ABOVE:
+        operator = Operator.RANGE_ABOVE;
         break;
       default:
         throw new UnexpectedEnumException(configOperator);

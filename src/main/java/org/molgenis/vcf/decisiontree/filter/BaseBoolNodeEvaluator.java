@@ -1,13 +1,11 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FIELD_PREFIX;
+import static org.molgenis.vcf.decisiontree.filter.model.ValueType.FLOAT;
+import static org.molgenis.vcf.decisiontree.filter.model.ValueType.INTEGER;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
-import htsjdk.samtools.cram.digest.ContentDigests;
 import org.molgenis.vcf.decisiontree.filter.model.*;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
@@ -20,13 +18,37 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
   }
 
   default boolean executeQuery(BoolQuery boolQuery, Object value) {
-    boolean matches;
-
-    Mode gtMode = null;
+    MultiMode multiMode = boolQuery.getMultiMode();
     Field field = boolQuery.getField();
     Operator operator = boolQuery.getOperator();
     Object queryValue = boolQuery.getValue();
 
+    switch (multiMode) {
+      case SINGLE -> {
+        return executeSingleQuery(value, field, operator, queryValue);
+      }
+      case ANY -> {
+        for(Object singleValue : ((Collection<?>) value)) {
+          if(executeSingleQuery(singleValue, field, operator, queryValue)){
+            return true;
+          }
+        }
+        return true;
+      }
+      case ALL -> {
+        for(Object singleValue : ((Collection<?>) value)) {
+          if(!executeSingleQuery(singleValue, field, operator, queryValue)){
+            return false;
+          }
+        }
+        return true;
+      }
+      default -> throw new UnexpectedEnumException(multiMode);
+    }
+  }
+
+  private boolean executeSingleQuery(Object value, Field field, Operator operator, Object queryValue) {
+    boolean matches;
     switch (operator) {
       case EQUALS:
         matches = value.equals(queryValue);
@@ -73,11 +95,66 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
       case CONTAINS_NONE:
         matches = executeContainsNoneQuery((Collection<?>) value, (Collection<?>) queryValue);
         break;
+      case RANGE_OVERLAPS:
+        matches = executeRangeOverlapsQuery(field, (Collection<?>) value, queryValue);
+        break;
+      case RANGE_BELOW:
+        matches = executeRangeBelowQuery(field, (Collection<?>) value, queryValue);
+        break;
+      case RANGE_ABOVE:
+        matches = executeRangeAboveQuery(field, (Collection<?>) value, queryValue);
+        break;
       default:
         throw new UnexpectedEnumException(operator);
     }
-
     return matches;
+  }
+
+  default boolean executeRangeAboveQuery(Field field, Collection<?> values, Object queryValue){
+    switch (field.getValueType()) {
+      case INTEGER:
+        List<Integer> integerList = (List<Integer>) values;
+        Integer minInteger = Collections.min(integerList);
+        return minInteger > Integer.valueOf(queryValue.toString());
+      case FLOAT:
+        List<Double> doubleList = (List<Double>) values;
+        Double minDouble = Collections.min(doubleList);
+        return minDouble > Double.valueOf(queryValue.toString());
+      default:
+        throw new UnexpectedEnumException(field.getValueType());
+    }
+  }
+
+  default boolean executeRangeBelowQuery(Field field, Collection<?> values, Object queryValue){
+    switch (field.getValueType()) {
+      case INTEGER:
+        List<Integer> integerList = (List<Integer>) values;
+        Integer maxInteger = Collections.max(integerList);
+        return maxInteger < Integer.valueOf(queryValue.toString());
+      case FLOAT:
+        List<Double> doubleList = (List<Double>) values;
+        Double maxDouble = Collections.max(doubleList);
+        return maxDouble < Double.valueOf(queryValue.toString());
+      default:
+        throw new UnexpectedEnumException(field.getValueType());
+    }
+  }
+
+  default boolean executeRangeOverlapsQuery(Field field, Collection<?> values, Object queryValue){
+    switch (field.getValueType()) {
+      case INTEGER:
+        List<Integer> integerList = (List<Integer>) values;
+        Integer maxInteger = Collections.max(integerList);
+        Integer minInteger = Collections.min(integerList);
+        return maxInteger >= Integer.valueOf(queryValue.toString()) && minInteger <= Integer.valueOf(queryValue.toString());
+      case FLOAT:
+        List<Double> doubleList = (List<Double>) values;
+        Double maxDouble = Collections.max(doubleList);
+        Double minDouble = Collections.min(doubleList);
+        return maxDouble >= Double.valueOf(queryValue.toString()) && minDouble <= Double.valueOf(queryValue.toString());
+      default:
+        throw new UnexpectedEnumException(field.getValueType());
+    }
   }
 
   default boolean executeSequenceEqualsQuery(Field field, Object value, Object queryValue){

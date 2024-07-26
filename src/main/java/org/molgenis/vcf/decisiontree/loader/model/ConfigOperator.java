@@ -31,6 +31,11 @@ public enum ConfigOperator {
   CONTAINS_ANY,
   @JsonProperty("contains_all")
   CONTAINS_ALL,
-  @JsonProperty("contains_none")
+  @JsonProperty("range_overlaps")
+  RANGE_OVERLAPS,
+  @JsonProperty("range_below")
+  RANGE_BELOW,
+  @JsonProperty("range_above")
+  RANGE_ABOVE, @JsonProperty("contains_none")
   CONTAINS_NONE
 }
