@@ -8,6 +8,7 @@ import java.util.stream.StreamSupport;
 import org.molgenis.vcf.decisiontree.runner.info.GenotypeMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.molgenis.vcf.decisiontree.runner.info.VepMetadataParser;
+import org.molgenis.vcf.utils.metadata.MetadataService;
 
 /**
  * {@link VCFFileReader} wrapper that works with nested metadata and data (e.g. CSQ INFO fields).
@@ -21,13 +22,13 @@ public class VcfReader implements AutoCloseable {
   private boolean inited = false;
   private NestedHeaderLine vepNestedHeaderLine = null;
   private NestedHeaderLine gtNestedHeaderLine = null;
-
+  private final MetadataService metadataService;
   public VcfReader(VCFFileReader vcfFileReader, VepMetadataParser vepMetadataParser,
-      GenotypeMetadataMapper genotypeMetadataMapper,
-      boolean strict) {
+      GenotypeMetadataMapper genotypeMetadataMapper, MetadataService metadataService, boolean strict) {
     this.vcfFileReader = requireNonNull(vcfFileReader);
     this.vepMetadataParser = requireNonNull(vepMetadataParser);
     this.genotypeMetadataMapper = requireNonNull(genotypeMetadataMapper);
+    this.metadataService = requireNonNull(metadataService);
     this.strict = strict;
   }
 
@@ -46,7 +47,7 @@ public class VcfReader implements AutoCloseable {
   public VcfMetadata getMetadata() {
     initNestedMeta();
     return new VcfMetadata(vcfFileReader.getFileHeader(), vepNestedHeaderLine, gtNestedHeaderLine,
-        strict);
+            metadataService, strict);
   }
 
   @Override

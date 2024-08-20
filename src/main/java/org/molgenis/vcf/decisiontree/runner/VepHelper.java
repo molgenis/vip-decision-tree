@@ -22,23 +22,27 @@ public class VepHelper {
       NestedHeaderLine nestedHeaderLine) {
     List<String> consequences = vcfRecord.getVepValues(nestedHeaderLine.getParentField());
     Map<Integer, List<VcfRecord>> records = new HashMap<>();
-    for (String consequence : consequences) {
-      int alleleNumIndex;
-      if (nestedHeaderLine.getField(ALLELE_NUM) instanceof NestedField alleleField) {
-        alleleNumIndex = alleleField.getIndex();
-      } else {
-        throw new UnknownFieldException(ALLELE_NUM, FieldType.INFO_VEP);
+    if(!(consequences.size() == 1 && consequences.get(0).equals("."))) {
+      for (String consequence : consequences) {
+        int alleleNumIndex;
+        if (nestedHeaderLine.getField(ALLELE_NUM) instanceof NestedField alleleField) {
+          alleleNumIndex = alleleField.getIndex();
+        } else {
+          throw new UnknownFieldException(ALLELE_NUM, FieldType.INFO_VEP);
+        }
+        int index = Integer.parseInt(consequence.split("\\|")[alleleNumIndex]);
+        List<VcfRecord> singleCsqRecord;
+        if (records.containsKey(index)) {
+          singleCsqRecord = records.get(index);
+        } else {
+          singleCsqRecord = new ArrayList<>();
+        }
+        singleCsqRecord.add(
+                vcfRecord.getFilteredCopy(consequence, nestedHeaderLine.getParentField()));
+        records.put(index, singleCsqRecord);
       }
-      int index = Integer.parseInt(consequence.split("\\|")[alleleNumIndex]);
-      List<VcfRecord> singleCsqRecord;
-      if (records.containsKey(index)) {
-        singleCsqRecord = records.get(index);
-      } else {
-        singleCsqRecord = new ArrayList<>();
-      }
-      singleCsqRecord.add(
-          vcfRecord.getFilteredCopy(consequence, nestedHeaderLine.getParentField()));
-      records.put(index, singleCsqRecord);
+    }else{
+      records.put(0, List.of(vcfRecord));
     }
     return records;
   }

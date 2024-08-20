@@ -12,6 +12,7 @@ import lombok.Value;
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public class ConfigBoolQuery {
+  @NonNull @Builder.Default ConfigMultiMode multiMode = ConfigMultiMode.SINGLE;
   @NonNull String field;
   @NonNull ConfigOperator operator;
   @NonNull Object value;

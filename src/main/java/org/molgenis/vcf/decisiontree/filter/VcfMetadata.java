@@ -1,9 +1,8 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.COMMON;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.*;
+import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.FIELD_TOKEN_SEPARATOR;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.toFieldType;
 
@@ -14,16 +13,15 @@ import htsjdk.variant.vcf.VCFHeaderLineType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.molgenis.vcf.decisiontree.filter.model.Field;
-import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
-import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.MissingField;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
+
+import org.molgenis.vcf.decisiontree.filter.model.*;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.ValueCountBuilder;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
+import org.molgenis.vcf.utils.metadata.MetadataService;
+import org.molgenis.vcf.utils.model.FieldMetadata;
+import org.molgenis.vcf.utils.model.NumberType;
 
 /**
  * {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields).
@@ -35,11 +33,14 @@ public class VcfMetadata {
   private final NestedHeaderLine nestedVepHeaderLine;
   private final NestedHeaderLine nestedGenotypeHeaderLine;
 
+  private final MetadataService metadataService;
+
   public VcfMetadata(VCFHeader vcfHeader, NestedHeaderLine nestedVepHeaderLine,
-      NestedHeaderLine nestedGenotypeHeaderLine, boolean strict) {
+                     NestedHeaderLine nestedGenotypeHeaderLine, MetadataService metadataService, boolean strict) {
     this.vcfHeader = requireNonNull(vcfHeader);
     this.nestedVepHeaderLine = requireNonNull(nestedVepHeaderLine);
     this.nestedGenotypeHeaderLine = requireNonNull(nestedGenotypeHeaderLine);
+    this.metadataService = requireNonNull(metadataService);
     this.strict = strict;
   }
 
@@ -152,10 +153,31 @@ public class VcfMetadata {
   }
 
   private Field toCompoundField(List<String> fieldTokens, FieldType fieldType) {
+    //HERE?
     if (fieldTokens.size() != 2) {
       throw new InvalidNumberOfTokensException(fieldTokens, fieldType, 2);
     }
     String field = fieldTokens.get(1);
+    if(fieldType == INFO){
+      if(metadataService.getFieldMetadatas() != null && metadataService.getFieldMetadatas().getInfo().containsKey(field)){
+        FieldMetadata fieldMetadata = metadataService.getFieldMetadatas().getInfo().get(field);
+        return FieldImpl.builder().id(field).fieldType(INFO)
+                .valueType(mapValueType(fieldMetadata.getField().getType()))
+                .valueCount(
+                        mapValueCount(fieldMetadata.getField().getNumberType(), fieldMetadata.getField().getNumberCount(), fieldMetadata.getField().isRequired()))
+                .separator(fieldMetadata.getField().getSeparator()).build();
+      }
+    }
+    if(fieldType == FORMAT) {
+      if (metadataService.getFieldMetadatas() != null && metadataService.getFieldMetadatas().getFormat().containsKey(field)) {
+        org.molgenis.vcf.utils.model.Field formatFieldMetadata = metadataService.getFieldMetadatas().getFormat().get(field);
+        return FieldImpl.builder().id(field).fieldType(FORMAT)
+                .valueType(mapValueType(formatFieldMetadata.getType()))
+                .valueCount(
+                        mapValueCount(formatFieldMetadata.getNumberType(), formatFieldMetadata.getNumberCount(), formatFieldMetadata.isRequired()))
+                .separator(formatFieldMetadata.getSeparator()).build();
+      }
+    }
     VCFCompoundHeaderLine vcfCompoundHeaderLine = getVcfCompoundHeaderLine(fieldType, field);
 
     if (vcfCompoundHeaderLine == null) {
@@ -194,8 +216,36 @@ public class VcfMetadata {
         .valueType(valueType)
         .valueCount(builder.build())
         .build();
+}
+
+  private ValueType mapValueType(org.molgenis.vcf.utils.model.ValueType type) {
+    return switch (type) {
+      case INTEGER -> ValueType.INTEGER;
+      case FLOAT -> ValueType.FLOAT;
+      case FLAG -> ValueType.FLAG;
+      case CHARACTER -> ValueType.CHARACTER;
+      case STRING, CATEGORICAL -> ValueType.STRING;
+      //noinspection UnnecessaryDefault
+      default -> throw new UnexpectedEnumException(type);
+    };
   }
 
+  private ValueCount mapValueCount(NumberType numberType, Integer numberCount, boolean required) {
+    return ValueCount.builder().type(mapNumberType(numberType)).count(numberCount)
+            .nullable(!required).build();
+  }
+
+  private Type mapNumberType(NumberType numberType) {
+    return switch (numberType) {
+      case NUMBER -> Type.FIXED;
+      case PER_ALT -> Type.A;
+      case PER_ALT_AND_REF -> Type.R;
+      case PER_GENOTYPE -> Type.G;
+      case OTHER -> VARIABLE;
+      //noinspection UnnecessaryDefault
+      default -> throw new UnexpectedEnumException(numberType);
+    };
+  }
   private VCFCompoundHeaderLine getVcfCompoundHeaderLine(FieldType fieldType, String field) {
     VCFCompoundHeaderLine vcfCompoundHeaderLine;
     switch (fieldType) {

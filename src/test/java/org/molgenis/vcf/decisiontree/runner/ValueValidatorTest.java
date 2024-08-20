@@ -21,11 +21,7 @@ import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeValidationException;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
+import org.molgenis.vcf.decisiontree.loader.model.*;
 
 @ExtendWith(MockitoExtension.class)
 class ValueValidatorTest {
@@ -41,7 +37,7 @@ class ValueValidatorTest {
   void validate(Object value, Field field) {
     when(vcfMetadata.getField("field")).thenReturn(field);
     when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
-        new ConfigBoolNode("", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
+        new ConfigBoolNode("", new ConfigBoolQuery(ConfigMultiMode.SINGLE, "field", ConfigOperator.EQUALS, value),
             configNodeOutcome, configNodeOutcome, configNodeOutcome)));
     assertDoesNotThrow(() -> ValueValidator.validate(configDecisionTree, vcfMetadata));
   }
@@ -51,7 +47,7 @@ class ValueValidatorTest {
   void validateInvalid(Object value, Field field) {
     when(vcfMetadata.getField("field")).thenReturn(field);
     when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
-        new ConfigBoolNode("", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
+        new ConfigBoolNode("", new ConfigBoolQuery(ConfigMultiMode.SINGLE,"field", ConfigOperator.EQUALS, value),
             configNodeOutcome, configNodeOutcome, configNodeOutcome)));
     assertThrows(ConfigDecisionTreeValidationException.class,
         () -> ValueValidator.validate(configDecisionTree, vcfMetadata));
