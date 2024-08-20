@@ -1,7 +1,7 @@
 {
   "files": {
     "clinvar" : {
-      "path" : "src/test/resources/clinvar.txt"
+      "path" : "clinvar.txt"
     }
   },
   "rootNode": "filter",
