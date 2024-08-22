@@ -34,7 +34,7 @@ public class QueryValidatorImpl implements QueryValidator {
                 case CONTAINS, NOT_CONTAINS, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_NONE:
                     validateContains(field, configBoolQuery);
                     break;
-                case EQUALS, NOT_EQUALS:
+                case EQUALS, NOT_EQUALS, EQUALS_SEQUENCE, NOT_EQUALS_SEQUENCE:
                     validateEquals(field, configBoolQuery);
                     break;
                 case RANGE_OVERLAPS, RANGE_ABOVE, RANGE_BELOW:
