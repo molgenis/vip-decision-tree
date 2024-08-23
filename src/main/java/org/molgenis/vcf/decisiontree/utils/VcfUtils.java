@@ -262,7 +262,8 @@ public class VcfUtils {
 
 
   public static Object getTypedVcfListValue(Field field, String stringValue) {
-    String[] stringValues = stringValue.split(field.getSeparator().toString());
+    String separator = field.getSeparator() != null ? field.getSeparator().toString() : ",";
+    String[] stringValues = stringValue.split(separator);
     List<Object> values = new ArrayList<>();
     for (String value : stringValues) {
       values.add(getTypedVcfValue(field, value));
