@@ -162,6 +162,9 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
       throw new UnexpectedEnumException(field.getValueType());
     }
     String actualValue = value.toString();
+    if(queryValue == null){
+      return false;
+    }
     String requestedValue = queryValue.toString();
     if(actualValue.length() != requestedValue.length()){
       return false;
