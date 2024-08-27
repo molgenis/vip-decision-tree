@@ -5,5 +5,6 @@ public enum ValueType {
   FLOAT,
   FLAG,
   CHARACTER,
-  STRING
+  STRING,
+  RANGE
 }

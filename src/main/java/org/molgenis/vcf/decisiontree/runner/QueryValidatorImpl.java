@@ -10,6 +10,7 @@ import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
 import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigMultiMode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.stereotype.Component;
@@ -48,7 +49,7 @@ public class QueryValidatorImpl implements QueryValidator {
 
     private void validateRange(Field field, ConfigBoolQuery query) {
         validateFileValueAllowed(query, field);
-        if (field.getValueType() != ValueType.FLOAT && field.getValueType() != ValueType.INTEGER) {
+        if (field.getValueType() != ValueType.RANGE ) {
             throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
         }
         validateRangeAlleleCount(field, DecisionType.BOOL);
@@ -75,7 +76,9 @@ public class QueryValidatorImpl implements QueryValidator {
         if (field.getValueType() != ValueType.FLOAT && field.getValueType() != ValueType.INTEGER) {
             throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
         }
-        validateSingleOrPerAlleleCount(field, DecisionType.BOOL, IN);
+        if(query.getMultiMode() == ConfigMultiMode.SINGLE) {
+            validateSingleOrPerAlleleCount(field, DecisionType.BOOL, IN);
+        }
     }
 
     private void validateEquals(Field field, ConfigBoolQuery configBoolQuery) {

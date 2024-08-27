@@ -254,6 +254,10 @@ public class VcfUtils {
       case CHARACTER, STRING:
         typedValue = VcfUtils.getVcfValueAsString(stringValue);
         break;
+      case RANGE:
+        typedValue = VcfUtils.getVcfValueAsString(stringValue);
+        typedValue = Arrays.stream(typedValue.toString().split("-")).map(Double::valueOf).toList();
+        break;
       default:
         throw new UnexpectedEnumException(valueType);
     }

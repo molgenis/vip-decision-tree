@@ -239,7 +239,7 @@ public class VcfRecord {
         if (field instanceof FieldImpl &&
                 ((FieldImpl) field).getValueCount().getType() == Type.G
                 && field.getFieldType() == FieldType.FORMAT) {
-            if (field.getSeparator().equals("/") || field.getSeparator().equals("|")) {
+            if (field.getSeparator() != null && (field.getSeparator().equals("/") || field.getSeparator().equals("|"))) {
                 throw new IllegalArgumentException("GT separator cannot be used as value separator in GT fields.");
             }
             if (((String) value).contains("/")) {
@@ -248,8 +248,9 @@ public class VcfRecord {
                 value = value.toString().split("\\|");
             }
             List<Object> typedList = new ArrayList<>();
+            Field newField = FieldImpl.builder().id(field.getId()).fieldType(FieldType.FORMAT).valueType(field.getValueType()).valueCount(ValueCount.builder().count(1).type(Type.FIXED).build()).build();
             for (String singleValue : (String[]) value) {
-                typedList.add(getTypedValue(field, singleValue));
+                typedList.add(getTypedValue(newField, singleValue));
             }
             typedValue = typedList;
         } else {

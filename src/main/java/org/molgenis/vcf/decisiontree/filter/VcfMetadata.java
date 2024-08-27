@@ -225,6 +225,7 @@ public class VcfMetadata {
       case FLAG -> ValueType.FLAG;
       case CHARACTER -> ValueType.CHARACTER;
       case STRING, CATEGORICAL -> ValueType.STRING;
+      case RANGE -> ValueType.RANGE;
       //noinspection UnnecessaryDefault
       default -> throw new UnexpectedEnumException(type);
     };

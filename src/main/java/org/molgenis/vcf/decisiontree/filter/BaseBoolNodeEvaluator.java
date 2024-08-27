@@ -33,7 +33,7 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
             return true;
           }
         }
-        return true;
+        return false;
       }
       case ALL -> {
         for(Object singleValue : ((Collection<?>) value)) {
@@ -127,11 +127,7 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
 
   default boolean executeRangeBelowQuery(Field field, Collection<?> values, Object queryValue){
     switch (field.getValueType()) {
-      case INTEGER:
-        List<Integer> integerList = (List<Integer>) values;
-        Integer maxInteger = Collections.max(integerList);
-        return maxInteger < Integer.valueOf(queryValue.toString());
-      case FLOAT:
+      case RANGE:
         List<Double> doubleList = (List<Double>) values;
         Double maxDouble = Collections.max(doubleList);
         return maxDouble < Double.valueOf(queryValue.toString());
@@ -290,7 +286,7 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
     String stringQueryValue = query.getValue().toString();
     if (stringQueryValue.startsWith(FIELD_PREFIX)) {
       String fieldId = stringQueryValue.substring(FIELD_PREFIX.length());
-      query = BoolQuery.builder().field(query.getField()).operator(query.getOperator())
+      query = BoolQuery.builder().multiMode(query.getMultiMode()).field(query.getField()).operator(query.getOperator())
           .value(variant.getValue(variant.getVcfMetadata().getField(fieldId), sampleContext))
           .build();
     }
