@@ -271,7 +271,7 @@ public class VcfRecord {
     String separator = Pattern.quote(nestedField.getParent().getSeparator().toString());
     int index = nestedField.getIndex();
     String parentId = nestedField.getParent().getId();
-    List<String> infoValues = VcfUtils.getInfoAsStringList(variantContext, parentId);
+    List<String> infoValues = VcfUtils.getInfoAsStringList(variantContext, parentId, VCFConstants.MISSING_VALUE_v4);
     if (!infoValues.isEmpty()) {
       String singleValue = infoValues.get(0);
       String[] split = singleValue.split(separator, -1);
