@@ -30,12 +30,14 @@ public class VcfUtils {
 
   public static Integer getInfoAsInteger(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
-    return getVcfValueAsInteger(value);
+    String missingValue = getMissingValue(field);
+    return getVcfValueAsInteger(value, missingValue);
   }
 
   public static List<Integer> getInfoAsIntegerList(VariantContext variantContext, Field field) {
     List<Integer> integerValues;
 
+    String missingValue = getMissingValue(field);
     Object value = variantContext.getAttribute(field.getId());
     if (value == null) {
       integerValues = List.of();
@@ -44,15 +46,15 @@ public class VcfUtils {
       if (size == 0) {
         integerValues = emptyList();
       } else if (size == 1) {
-        integerValues = singletonList(getVcfValueAsInteger(objectValues.get(0)));
+        integerValues = singletonList(getVcfValueAsInteger(objectValues.get(0), missingValue));
       } else {
         integerValues = new ArrayList<>(objectValues.size());
         for (Object objValue : objectValues) {
-          integerValues.add(getVcfValueAsInteger(objValue));
+          integerValues.add(getVcfValueAsInteger(objValue, missingValue));
         }
       }
     } else if (value instanceof String stringValue) {
-      integerValues = singletonList(getInfoStringValueAsInteger(stringValue));
+      integerValues = singletonList(getInfoStringValueAsInteger(stringValue, missingValue));
     } else {
       throw new TypeConversionException(value, Integer.class);
     }
@@ -61,14 +63,14 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  Integer getVcfValueAsInteger(@Nullable Object objValue) {
+  Integer getVcfValueAsInteger(@Nullable Object objValue, String missingValue) {
     Integer intValue;
     if (objValue == null) {
       intValue = null;
     } else if (objValue instanceof Integer integer) {
       intValue = integer;
     } else if (objValue instanceof String stringValue) {
-      intValue = getInfoStringValueAsInteger(stringValue);
+      intValue = getInfoStringValueAsInteger(stringValue, missingValue);
     } else {
       throw new TypeConversionException(objValue, Integer.class);
     }
@@ -76,9 +78,9 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  Integer getInfoStringValueAsInteger(String infoStrValue) {
+  Integer getInfoStringValueAsInteger(String infoStrValue, String missingValue) {
     Integer intValue;
-    if (infoStrValue.equals(VCFConstants.MISSING_VALUE_v4)) {
+    if (infoStrValue.equals(missingValue)) {
       intValue = null;
     } else {
       intValue = Integer.valueOf(infoStrValue);
@@ -88,11 +90,13 @@ public class VcfUtils {
 
   public static Double getInfoAsDouble(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
-    return getVcfValueAsDouble(value);
+    String missingValue = getMissingValue(field);
+    return getVcfValueAsDouble(value, missingValue);
   }
 
   public static List<Double> getInfoAsDoubleList(VariantContext variantContext, Field field) {
     List<Double> doubleValues;
+    String missingValue = getMissingValue(field);
 
     Object value = variantContext.getAttribute(field.getId());
     if (value == null) {
@@ -102,15 +106,15 @@ public class VcfUtils {
       if (size == 0) {
         doubleValues = emptyList();
       } else if (size == 1) {
-        doubleValues = singletonList(getVcfValueAsDouble(objectValues.get(0)));
+        doubleValues = singletonList(getVcfValueAsDouble(objectValues.get(0), missingValue));
       } else {
         doubleValues = new ArrayList<>(objectValues.size());
         for (Object objValue : objectValues) {
-          doubleValues.add(getVcfValueAsDouble(objValue));
+          doubleValues.add(getVcfValueAsDouble(objValue, missingValue));
         }
       }
     } else if (value instanceof String string) {
-      doubleValues = singletonList(getInfoStringValueAsDouble(string));
+      doubleValues = singletonList(getInfoStringValueAsDouble(string, missingValue));
     } else {
       throw new TypeConversionException(value, Double.class);
     }
@@ -118,15 +122,19 @@ public class VcfUtils {
     return doubleValues;
   }
 
+  private static String getMissingValue(Field field) {
+    return field.getFieldType() == FORMAT ? "" : VCFConstants.MISSING_VALUE_v4;
+  }
+
   private static @Nullable
-  Double getVcfValueAsDouble(@Nullable Object objValue) {
+  Double getVcfValueAsDouble(@Nullable Object objValue, String missingValue) {
     Double doubleValue;
     if (objValue == null) {
       doubleValue = null;
     } else if (objValue instanceof Double doubleVal) {
       doubleValue = doubleVal;
     } else if (objValue instanceof String string) {
-      doubleValue = getInfoStringValueAsDouble(string);
+      doubleValue = getInfoStringValueAsDouble(string, missingValue);
     } else {
       throw new TypeConversionException(objValue, Double.class);
     }
@@ -134,9 +142,9 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  Double getInfoStringValueAsDouble(String infoStrValue) {
+  Double getInfoStringValueAsDouble(String infoStrValue, String missingValue) {
     Double doubleValue;
-    if (infoStrValue.equals(VCFConstants.MISSING_VALUE_v4)) {
+    if (infoStrValue.equals(missingValue)) {
       doubleValue = null;
     } else {
       doubleValue = Double.valueOf(infoStrValue);
@@ -146,19 +154,21 @@ public class VcfUtils {
 
   public static String getInfoAsString(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
-    return getVcfValueAsString(value);
+    String missingValue = getMissingValue(field);
+    return getVcfValueAsString(value, missingValue);
   }
 
   public static List<String> getInfoAsStringList(VariantContext variantContext, Field field) {
     List<String> strValues;
     String id = field.getId();
+    String missingValue = getMissingValue(field);
 
-    strValues = getInfoAsStringList(variantContext, id);
+    strValues = getInfoAsStringList(variantContext, id, missingValue);
 
     return strValues;
   }
 
-  public static List<String> getInfoAsStringList(VariantContext variantContext, String id) {
+  public static List<String> getInfoAsStringList(VariantContext variantContext, String id, String missingValue) {
     List<String> strValues;
     Object value = variantContext.getAttribute(id);
     if (value == null) {
@@ -168,15 +178,15 @@ public class VcfUtils {
       if (size == 0) {
         strValues = emptyList();
       } else if (size == 1) {
-        strValues = singletonList(getVcfValueAsString(objectValues.get(0)));
+        strValues = singletonList(getVcfValueAsString(objectValues.get(0), missingValue));
       } else {
         strValues = new ArrayList<>(objectValues.size());
         for (Object objValue : objectValues) {
-          strValues.add(getVcfValueAsString(objValue));
+          strValues.add(getVcfValueAsString(objValue, missingValue));
         }
       }
     } else if (value instanceof String string) {
-      strValues = singletonList(getInfoStringValueAsString(string));
+      strValues = singletonList(getInfoStringValueAsString(string, missingValue));
     } else {
       throw new TypeConversionException(value, String.class);
     }
@@ -185,12 +195,12 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  String getVcfValueAsString(@Nullable Object objValue) {
+  String getVcfValueAsString(@Nullable Object objValue, String missingValue) {
     String strValue;
     if (objValue == null) {
       strValue = null;
     } else if (objValue instanceof String string) {
-      strValue = getInfoStringValueAsString(string);
+      strValue = getInfoStringValueAsString(string, missingValue);
     } else {
       throw new TypeConversionException(objValue, String.class);
     }
@@ -198,9 +208,9 @@ public class VcfUtils {
   }
 
   private static @Nullable
-  String getInfoStringValueAsString(String infoStrValue) {
+  String getInfoStringValueAsString(String infoStrValue, String missingValue) {
     String stringValue;
-    if (infoStrValue.equals(VCFConstants.MISSING_VALUE_v4)) {
+    if (infoStrValue.equals(missingValue)) {
       stringValue = null;
     } else {
       stringValue = infoStrValue;
@@ -241,18 +251,19 @@ public class VcfUtils {
   public static Object getTypedVcfValue(Field field, String stringValue) {
     Object typedValue;
     ValueType valueType = field.getValueType();
+    String missingValue = getMissingValue(field);
     switch (valueType) {
       case INTEGER:
-        typedValue = VcfUtils.getVcfValueAsInteger(stringValue);
+        typedValue = VcfUtils.getVcfValueAsInteger(stringValue, missingValue);
         break;
       case FLAG:
         typedValue = VcfUtils.getVcfValueAsBoolean(stringValue);
         break;
       case FLOAT:
-        typedValue = VcfUtils.getVcfValueAsDouble(stringValue);
+        typedValue = VcfUtils.getVcfValueAsDouble(stringValue, missingValue);
         break;
       case CHARACTER, STRING:
-        typedValue = VcfUtils.getVcfValueAsString(stringValue);
+        typedValue = VcfUtils.getVcfValueAsString(stringValue, missingValue);
         break;
       default:
         throw new UnexpectedEnumException(valueType);

@@ -16,6 +16,7 @@ import htsjdk.variant.variantcontext.VariantContext;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
+import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 
 class VcfUtilsTest {
 
@@ -299,10 +300,25 @@ class VcfUtilsTest {
   @Test
   void getInfoAsDoubleListSingletonStringMissing() {
     String key = "my_key";
-    FieldImpl field = when(mock(FieldImpl.class).getId()).thenReturn(key).getMock();
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getId()).thenReturn(key);
+    when(field.getFieldType()).thenReturn(FieldType.INFO);
     List<String> values = singletonList(".");
     VariantContext variantContext =
         when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
+
+    assertEquals(singletonList(null), VcfUtils.getInfoAsDoubleList(variantContext, field));
+  }
+
+  @Test
+  void getFormatAsDoubleListSingletonStringMissing() {
+    String key = "my_key";
+    FieldImpl field = mock(FieldImpl.class);
+    when(field.getId()).thenReturn(key);
+    when(field.getFieldType()).thenReturn(FieldType.FORMAT);
+    List<String> values = singletonList("");
+    VariantContext variantContext =
+            when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
 
     assertEquals(singletonList(null), VcfUtils.getInfoAsDoubleList(variantContext, field));
   }
