@@ -6,10 +6,12 @@ import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 public class RecordWriterImpl implements RecordWriter {
 
   private final VariantContextWriter vcfWriter;
+    private final Thread writerThread;
 
-  public RecordWriterImpl(VariantContextWriter vcfWriter) {
-    this.vcfWriter = requireNonNull(vcfWriter);
-  }
+    public RecordWriterImpl(VariantContextWriter vcfWriter, Thread writerThread) {
+      this.vcfWriter = requireNonNull(vcfWriter);
+      this.writerThread = requireNonNull(writerThread);
+    }
 
   @Override
   public void write(VcfRecord vcfRecord) {
@@ -19,5 +21,11 @@ public class RecordWriterImpl implements RecordWriter {
   @Override
   public void close() {
     vcfWriter.close();
+      try {
+          writerThread.join();
+      } catch (InterruptedException e) {
+          writerThread.interrupt();
+          throw new RuntimeException(e);
+      }
   }
 }

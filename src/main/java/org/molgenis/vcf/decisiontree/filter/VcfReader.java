@@ -4,7 +4,8 @@ import static java.util.Objects.requireNonNull;
 
 import htsjdk.variant.vcf.VCFFileReader;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+
+import htsjdk.variant.vcf.VCFIterator;
 import org.molgenis.vcf.decisiontree.runner.info.GenotypeMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.molgenis.vcf.decisiontree.runner.info.VepMetadataParser;
@@ -14,7 +15,7 @@ import org.molgenis.vcf.decisiontree.runner.info.VepMetadataParser;
  */
 public class VcfReader implements AutoCloseable {
 
-  private final VCFFileReader vcfFileReader;
+  private final VCFIterator vcfIterator;
   private final VepMetadataParser vepMetadataParser;
   private final boolean strict;
   private final GenotypeMetadataMapper genotypeMetadataMapper;
@@ -22,10 +23,10 @@ public class VcfReader implements AutoCloseable {
   private NestedHeaderLine vepNestedHeaderLine = null;
   private NestedHeaderLine gtNestedHeaderLine = null;
 
-  public VcfReader(VCFFileReader vcfFileReader, VepMetadataParser vepMetadataParser,
-      GenotypeMetadataMapper genotypeMetadataMapper,
-      boolean strict) {
-    this.vcfFileReader = requireNonNull(vcfFileReader);
+  public VcfReader(VCFIterator vcfIterator, VepMetadataParser vepMetadataParser,
+                   GenotypeMetadataMapper genotypeMetadataMapper,
+                   boolean strict) {
+    this.vcfIterator = requireNonNull(vcfIterator);
     this.vepMetadataParser = requireNonNull(vepMetadataParser);
     this.genotypeMetadataMapper = requireNonNull(genotypeMetadataMapper);
     this.strict = strict;
@@ -33,24 +34,24 @@ public class VcfReader implements AutoCloseable {
 
   private void initNestedMeta() {
     if (!inited) {
-      vepNestedHeaderLine = vepMetadataParser.map(vcfFileReader.getFileHeader());
+      vepNestedHeaderLine = vepMetadataParser.map(vcfIterator.getHeader());
       gtNestedHeaderLine = genotypeMetadataMapper.map();
       inited = true;
     }
   }
 
   public Stream<VcfRecord> stream() {
-    return StreamSupport.stream(vcfFileReader.spliterator(), false).map(VcfRecord::new);
+    return vcfIterator.stream().map(VcfRecord::new);
   }
 
   public VcfMetadata getMetadata() {
     initNestedMeta();
-    return new VcfMetadata(vcfFileReader.getFileHeader(), vepNestedHeaderLine, gtNestedHeaderLine,
+    return new VcfMetadata(vcfIterator.getHeader(), vepNestedHeaderLine, gtNestedHeaderLine,
         strict);
   }
 
   @Override
   public void close() {
-    vcfFileReader.close();
+    vcfIterator.close();
   }
 }

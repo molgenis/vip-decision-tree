@@ -2,7 +2,9 @@ package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Objects.requireNonNull;
 
-import htsjdk.variant.vcf.VCFFileReader;
+import htsjdk.variant.vcf.VCFIteratorBuilder;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
@@ -29,8 +31,12 @@ class VcfReaderFactoryImpl implements VcfReaderFactory {
 
     Path inputVcfPath = settings.getInputVcfPath();
     boolean strict = settings.isStrict();
-    return new VcfReader(new VCFFileReader(inputVcfPath.toFile(), false), vepMetadataParser,
-        genotypeMetadataMapper,
-        strict);
+      try {
+          return new VcfReader(new VCFIteratorBuilder().open(new VcfInputStreamDecorator(inputVcfPath)), vepMetadataParser,
+              genotypeMetadataMapper,
+              strict);
+      } catch (IOException e) {
+          throw new UncheckedIOException(e);
+      }
   }
 }

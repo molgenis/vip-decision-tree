@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.decisiontree.ModifiedVcfWriter.getWriterThread;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPC_S;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPP_S;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPL_S;
@@ -17,6 +18,8 @@ import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PipedOutputStream;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,13 +56,21 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
   public RecordWriter create(VcfMetadata vcfMetadata, Settings settings) {
     WriterSettings writerSettings = settings.getWriterSettings();
 
-    VariantContextWriter vcfWriter = createVcfWriter(writerSettings);
+    PipedOutputStream pipedOut = new PipedOutputStream();
+    Thread writerThread;
+    try {
+        writerThread = getWriterThread(pipedOut, writerSettings);
+    } catch (IOException e) {
+        throw new UncheckedIOException(e);
+    }
+    VariantContextWriter vcfWriter = createVcfWriter(writerSettings, pipedOut);
     VCFHeader vcfHeader = createHeader(vcfMetadata, settings);
     vcfWriter.writeHeader(vcfHeader);
-    return new RecordWriterImpl(vcfWriter);
+
+    return new RecordWriterImpl(vcfWriter, writerThread);
   }
 
-  private static VariantContextWriter createVcfWriter(WriterSettings settings) {
+  private static VariantContextWriter createVcfWriter(WriterSettings settings, OutputStream outputStream) {
     Path outputVcfPath = settings.getOutputVcfPath();
     if (settings.isOverwriteOutput()) {
       try {
@@ -74,7 +85,7 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
 
     return new VariantContextWriterBuilder()
         .clearOptions()
-        .setOutputFile(outputVcfPath.toFile())
+        .setOutputStream(outputStream)
         .build();
   }
 

@@ -36,6 +36,7 @@ class AppIT {
     // output differs every run (different tmp dir)
     outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
+    outputVcf = outputVcf.replaceAll("\\R", "\n");
 
     Path expectedOutputFile = ResourceUtils.getFile("classpath:example-classified.vcf").toPath();
     String expectedOutputVcf = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
@@ -59,6 +60,7 @@ class AppIT {
     // output differs every run due (different tmp dir)
     outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
+    outputVcf = outputVcf.replaceAll("\\R", "\n");
 
     Path expectedOutputFile = ResourceUtils.getFile("classpath:example-classified_paths-labels.vcf")
         .toPath();
@@ -85,6 +87,7 @@ class AppIT {
     // output differs every run (different tmp dir)
     outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
+    outputVcf = outputVcf.replaceAll("\\R", "\n");
 
     Path expectedOutputFile = ResourceUtils.getFile("classpath:example_samples-classified.vcf")
         .toPath();
@@ -109,6 +112,7 @@ class AppIT {
     // output differs every run (different tmp dir)
     outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
+    outputVcf = outputVcf.replaceAll("\\R", "\n");
 
     Path expectedOutputFile = ResourceUtils.getFile(
             "classpath:example_samples-classified_paths-labels.vcf")
@@ -135,6 +139,7 @@ class AppIT {
     // output differs every run (different tmp dir)
     outputVcf = HEADER_VERSION_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeVersion=");
     outputVcf = HEADER_COMMAND_PATTERN.matcher(outputVcf).replaceAll("##VIP_treeCommand=");
+    outputVcf = outputVcf.replaceAll("\\R", "\n");
 
     Path expectedOutputFile = ResourceUtils.getFile(
             "classpath:example_samples-classified-noPPP.vcf")

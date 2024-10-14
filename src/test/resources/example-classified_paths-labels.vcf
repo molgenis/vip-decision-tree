@@ -51,3 +51,5 @@
 1	10042541	.	C	G	.	PASS	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||LB|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&flag&exit_lb|
 1	10042542	.	C	G	.	.	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||LB|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&flag&exit_lb|
 1	10042543	.	C	G	.	PASS	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||LP|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&flag&exit_lp|;FLAG1
+1	10042544	.	C	<CNV:TR>	.	PASS	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||LB|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&flag&exit_lb|
+1	10042545	.	C	<CNV:TR>,<CNV:TR>	.	PASS	CSQ=|||||||||||||||||||1||||||||||||||||||||||||||LB|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&flag&exit_lb|,|||||||||||||||||||2||||||||||||||||||||||||||LB|filter&vkgl&clinVar&gnomad&effect&spliceAI&annotSV&impact&flag&exit_lb|
