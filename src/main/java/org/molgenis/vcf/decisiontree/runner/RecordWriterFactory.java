@@ -4,8 +4,6 @@ import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.RecordWriter;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 
-import java.io.IOException;
-
 interface RecordWriterFactory {
 
   RecordWriter create(VcfMetadata vcfMetadata, Settings settings);

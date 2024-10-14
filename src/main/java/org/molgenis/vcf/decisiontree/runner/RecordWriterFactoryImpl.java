@@ -1,7 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import static java.lang.String.format;
-import static org.molgenis.vcf.decisiontree.ModifiedVcfWriter.getWriterThread;
+import static org.molgenis.vcf.decisiontree.runner.VepHelper.ModifiedVcfWriter.getWriterThread;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPC_S;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPP_S;
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.VIPL_S;
