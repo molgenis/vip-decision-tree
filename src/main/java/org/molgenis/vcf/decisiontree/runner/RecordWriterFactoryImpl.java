@@ -59,20 +59,20 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
     PipedOutputStream pipedOut = new PipedOutputStream();
     Thread writerThread;
     try {
-        writerThread = getWriterThread(pipedOut, writerSettings);
+        writerThread = createWriterThread(pipedOut, writerSettings);
     } catch (IOException e) {
         throw new UncheckedIOException(e);
     }
-    VariantContextWriter vcfWriter = createVcfWriter(writerSettings, pipedOut);
+    VariantContextWriter vcfWriter = createVcfWriter(pipedOut);
     VCFHeader vcfHeader = createHeader(vcfMetadata, settings);
     vcfWriter.writeHeader(vcfHeader);
 
     return new RecordWriterImpl(vcfWriter, writerThread);
   }
 
-  private static VariantContextWriter createVcfWriter(WriterSettings settings, OutputStream outputStream) {
-    Path outputVcfPath = settings.getOutputVcfPath();
-    if (settings.isOverwriteOutput()) {
+  private static Thread createWriterThread(PipedOutputStream pipedOut, WriterSettings writerSettings) throws IOException {
+    Path outputVcfPath = writerSettings.getOutputVcfPath();
+    if (writerSettings.isOverwriteOutput()) {
       try {
         Files.deleteIfExists(outputVcfPath);
       } catch (IOException e) {
@@ -80,9 +80,12 @@ class RecordWriterFactoryImpl implements RecordWriterFactory {
       }
     } else if (Files.exists(outputVcfPath)) {
       throw new IllegalArgumentException(
-          format("cannot create '%s' because it already exists.", outputVcfPath));
+              format("cannot create '%s' because it already exists.", outputVcfPath));
     }
+    return getWriterThread(pipedOut, writerSettings);
+  }
 
+  private static VariantContextWriter createVcfWriter(OutputStream outputStream) {
     return new VariantContextWriterBuilder()
         .clearOptions()
         .setOutputStream(outputStream)

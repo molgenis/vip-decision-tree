@@ -1,5 +1,6 @@
 package org.molgenis.vcf.decisiontree.runner;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapperImpl.ALLELE_NUM;
 
@@ -7,6 +8,8 @@ import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,12 +72,13 @@ public class VepHelper {
         private ModifiedVcfWriter(){}
 
         public static Thread getWriterThread(PipedOutputStream pipedOut, WriterSettings settings) throws IOException {
+            Path outputVcfPath = settings.getOutputVcfPath();
             PipedInputStream pipedIn = new PipedInputStream(pipedOut);
 
             // Create a thread to write the modified output to a file
             Thread writerThread = new Thread(() -> {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(pipedIn));
-                     BufferedWriter finalWriter = new BufferedWriter(new FileWriter(settings.getOutputVcfPath().toFile()))) {
+                     BufferedWriter finalWriter = new BufferedWriter(new FileWriter(outputVcfPath.toFile()))) {
 
                     String line;
                     while ((line = reader.readLine()) != null) {
