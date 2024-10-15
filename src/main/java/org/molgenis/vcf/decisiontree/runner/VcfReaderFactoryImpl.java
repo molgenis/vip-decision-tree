@@ -3,6 +3,7 @@ package org.molgenis.vcf.decisiontree.runner;
 import static java.util.Objects.requireNonNull;
 
 import htsjdk.variant.vcf.VCFIteratorBuilder;
+
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -32,7 +33,7 @@ class VcfReaderFactoryImpl implements VcfReaderFactory {
     Path inputVcfPath = settings.getInputVcfPath();
     boolean strict = settings.isStrict();
       try {
-          return new VcfReader(new VCFIteratorBuilder().open(new VcfInputStreamDecorator(inputVcfPath)), vepMetadataParser,
+          return new VcfReader(new VCFIteratorBuilder().open(VcfInputStreamDecorator.preprocessVCF(inputVcfPath.toFile())), vepMetadataParser,
               genotypeMetadataMapper,
               strict);
       } catch (IOException e) {
