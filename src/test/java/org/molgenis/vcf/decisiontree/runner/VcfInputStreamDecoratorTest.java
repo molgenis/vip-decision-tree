@@ -29,6 +29,18 @@ class VcfInputStreamDecoratorTest {
     }
 
     @Test
+    void testReadNull() {
+        byte[] buffer = null;
+        assertThrows(NullPointerException.class, () -> vcfInputStreamDecorator.read(buffer, 0, 1024));
+    }
+
+    @Test
+    void testReadInvalid() {
+        byte[] buffer = new byte[1024];
+        assertThrows(IndexOutOfBoundsException.class, () -> vcfInputStreamDecorator.read(buffer, 0, 999999999));
+    }
+
+    @Test
     void testReadPartially() throws IOException {
         byte[] buffer = new byte[10];
 
@@ -49,6 +61,7 @@ class VcfInputStreamDecoratorTest {
             totalBytesRead += bytesRead;
         }
         String result = new String(buffer, 0, totalBytesRead);
+        assertTrue(result.contains("\t10042543\t.\tC\tT\t.\tPASS\t."));
         assertTrue(result.contains("1\t10042544\t.\tC\t<CNV:TR>\t.\tPASS\t."));
         assertTrue(result.contains("1\t10042545\t.\tC\t<CNV:TR1>,<CNV:TR2>\t.\tPASS\t."));
     }

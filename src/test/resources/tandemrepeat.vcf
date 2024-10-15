@@ -2,5 +2,6 @@
 ##contig=<ID=1,length=249250621,assembly=b37>
 ##FILTER=<ID=PASS,Description="All filters passed">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	10042543	.	C	T	.	PASS	.
 1	10042544	.	C	<CNV:TR>	.	PASS	.
 1	10042545	.	C	<CNV:TR>,<CNV:TR>	.	PASS	.

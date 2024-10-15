@@ -1,6 +1,5 @@
 package org.molgenis.vcf.decisiontree.runner;
 
-import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapperImpl.ALLELE_NUM;
 
@@ -8,7 +7,6 @@ import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
