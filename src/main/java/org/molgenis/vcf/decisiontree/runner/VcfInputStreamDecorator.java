@@ -20,14 +20,57 @@ public class VcfInputStreamDecorator extends InputStream {
     @Override
     public int read() throws IOException {
         if (buffer == null || buffer.available() == 0) {
-            String line = reader.readLine();
-            if (line == null) {
-                return -1; // End of stream
-            }
-            String modifiedLine = processLine(line) + "\n";
-            buffer = new ByteArrayInputStream(modifiedLine.getBytes(StandardCharsets.UTF_8));
+            Integer x = readFromBuffer(-1);
+            if (x != null) return x;
         }
         return buffer.read();
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        validateBufferedRead(b, off, len);
+
+        int totalBytesRead = 0;
+
+        while (totalBytesRead < len) {
+            // If buffer is null or empty, refill it with a new line
+            if (buffer == null || buffer.available() == 0) {
+                Integer totalBytesRead1 = readFromBuffer(totalBytesRead == 0 ? -1 : totalBytesRead);
+                if (totalBytesRead1 != null) return totalBytesRead1;
+            }
+
+            // Read from the buffer into the byte array
+            int bytesRead = buffer.read(b, off + totalBytesRead, len - totalBytesRead);
+            if (bytesRead > 0) {
+                totalBytesRead += bytesRead;
+            }
+
+            // If we haven't filled the buffer but no more data is available, break
+            if (bytesRead == -1) {
+                break;
+            }
+        }
+
+        return totalBytesRead == 0 ? -1 : totalBytesRead;
+    }
+
+    private Integer readFromBuffer(int totalBytesRead) throws IOException {
+        String line = reader.readLine();
+        if (line == null) {
+            return totalBytesRead;
+        }
+        String modifiedLine = processLine(line) + "\n";
+        buffer = new ByteArrayInputStream(modifiedLine.getBytes(StandardCharsets.UTF_8));
+        return null;
+    }
+
+    private static void validateBufferedRead(byte[] b, int off, int len) {
+        if (b == null) {
+            throw new NullPointerException("Buffer cannot be null");
+        }
+        if (off < 0 || len < 0 || off + len > b.length) {
+            throw new IndexOutOfBoundsException("Invalid offset or length");
+        }
     }
 
     private String processLine(String line) {
