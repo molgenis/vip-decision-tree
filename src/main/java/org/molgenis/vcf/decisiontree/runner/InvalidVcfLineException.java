@@ -7,6 +7,7 @@ import static java.lang.String.format;
 public class InvalidVcfLineException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 1L;
+
     public InvalidVcfLineException(String line) {
         super(
                 format(

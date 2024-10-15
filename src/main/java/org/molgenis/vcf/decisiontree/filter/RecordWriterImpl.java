@@ -25,7 +25,7 @@ public class RecordWriterImpl implements RecordWriter {
           writerThread.join();
       } catch (InterruptedException e) {
           writerThread.interrupt();
-          throw new RuntimeException(e);
+          throw new WriterThreadInterruptedException(e.getMessage());
       }
   }
 }

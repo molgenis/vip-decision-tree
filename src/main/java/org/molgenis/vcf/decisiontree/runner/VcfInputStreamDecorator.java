@@ -82,9 +82,8 @@ public class VcfInputStreamDecorator extends InputStream {
             String altField = parts[4];
             if (altField.contains(TR_ALLELE)) {
                 String[] alts = altField.split(",");
-                int i = 1;
                 if (alts.length > 1) {
-                    replaceStrAlleles(alts, i, parts);
+                    replaceStrAlleles(alts, parts);
                 }
             }
         } else {
@@ -94,7 +93,8 @@ public class VcfInputStreamDecorator extends InputStream {
         return String.join("\t", parts);
     }
 
-    private static void replaceStrAlleles(String[] alts, int i, String[] parts) {
+    private static void replaceStrAlleles(String[] alts, String[] parts) {
+        int i = 1;
         List<String> newAlt = new ArrayList<>();
         for (String alt : alts) {
             if (alt.equals(TR_ALLELE)) {
