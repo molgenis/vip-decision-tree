@@ -101,7 +101,7 @@ class AppIT {
     String inputFile = ResourceUtils.getFile("classpath:example_samples.vcf").toString();
     String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
     String treeConfigFile = ResourceUtils.getFile("classpath:example_sample.json").toString();
-    String outputFile = sharedTempDir.resolve("example-classified.vcf").toString();
+    String outputFile = sharedTempDir.resolve("example-classified-samples-paths-labels.vcf").toString();
 
     String[] args = {"-i", inputFile, "-m", metadataFile, "-c", treeConfigFile, "-o", outputFile, "-pb", "Patient",
         "-l", "-p", "-t", "sAMPlE", "-ph", "HP:0000951;HP:0003124",};
