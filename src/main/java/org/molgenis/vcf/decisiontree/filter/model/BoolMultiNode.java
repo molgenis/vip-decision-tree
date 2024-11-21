@@ -14,6 +14,7 @@ public class BoolMultiNode implements DecisionNode {
 
   @NonNull NodeType nodeType = NodeType.DECISION;
   @NonNull String id;
+  @NonNull String label;
   String description;
 
   @NonNull DecisionType decisionType = DecisionType.BOOL_MULTI;

@@ -57,6 +57,7 @@ class BoolMultiNodeEvaluatorTest {
     BoolMultiNode node =
         BoolMultiNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .fields(List.of(field1, field2))
             .clauses(clauses)
             .outcomeDefault(outcomeDefault)
@@ -100,6 +101,7 @@ class BoolMultiNodeEvaluatorTest {
     BoolMultiNode node =
         BoolMultiNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .fields(List.of(field1, field2))
             .clauses(clauses)
             .outcomeDefault(outcomeDefault)
@@ -144,6 +146,7 @@ class BoolMultiNodeEvaluatorTest {
     BoolMultiNode node =
         BoolMultiNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .fields(List.of(field1, field2))
             .clauses(clauses)
             .outcomeDefault(outcomeDefault)
@@ -187,6 +190,7 @@ class BoolMultiNodeEvaluatorTest {
     BoolMultiNode node =
         BoolMultiNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .fields(List.of(field1, field2))
             .clauses(clauses)
             .outcomeDefault(outcomeDefault)
@@ -222,6 +226,7 @@ class BoolMultiNodeEvaluatorTest {
     BoolMultiNode node =
         BoolMultiNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .fields(List.of(field1, field2))
             .clauses(clauses)
             .outcomeDefault(outcomeDefault)
@@ -253,6 +258,7 @@ class BoolMultiNodeEvaluatorTest {
     BoolMultiNode node =
         BoolMultiNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .fields(List.of(field1))
             .clauses(clauses)
             .outcomeDefault(outcomeDefault)
@@ -283,6 +289,7 @@ class BoolMultiNodeEvaluatorTest {
     BoolMultiNode node =
         BoolMultiNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .fields(List.of(field1))
             .clauses(clauses)
             .outcomeDefault(outcomeDefault)
@@ -312,6 +319,7 @@ class BoolMultiNodeEvaluatorTest {
     BoolMultiNode node =
         BoolMultiNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .fields(List.of(field1))
             .clauses(clauses)
             .outcomeDefault(outcomeDefault)

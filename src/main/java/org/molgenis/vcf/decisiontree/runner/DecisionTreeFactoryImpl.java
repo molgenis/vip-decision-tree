@@ -158,6 +158,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     Field field = vcfMetadata.getField(configNode.getField());
     return ExistsNode.builder()
         .id(id)
+        .label(configNode.getLabel())
         .field(field)
         .description(configNode.getDescription())
         .build();
@@ -168,6 +169,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     BoolQuery boolQuery = toBoolQuery(vcfMetadata, nodeConfig.getQuery(), files);
     return BoolNode.builder()
         .id(id)
+        .label(nodeConfig.getLabel())
         .description(nodeConfig.getDescription())
         .query(boolQuery)
         .build();
@@ -198,6 +200,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .toList();
     return BoolMultiNode.builder()
         .id(id)
+        .label(nodeConfig.getLabel())
         .fields(fields)
         .description(nodeConfig.getDescription())
         .clauses(boolMultiQueries)
@@ -286,6 +289,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     queryValidator.validateCategoricalNode(field);
     return CategoricalNode.builder()
         .id(id)
+        .label(nodeConfig.getLabel())
         .description(nodeConfig.getDescription())
         .field(field)
         .build();
@@ -294,6 +298,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   private LeafNode toLeafNode(String id, ConfigLeafNode nodeConfig) {
     return LeafNode.builder()
         .id(id)
+        .label(nodeConfig.getLabel())
         .description(nodeConfig.getDescription())
         .clazz(nodeConfig.getClazz())
         .build();

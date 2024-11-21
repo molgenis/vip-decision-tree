@@ -14,6 +14,7 @@ public class CategoricalNode implements DecisionNode {
 
   @NonNull DecisionType decisionType = DecisionType.CATEGORICAL;
   @NonNull String id;
+  @NonNull String label;
   String description;
 
   @NonNull NodeType nodeType = NodeType.DECISION;

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO;
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.IN;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -13,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -34,7 +32,6 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigMode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
@@ -66,9 +63,9 @@ class DecisionTreeFactoryImplTest{
         ConfigBoolQuery.builder().field("INFO/testField").operator(configOperator)
             .value(FILE_PREFIX + "test")
             .build();
-    ConfigLeafNode leafNode = ConfigLeafNode.builder().clazz("end").build();
+    ConfigLeafNode leafNode = ConfigLeafNode.builder().label("label").clazz("end").build();
     ConfigNodeOutcome outcome = ConfigNodeOutcome.builder().nextNode("end").build();
-    ConfigNode configNode = ConfigBoolNode.builder().query(query).outcomeTrue(
+    ConfigNode configNode = ConfigBoolNode.builder().label("label").query(query).outcomeTrue(
         outcome).outcomeFalse(outcome).build();
     Map<String, ConfigNode> nodes = Map.of("test", configNode, "end", leafNode);
     when(decisionTree.getLabels()).thenReturn(Collections.emptyMap());

@@ -6,4 +6,6 @@ public interface Node {
   String getId();
 
   String getDescription();
+
+  String getLabel();
 }

@@ -17,4 +17,7 @@ public interface ConfigNode {
 
   @JsonPropertyDescription
   String getDescription();
+
+  @JsonPropertyDescription
+  String getLabel();
 }
