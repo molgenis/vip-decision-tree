@@ -15,6 +15,7 @@ public class BoolNode implements DecisionNode {
 
   @NonNull NodeType nodeType = NodeType.DECISION;
   @NonNull String id;
+  @NonNull String label;
   String description;
 
   @NonNull DecisionType decisionType = DecisionType.BOOL;

@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.loader.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ public class ConfigLeafNode implements ConfigNode {
   @NonNull Type type = Type.LEAF;
 
   String description;
+  @NonNull String label;
 
   @JsonProperty("class")
   String clazz;

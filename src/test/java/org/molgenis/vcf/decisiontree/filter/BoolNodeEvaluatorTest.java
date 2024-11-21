@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
@@ -45,6 +44,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -71,6 +71,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -97,6 +98,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -123,6 +125,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -149,6 +152,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -175,6 +179,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -201,6 +206,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -227,6 +233,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -253,6 +260,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -279,6 +287,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -305,6 +314,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -331,6 +341,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -357,6 +368,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -383,6 +395,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -409,6 +422,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -435,6 +449,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -461,6 +476,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -487,6 +503,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -513,6 +530,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -537,6 +555,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -561,6 +580,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -587,6 +607,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -612,6 +633,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -643,6 +665,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -674,6 +697,7 @@ class BoolNodeEvaluatorTest {
     BoolNode node =
         BoolNode.builder()
             .id("bool_node")
+            .label("bool_node")
             .query(boolQuery)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)

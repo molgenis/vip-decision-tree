@@ -2,6 +2,7 @@
   "rootNode": "family",
   "nodes": {
     "family": {
+      "label": "Family",
       "type": "BOOL",
       "query": {
         "field": "SAMPLE/FAMILY_ID",
@@ -19,6 +20,7 @@
       }
     },
     "proband_hom_ref": {
+      "label": "Hom Ref",
       "description": "Proband homozygous reference call",
       "type": "BOOL_MULTI",
       "fields": [
@@ -54,6 +56,7 @@
       }
     },
     "depth": {
+      "label": "Depth",
       "type": "BOOL",
       "query": {
         "field": "FORMAT/AD",
@@ -74,6 +77,7 @@
       }
     },
     "read_depth": {
+      "label": "Read Depth",
       "type": "BOOL",
       "query": {
         "field": "FORMAT/DP",
@@ -91,6 +95,7 @@
       }
     },
     "alleles": {
+      "label": "Alleles",
       "type": "BOOL",
       "query": {
         "field": "FORMAT/GENOTYPE/ALLELES",
@@ -108,6 +113,7 @@
       }
     },
     "genotype": {
+      "label": "Genotype",
       "type": "BOOL",
       "query": {
         "field": "FORMAT/GT",
@@ -125,6 +131,7 @@
       }
     },
     "phenotype": {
+      "label": "Phenotype",
       "type": "BOOL",
       "query": {
         "field": "SAMPLE/PHENOTYPES",
@@ -142,14 +149,17 @@
       }
     },
     "exit_true": {
+      "label": "True",
       "type": "LEAF",
       "class": "class_true"
     },
     "exit_false": {
+      "label": "False",
       "type": "LEAF",
       "class": "class_false"
     },
     "exit_miss": {
+      "label": "Miss",
       "type": "LEAF",
       "class": "class_miss"
     }

@@ -13,6 +13,7 @@ public class ExistsNode implements DecisionNode {
 
   @NonNull NodeType nodeType = NodeType.DECISION;
   @NonNull String id;
+  @NonNull String label;
   @NonNull Field field;
   String description;
 

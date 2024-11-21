@@ -11,6 +11,7 @@ import lombok.experimental.NonFinal;
 public class LeafNode implements Node {
   @NonNull NodeType nodeType = NodeType.LEAF;
   @NonNull String id;
+  @NonNull String label;
   String description;
 
   @NonNull String clazz;

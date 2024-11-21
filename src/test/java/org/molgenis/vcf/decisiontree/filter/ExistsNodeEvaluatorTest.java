@@ -31,6 +31,7 @@ class ExistsNodeEvaluatorTest {
     ExistsNode node =
         ExistsNode.builder()
             .id("exists_node")
+            .label("exists_node")
             .field(field)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -50,6 +51,7 @@ class ExistsNodeEvaluatorTest {
     ExistsNode node =
         ExistsNode.builder()
             .id("exists_node")
+            .label("exists_node")
             .field(field)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)
@@ -70,6 +72,7 @@ class ExistsNodeEvaluatorTest {
     ExistsNode node =
         ExistsNode.builder()
             .id("exists_node")
+            .label("exists_node")
             .field(field)
             .outcomeTrue(outcomeTrue)
             .outcomeFalse(outcomeFalse)

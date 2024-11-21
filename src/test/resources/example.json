@@ -7,6 +7,7 @@
   "rootNode": "filter",
   "nodes": {
     "filter": {
+      "label": "filter",
       "type": "BOOL",
       "description": "All filters passed",
       "query": {
@@ -27,6 +28,7 @@
       }
     },
     "spliceAI": {
+      "label": "spliceAI",
       "type": "BOOL_MULTI",
       "fields": [
         "INFO/CSQ/SpliceAI_pred_DS_AG",
@@ -72,6 +74,7 @@
       }
     },
     "vkgl": {
+      "label": "VKGL",
       "type": "CATEGORICAL",
       "description": "VKGL classification",
       "field": "INFO/CSQ/VKGL_CL",
@@ -97,6 +100,7 @@
       }
     },
     "annotSV": {
+      "label": "AnnotSV",
       "type": "CATEGORICAL",
       "description": "VKGL classification",
       "field": "INFO/CSQ/ASV_ACMG_class",
@@ -122,6 +126,7 @@
       }
     },
     "gnomad": {
+      "label": "GnomAD",
       "type": "BOOL",
       "description": "gnomAD_AF < 0.02",
       "query": {
@@ -140,6 +145,7 @@
       }
     },
     "effect": {
+      "label": "Effect",
       "type": "BOOL",
       "description": "Consequence contains 'missense'",
       "query": {
@@ -158,6 +164,7 @@
       }
     },
     "clinVar": {
+      "label": "ClinVar",
       "type": "BOOL_MULTI",
       "fields": [
         "INFO/CLINVAR"
@@ -214,6 +221,7 @@
       }
     },
     "sift": {
+      "label": "SIFT",
       "description": "SIFT qualitative prediction",
       "type": "BOOL",
       "query": {
@@ -232,6 +240,7 @@
       }
     },
     "polyphen": {
+      "label": "PolyPhen",
       "description": "PolyPhen qualitative prediction",
       "type": "BOOL_MULTI",
       "fields": [
@@ -289,6 +298,7 @@
       }
     },
     "impact": {
+      "label": "IMPACT",
       "type": "CATEGORICAL",
       "description": "IMPACT rating",
       "field": "INFO/CSQ/IMPACT",
@@ -311,6 +321,7 @@
       }
     },
     "flag": {
+      "label": "FLAG",
       "type": "BOOL",
       "description": "flag exists",
       "query": {
@@ -329,22 +340,27 @@
       }
     },
     "exit_b": {
+      "label": "Benign",
       "type": "LEAF",
       "class": "B"
     },
     "exit_lb": {
+      "label": "Likely Benign",
       "type": "LEAF",
       "class": "LB"
     },
     "exit_vus": {
+      "label": "Variant of Unknown Significance",
       "type": "LEAF",
       "class": "VUS"
     },
     "exit_lp": {
+      "label": "Likely Pathogenic",
       "type": "LEAF",
       "class": "LP"
     },
     "exit_p": {
+      "label": "Pathogenic",
       "type": "LEAF",
       "class": "P"
     }

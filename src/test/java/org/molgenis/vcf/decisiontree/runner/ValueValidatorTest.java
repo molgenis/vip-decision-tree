@@ -41,7 +41,7 @@ class ValueValidatorTest {
   void validate(Object value, Field field) {
     when(vcfMetadata.getField("field")).thenReturn(field);
     when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
-        new ConfigBoolNode("", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
+        new ConfigBoolNode("", "label", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
             configNodeOutcome, configNodeOutcome, configNodeOutcome)));
     assertDoesNotThrow(() -> ValueValidator.validate(configDecisionTree, vcfMetadata));
   }
@@ -51,7 +51,7 @@ class ValueValidatorTest {
   void validateInvalid(Object value, Field field) {
     when(vcfMetadata.getField("field")).thenReturn(field);
     when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
-        new ConfigBoolNode("", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
+        new ConfigBoolNode("", "label", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
             configNodeOutcome, configNodeOutcome, configNodeOutcome)));
     assertThrows(ConfigDecisionTreeValidationException.class,
         () -> ValueValidator.validate(configDecisionTree, vcfMetadata));

@@ -15,6 +15,7 @@ import lombok.Value;
 public class ConfigCategoricalNode implements ConfigNode {
   @NonNull Type type = Type.CATEGORICAL;
   String description;
+  @NonNull String label;
 
   @NonNull String field;
   @NonNull Map<String, ConfigNodeOutcome> outcomeMap;
