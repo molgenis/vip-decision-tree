@@ -71,7 +71,7 @@ public class SampleClassifierImpl implements Classifier {
     for (SampleContext sampleContext : samplesContexts) {
       if (sampleContext.getProband()) {
         List<Decision> sampleDecisions = new ArrayList<>();
-        processRecord(vcfRecord, decisionTree, vcfMetadata, nestedHeaderLine, alleleCsqMap,
+        processRecord(vcfRecord, decisionTree, vcfMetadata, alleleCsqMap,
             sampleContext, sampleDecisions);
         sampleAnnotator.annotate(sampleDecisions, sampleContext.getIndex(), vcBuilder);
         decisions.addAll(
@@ -87,22 +87,21 @@ public class SampleClassifierImpl implements Classifier {
 
   private void processRecord
       (VcfRecord vcfRecord, DecisionTree decisionTree, VcfMetadata vcfMetadata,
-          NestedHeaderLine nestedHeaderLine, Map<Integer, List<VcfRecord>> alleleCsqMap,
+          Map<Integer, List<VcfRecord>> alleleCsqMap,
           SampleContext sampleContext,
           List<Decision> sampleDecisions) {
     for (int alleleIndex = 0; alleleIndex < vcfRecord.getNrAltAlleles(); alleleIndex++) {
       Integer vepAlleleIndex = alleleIndex + 1;
       Allele allele = vcfRecord.getAltAllele(alleleIndex);
       List<VcfRecord> singleCsqRecords = alleleCsqMap.get(vepAlleleIndex);
-      if (singleCsqRecords == null || singleCsqRecords.isEmpty()) {
-        singleCsqRecords = List.of(
-            vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, nestedHeaderLine));
-      }
-      for (VcfRecord singleCsqRecord : singleCsqRecords) {
-        Variant variant = Variant.builder().vcfMetadata(vcfMetadata).vcfRecord(singleCsqRecord)
-            .allele(allele).build();
-        sampleDecisions.add(
-            decisionTreeExecutor.execute(decisionTree, variant, sampleContext));
+      //only classify samples if a CSQ is present
+      if(singleCsqRecords != null) {
+        for (VcfRecord singleCsqRecord : singleCsqRecords) {
+          Variant variant = Variant.builder().vcfMetadata(vcfMetadata).vcfRecord(singleCsqRecord)
+                  .allele(allele).build();
+          sampleDecisions.add(
+                  decisionTreeExecutor.execute(decisionTree, variant, sampleContext));
+        }
       }
     }
   }
