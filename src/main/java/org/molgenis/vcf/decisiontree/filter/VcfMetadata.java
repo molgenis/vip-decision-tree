@@ -18,12 +18,11 @@ import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.ValueCountBuilder;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueCount.ValueCountBuilder;
+import org.molgenis.vcf.utils.metadata.ValueType;
 
 /**
  * {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields).
@@ -72,15 +71,15 @@ public class VcfMetadata {
     switch (field.toUpperCase()) {
       case "PROBAND" -> {
         valueType = ValueType.FLAG;
-        valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
+        valueCount = ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build();
       }
       case "ID", "AFFECTED_STATUS", "SEX", "FATHER_ID", "MOTHER_ID", "FAMILY_ID" -> {
         valueType = ValueType.STRING;
-        valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
+        valueCount = ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build();
       }
       case "PHENOTYPES" -> {
         valueType = ValueType.STRING;
-        valueCount = ValueCount.builder().type(Type.VARIABLE).nullable(true).build();
+        valueCount = ValueCount.builder().type(ValueCount.Type.VARIABLE).nullable(true).build();
       }
       default -> throw new UnsupportedFieldException(field);
     }
@@ -127,19 +126,19 @@ public class VcfMetadata {
     switch (field) {
       case "#CHROM", "REF" -> {
         valueType = ValueType.STRING;
-        valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
+        valueCount = ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build();
       }
       case "POS" -> {
         valueType = ValueType.INTEGER;
-        valueCount = ValueCount.builder().type(Type.FIXED).count(1).build();
+        valueCount = ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build();
       }
       case "ID", "FILTER", "ALT" -> {
         valueType = ValueType.STRING;
-        valueCount = ValueCount.builder().type(Type.VARIABLE).nullable(true).build();
+        valueCount = ValueCount.builder().type(ValueCount.Type.VARIABLE).nullable(true).build();
       }
       case "QUAL" -> {
         valueType = ValueType.FLOAT;
-        valueCount = ValueCount.builder().type(Type.FIXED).count(1).nullable(true).build();
+        valueCount = ValueCount.builder().type(ValueCount.Type.FIXED).count(1).nullable(true).build();
       }
       default -> throw new UnsupportedFieldException(field);
     }
@@ -179,12 +178,12 @@ public class VcfMetadata {
     switch (countType) {
       case INTEGER -> {
         int count = vcfCompoundHeaderLine.getCount();
-        builder.type(Type.FIXED).count(count).nullable(valueType != ValueType.FLAG);
+        builder.type(ValueCount.Type.FIXED).count(count).nullable(valueType != ValueType.FLAG);
       }
-      case A -> builder.type(Type.A).nullable(true);
-      case R -> builder.type(Type.R).nullable(true);
-      case G -> builder.type(Type.G).nullable(true);
-      case UNBOUNDED -> builder.type(Type.VARIABLE).nullable(true);
+      case A -> builder.type(ValueCount.Type.A).nullable(true);
+      case R -> builder.type(ValueCount.Type.R).nullable(true);
+      case G -> builder.type(ValueCount.Type.G).nullable(true);
+      case UNBOUNDED -> builder.type(ValueCount.Type.VARIABLE).nullable(true);
       default -> throw new UnexpectedEnumException(countType);
     }
 
@@ -217,7 +216,7 @@ public class VcfMetadata {
   }
 
   public static boolean isSingleValueField(Field field) {
-    return field.getValueCount().getType() == Type.FIXED && field.getValueCount().getCount() <= 1;
+    return field.getValueCount().getType() == ValueCount.Type.FIXED && field.getValueCount().getCount() <= 1;
   }
 
   public Map<String, Integer> getSampleNameToOffset() {

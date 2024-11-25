@@ -15,7 +15,7 @@ import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.utils.metadata.ValueType;
 
 class BoolMultiNodeEvaluatorTest {
 

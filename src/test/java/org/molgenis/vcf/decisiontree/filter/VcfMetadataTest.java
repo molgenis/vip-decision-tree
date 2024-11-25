@@ -26,10 +26,9 @@ import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 
 @ExtendWith(MockitoExtension.class)
 class VcfMetadataTest {
@@ -47,7 +46,7 @@ class VcfMetadataTest {
         vepNestedMetadata.put("consequence", createNestedField("consequence"));
         Field vepField = FieldImpl.builder().id("VEP").fieldType(FieldType.INFO)
                 .valueType(ValueType.STRING).valueCount(ValueCount.builder()
-                        .type(Type.VARIABLE).build()).build();
+                        .type(ValueCount.Type.VARIABLE).build()).build();
         NestedHeaderLine nestedVepHeaderLine = NestedHeaderLine.builder()
                 .nestedFields(vepNestedMetadata).parentField(vepField).build();
         NestedHeaderLine nestedGtHeaderLine = NestedHeaderLine.builder()
@@ -64,7 +63,7 @@ class VcfMetadataTest {
                         .id(fieldId)
                         .fieldType(FieldType.COMMON)
                         .valueType(ValueType.STRING)
-                        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -77,7 +76,7 @@ class VcfMetadataTest {
                         .id(fieldId)
                         .fieldType(FieldType.COMMON)
                         .valueType(ValueType.INTEGER)
-                        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -91,7 +90,7 @@ class VcfMetadataTest {
                         .id(fieldId)
                         .fieldType(FieldType.COMMON)
                         .valueType(ValueType.STRING)
-                        .valueCount(ValueCount.builder().type(Type.VARIABLE).nullable(true).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.VARIABLE).nullable(true).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -104,7 +103,7 @@ class VcfMetadataTest {
                         .id(fieldId)
                         .fieldType(FieldType.COMMON)
                         .valueType(ValueType.STRING)
-                        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -117,7 +116,7 @@ class VcfMetadataTest {
                         .id(fieldId)
                         .fieldType(FieldType.COMMON)
                         .valueType(ValueType.FLOAT)
-                        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).nullable(true).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).nullable(true).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -139,7 +138,7 @@ class VcfMetadataTest {
                         .id("my_field")
                         .fieldType(FieldType.INFO)
                         .valueType(ValueType.INTEGER)
-                        .valueCount(ValueCount.builder().type(Type.G).nullable(true).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.G).nullable(true).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -156,7 +155,7 @@ class VcfMetadataTest {
                         .id("my_field")
                         .fieldType(FieldType.INFO)
                         .valueType(ValueType.FLOAT)
-                        .valueCount(ValueCount.builder().type(Type.R).nullable(true).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.R).nullable(true).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -173,7 +172,7 @@ class VcfMetadataTest {
                         .id("my_field")
                         .fieldType(FieldType.INFO)
                         .valueType(ValueType.STRING)
-                        .valueCount(ValueCount.builder().type(Type.A).nullable(true).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.A).nullable(true).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -190,7 +189,7 @@ class VcfMetadataTest {
                         .id("my_field")
                         .fieldType(FieldType.INFO)
                         .valueType(ValueType.STRING)
-                        .valueCount(ValueCount.builder().type(Type.VARIABLE).nullable(true).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.VARIABLE).nullable(true).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -207,7 +206,7 @@ class VcfMetadataTest {
                         .id("my_field")
                         .fieldType(FieldType.INFO)
                         .valueType(ValueType.CHARACTER)
-                        .valueCount(ValueCount.builder().type(Type.R).nullable(true).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.R).nullable(true).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -225,7 +224,7 @@ class VcfMetadataTest {
                         .id("my_field")
                         .fieldType(FieldType.INFO)
                         .valueType(ValueType.FLAG)
-                        .valueCount(ValueCount.builder().type(Type.FIXED).count(0).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(0).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -247,7 +246,7 @@ class VcfMetadataTest {
                         .id("my_field")
                         .fieldType(FieldType.FORMAT)
                         .valueType(ValueType.INTEGER)
-                        .valueCount(ValueCount.builder().type(Type.G).nullable(true).build())
+                        .valueCount(ValueCount.builder().type(ValueCount.Type.G).nullable(true).build())
                         .build(),
                 vcfMetadata.getField(fieldId));
     }
@@ -294,49 +293,49 @@ class VcfMetadataTest {
 
     @Test
     void getFieldSampleId() {
-        Field field = FieldImpl.builder().id("ID").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(Type.FIXED).count(1).build()).build();
+        Field field = FieldImpl.builder().id("ID").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build()).build();
         assertEquals(field, vcfMetadata.getField("SAMPLE/ID"));
     }
 
     @Test
     void getFieldSampleProband() {
-        Field field = FieldImpl.builder().id("PROBAND").fieldType(FieldType.SAMPLE).valueType(ValueType.FLAG).valueCount(ValueCount.builder().type(Type.FIXED).count(1).build()).build();
+        Field field = FieldImpl.builder().id("PROBAND").fieldType(FieldType.SAMPLE).valueType(ValueType.FLAG).valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build()).build();
         assertEquals(field, vcfMetadata.getField("SAMPLE/PROBAND"));
     }
 
     @Test
     void getFieldSampleAffectedStatus() {
-        Field field = FieldImpl.builder().id("AFFECTED_STATUS").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(Type.FIXED).count(1).build()).build();
+        Field field = FieldImpl.builder().id("AFFECTED_STATUS").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build()).build();
         assertEquals(field, vcfMetadata.getField("SAMPLE/AFFECTED_STATUS"));
     }
 
     @Test
     void getFieldSampleSex() {
-        Field field = FieldImpl.builder().id("SEX").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(Type.FIXED).count(1).build()).build();
+        Field field = FieldImpl.builder().id("SEX").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build()).build();
         assertEquals(field, vcfMetadata.getField("SAMPLE/SEX"));
     }
 
     @Test
     void getFieldSampleFatherId() {
-        Field field = FieldImpl.builder().id("FATHER_ID").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(Type.FIXED).count(1).build()).build();
+        Field field = FieldImpl.builder().id("FATHER_ID").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build()).build();
         assertEquals(field, vcfMetadata.getField("SAMPLE/FATHER_ID"));
     }
 
     @Test
     void getFieldSampleMotherId() {
-        Field field = FieldImpl.builder().id("MOTHER_ID").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(Type.FIXED).count(1).build()).build();
+        Field field = FieldImpl.builder().id("MOTHER_ID").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build()).build();
         assertEquals(field, vcfMetadata.getField("SAMPLE/MOTHER_ID"));
     }
 
     @Test
     void getFieldSampleFamilyId() {
-        Field field = FieldImpl.builder().id("FAMILY_ID").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(Type.FIXED).count(1).build()).build();
+        Field field = FieldImpl.builder().id("FAMILY_ID").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build()).build();
         assertEquals(field, vcfMetadata.getField("SAMPLE/FAMILY_ID"));
     }
 
     @Test
     void getFieldSamplePhenotypes() {
-        Field field = FieldImpl.builder().id("PHENOTYPES").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(Type.VARIABLE).nullable(true).build()).build();
+        Field field = FieldImpl.builder().id("PHENOTYPES").fieldType(FieldType.SAMPLE).valueType(ValueType.STRING).valueCount(ValueCount.builder().type(ValueCount.Type.VARIABLE).nullable(true).build()).build();
         assertEquals(field, vcfMetadata.getField("SAMPLE/PHENOTYPES"));
     }
 
@@ -351,7 +350,7 @@ class VcfMetadataTest {
     }
 
     private NestedField createNestedField(String field) {
-        ValueCount valueCount = ValueCount.builder().type(Type.VARIABLE).build();
+        ValueCount valueCount = ValueCount.builder().type(ValueCount.Type.VARIABLE).build();
         FieldImpl parent = FieldImpl.builder().id("VEP").fieldType(FieldType.INFO)
                 .valueType(ValueType.STRING).valueCount(valueCount).separator('|').build();
         return NestedField.nestedBuilder().id(field).parent(parent).fieldType(FieldType.INFO_VEP)

@@ -6,10 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 
 class UnsupportedValueCountTypeExceptionTest {
   @Test
@@ -19,6 +18,6 @@ class UnsupportedValueCountTypeExceptionTest {
         new UnsupportedValueCountTypeException(
             FieldImpl.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.FLOAT)
                 .valueCount(
-                    ValueCount.builder().type(Type.G).build()).build(), DecisionType.CATEGORICAL, ConfigOperator.IN).getMessage());
+                    ValueCount.builder().type(ValueCount.Type.G).build()).build(), DecisionType.CATEGORICAL, ConfigOperator.IN).getMessage());
   }
 }

@@ -6,11 +6,11 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 import org.springframework.stereotype.Component;
 
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.*;
@@ -79,17 +79,17 @@ public class QueryValidatorImpl implements QueryValidator {
     validateFileValueAllowed(configBoolQuery, field);
     if (field.getValueType() == ValueType.FLAG || field.getValueType() == ValueType.FLOAT) {
       throw new UnsupportedValueTypeException(field, DecisionType.BOOL);
-    } else if (field.getValueCount().getType() == Type.FIXED
+    } else if (field.getValueCount().getType() == ValueCount.Type.FIXED
         && field.getValueCount().getCount() == 1) {
       throw new UnsupportedValueCountException(field, DecisionType.BOOL, CONTAINS);
     }
   }
 
   private void validateSingleOrPerAlleleCount(Field field, DecisionType decisionType, ConfigOperator configOperator) {
-    if (field.getValueCount().getType() == Type.G ||
-        field.getValueCount().getType() == Type.VARIABLE) {
+    if (field.getValueCount().getType() == ValueCount.Type.G ||
+        field.getValueCount().getType() == ValueCount.Type.VARIABLE) {
       throw new UnsupportedValueCountTypeException(field, decisionType, configOperator);
-    } else if (field.getValueCount().getType() == Type.FIXED
+    } else if (field.getValueCount().getType() == ValueCount.Type.FIXED
         && field.getValueCount().getCount() != 1) {
       throw new UnsupportedValueCountException(field, decisionType, configOperator);
     }
