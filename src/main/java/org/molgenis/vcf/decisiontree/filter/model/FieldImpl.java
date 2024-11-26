@@ -1,9 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.NonFinal;
 import org.molgenis.vcf.utils.metadata.ValueCount;
 import org.molgenis.vcf.utils.metadata.ValueType;
@@ -12,6 +9,7 @@ import org.molgenis.vcf.utils.metadata.ValueType;
 @Builder
 @NonFinal
 @AllArgsConstructor
+@EqualsAndHashCode
 public class FieldImpl implements Field {
 
   @NonNull String id;

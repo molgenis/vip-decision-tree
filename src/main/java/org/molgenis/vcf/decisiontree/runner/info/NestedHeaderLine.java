@@ -2,6 +2,7 @@ package org.molgenis.vcf.decisiontree.runner.info;
 
 import java.util.Map;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -10,6 +11,7 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 
 @Value
 @Builder
+@EqualsAndHashCode
 public class NestedHeaderLine {
 
   @NonNull Field parentField;

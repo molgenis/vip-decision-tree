@@ -10,10 +10,9 @@ import static org.molgenis.vcf.utils.metadata.ValueCount.Type.*;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,11 +22,10 @@ import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.utils.metadata.FieldMetadataService;
-import org.molgenis.vcf.utils.metadata.ValueCount;
-import org.molgenis.vcf.utils.metadata.ValueType;
+import org.molgenis.vcf.utils.metadata.*;
+import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
-import org.springframework.util.ResourceUtils;
+import org.molgenis.vcf.utils.model.metadata.NestedFieldMetadata;
 
 @ExtendWith(MockitoExtension.class)
 class VepMetadataMapperImplTest {
@@ -35,16 +33,16 @@ class VepMetadataMapperImplTest {
   private VepMetadataMapper vepMetadataMapper;
 
   @Mock
-  VCFInfoHeaderLine headerLine;
-
-  @Mock
   FieldMetadataService fieldMetadataService;
 
-  @BeforeEach
-  void setUp() throws FileNotFoundException {
-    String metadataFile = ResourceUtils.getFile("classpath:field_metadata.json").toString();
+  @Mock
+  VCFInfoHeaderLine headerLine;
 
-    vepMetadataMapper = new VepMetadataMapperImpl(Path.of(metadataFile));
+
+
+  @BeforeEach
+  void setUp(){
+    vepMetadataMapper = new VepMetadataMapperImpl(fieldMetadataService);
   }
 
   @Test
@@ -64,35 +62,37 @@ class VepMetadataMapperImplTest {
   @Test
   void map() {
     VCFHeader vcfHeader = mock(VCFHeader.class);
+    VCFInfoHeaderLine csqInfoHeaderLine = mock(VCFInfoHeaderLine.class);
+    when(csqInfoHeaderLine.getID()).thenReturn("CSQ");
+    when(vcfHeader.getInfoHeaderLine("CSQ")).thenReturn(csqInfoHeaderLine);
 
-    FieldMetadatas TODO = null;//FIXME
-    when(fieldMetadataService.load(vcfHeader)).thenReturn(TODO);
+    NestedFieldMetadata nestedStrandMeta = NestedFieldMetadata.builder().index(0)
+            .label("STRAND").description("STRAND")
+            .type(ValueType.INTEGER).numberType(FIXED).numberCount(1).build();
+    NestedFieldMetadata nestedTestMeta = NestedFieldMetadata.builder().index(1)
+            .label("TEST label").description("TEST desc").type(ValueType.INTEGER)
+            .numberType(ValueCount.Type.R).build();
+    FieldMetadata csqMeta = FieldMetadata.builder().label("CSQ").description("Consequence annotations from Ensembl VEP. Format: STRAND|TEST").numberType(ValueCount.Type.VARIABLE).type(ValueType.STRING).numberType(ValueCount.Type.VARIABLE).nestedFields(Map.of("STRAND", nestedStrandMeta, "TEST", nestedTestMeta)).build();
+    FieldMetadatas fieldMetadatas = FieldMetadatas.builder().info(Map.of("CSQ", csqMeta)).format(Map.of()).build();
+    when(fieldMetadataService.load(vcfHeader, Map.of(FieldIdentifier.builder().name("CSQ").type(org.molgenis.vcf.utils.metadata.FieldType.INFO).build(), NestedAttributes.builder().seperator("|").prefix("Consequence annotations from Ensembl VEP. Format: ").build()))).thenReturn(fieldMetadatas);
 
     NestedHeaderLine actual = vepMetadataMapper
-        .map("CSQ", vcfHeader);
+            .map("CSQ", vcfHeader);
 
     Field vepField = FieldImpl.builder().id("CSQ").fieldType(FieldType.INFO)
         .valueType(ValueType.STRING).valueCount(ValueCount.builder()
             .type(VARIABLE).build()).separator('|').build();
     Map<String, NestedField> expectedMap = new HashMap<>();
-    expectedMap.put("Allele", NestedField.nestedBuilder().id("Allele").index(4).parent(vepField)
+    expectedMap.put("STRAND", NestedField.nestedBuilder().id("STRAND").index(0).parent(vepField)
         .fieldType(FieldType.INFO_VEP)
         .valueCount(ValueCount.builder().type(FIXED).count(1).build())
-        .valueType(ValueType.STRING).build());
-    expectedMap.put("field2", NestedField.nestedBuilder().id("field2").index(3).parent(vepField)
+        .valueType(ValueType.INTEGER).build());
+    expectedMap.put("TEST", NestedField.nestedBuilder().id("TEST").index(1).parent(vepField)
         .fieldType(FieldType.INFO_VEP)
         .valueCount(ValueCount.builder().type(ValueCount.Type.R).build())
-        .valueType(ValueType.INTEGER).build());
-    expectedMap.put("field3", NestedField.nestedBuilder().id("field3").index(2).parent(vepField)
-        .fieldType(FieldType.INFO_VEP)
-        .valueCount(ValueCount.builder().type(ValueCount.Type.G).build())
-        .valueType(ValueType.CHARACTER).build());
-    expectedMap.put("field4", NestedField.nestedBuilder().id("field4").index(1).parent(vepField)
-        .fieldType(FieldType.INFO_VEP)
-        .valueCount(ValueCount.builder().type(ValueCount.Type.A).build())
         .valueType(ValueType.STRING).build());
-    assertEquals(NestedHeaderLine.builder().nestedFields(expectedMap).parentField(vepField).build(),
-        actual);
+    NestedHeaderLine expected = NestedHeaderLine.builder().nestedFields(expectedMap).parentField(vepField).build();
+    assertEquals(expected, actual);
   }
 
 }

@@ -3,6 +3,7 @@ package org.molgenis.vcf.decisiontree.filter.model;
 import static java.util.Objects.requireNonNull;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
@@ -11,6 +12,7 @@ import org.molgenis.vcf.utils.metadata.ValueType;
 
 @Value
 @NonFinal
+@EqualsAndHashCode(callSuper = false)
 public class NestedField extends FieldImpl implements Comparable<NestedField> {
 
   final int index;
