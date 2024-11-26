@@ -373,7 +373,7 @@ public class VcfRecord {
       case FLOAT:
         value = VcfUtils.getInfoAsDouble(variantContext, field);
         break;
-      case CHARACTER, STRING:
+      case CHARACTER, STRING, CATEGORICAL:
         value = VcfUtils.getInfoAsString(variantContext, field);
         break;
       default:
@@ -392,7 +392,7 @@ public class VcfRecord {
       case FLOAT:
         listValues = VcfUtils.getInfoAsDoubleList(variantContext, field);
         break;
-      case CHARACTER, STRING:
+      case CHARACTER, STRING, CATEGORICAL:
         listValues = VcfUtils.getInfoAsStringList(variantContext, field);
         break;
       case FLAG:

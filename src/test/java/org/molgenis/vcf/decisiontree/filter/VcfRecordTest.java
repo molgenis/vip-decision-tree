@@ -346,6 +346,19 @@ class VcfRecordTest {
   }
 
   @Test
+  void getValueInfoFixedOneCategorical() {
+    FieldImpl field =
+            FieldImpl.builder()
+                    .id("my_field")
+                    .fieldType(FieldType.INFO)
+                    .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
+                    .valueType(ValueType.CATEGORICAL)
+                    .build();
+    when(variantContext.getAttribute("my_field")).thenReturn("str0");
+    assertEquals("str0", vcfRecord.getValue(field, createAllele()));
+  }
+
+  @Test
   void getValueFormatAD() {
     FieldImpl field =
         FieldImpl.builder()
