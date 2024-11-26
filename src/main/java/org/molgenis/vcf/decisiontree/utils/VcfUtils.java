@@ -17,8 +17,8 @@ import java.util.List;
 import org.molgenis.vcf.decisiontree.filter.UnsupportedFieldException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
+import org.molgenis.vcf.utils.metadata.ValueType;
 import org.springframework.lang.Nullable;
 
 public class VcfUtils {
@@ -262,7 +262,7 @@ public class VcfUtils {
       case FLOAT:
         typedValue = VcfUtils.getVcfValueAsDouble(stringValue, missingValue);
         break;
-      case CHARACTER, STRING:
+      case CHARACTER, STRING, CATEGORICAL:
         typedValue = VcfUtils.getVcfValueAsString(stringValue, missingValue);
         break;
       default:

@@ -6,16 +6,15 @@ import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 
 class UnsupportedOperatorExceptionTest {
 
   FieldImpl field = FieldImpl.builder().id("test").fieldType(FieldType.INFO)
       .valueType(ValueType.FLAG).valueCount(
-          ValueCount.builder().type(Type.FIXED).build()).build();
+          ValueCount.builder().type(ValueCount.Type.FIXED).build()).build();
 
   @Test
   void getMessage() {

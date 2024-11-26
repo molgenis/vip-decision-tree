@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
+import org.molgenis.vcf.utils.metadata.ValueCount;
 
 class ExistsNodeEvaluatorTest {
 
@@ -65,7 +64,7 @@ class ExistsNodeEvaluatorTest {
   @Test
   void evaluateExistsFalseValueCountVariable() {
     FieldImpl field = mock(FieldImpl.class);
-    when(field.getValueCount()).thenReturn(ValueCount.builder().type(Type.VARIABLE).build());
+    when(field.getValueCount()).thenReturn(ValueCount.builder().type(ValueCount.Type.VARIABLE).build());
 
     NodeOutcome outcomeTrue = mock(NodeOutcome.class);
     NodeOutcome outcomeFalse = mock(NodeOutcome.class);

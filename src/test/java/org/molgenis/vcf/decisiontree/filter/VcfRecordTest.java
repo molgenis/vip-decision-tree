@@ -27,9 +27,8 @@ import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 
 @ExtendWith(MockitoExtension.class)
@@ -193,7 +192,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.A).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.A).build())
             .valueType(ValueType.INTEGER)
             .build();
     int alleleIndex = 2;
@@ -207,7 +206,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.A).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.A).build())
             .valueType(ValueType.FLOAT)
             .build();
     int alleleIndex = 2;
@@ -221,7 +220,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.A).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.A).build())
             .valueType(ValueType.STRING)
             .build();
     int alleleIndex = 2;
@@ -235,7 +234,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.R).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.R).build())
             .valueType(ValueType.INTEGER)
             .build();
     int alleleIndex = 2;
@@ -249,7 +248,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.VARIABLE).build())
             .valueType(ValueType.INTEGER)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(asList(1, 2));
@@ -262,7 +261,7 @@ class VcfRecordTest {
             FieldImpl.builder()
                     .id("my_field")
                     .fieldType(FieldType.INFO)
-                    .valueCount(ValueCount.builder().type(Type.FIXED).count(0).build())
+                    .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(0).build())
                     .valueType(ValueType.FLAG)
                     .build();
     Allele allele = createAllele();
@@ -274,7 +273,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.VARIABLE).build())
             .valueType(ValueType.FLAG)
             .build();
     Allele allele = createAllele();
@@ -287,7 +286,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(2).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(2).build())
             .valueType(ValueType.INTEGER)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(asList(1, 2));
@@ -300,7 +299,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .valueType(ValueType.INTEGER)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(1);
@@ -313,7 +312,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .valueType(ValueType.FLOAT)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(1.2);
@@ -326,7 +325,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .valueType(ValueType.FLAG)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn(true);
@@ -339,7 +338,7 @@ class VcfRecordTest {
         FieldImpl.builder()
             .id("my_field")
             .fieldType(FieldType.INFO)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .valueType(ValueType.STRING)
             .build();
     when(variantContext.getAttribute("my_field")).thenReturn("str0");
@@ -353,7 +352,7 @@ class VcfRecordTest {
             .id("AD")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getAD()).thenReturn(new int[]{10, 10});
@@ -370,7 +369,7 @@ class VcfRecordTest {
             .id("AD")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getAD()).thenReturn(null);
@@ -386,7 +385,7 @@ class VcfRecordTest {
             .id("DP")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getDP()).thenReturn(10);
@@ -402,7 +401,7 @@ class VcfRecordTest {
             .id("DP")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getDP()).thenReturn(-1);
@@ -417,7 +416,7 @@ class VcfRecordTest {
             .id("GT")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getAlleles()).thenReturn(List.of(htsjdk.variant.variantcontext.Allele.ALT_T,
@@ -437,7 +436,7 @@ class VcfRecordTest {
             .id("GT")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getAlleles()).thenReturn(List.of(htsjdk.variant.variantcontext.Allele.NO_CALL,
@@ -457,7 +456,7 @@ class VcfRecordTest {
             .id("GQ")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getGQ()).thenReturn(10);
@@ -472,7 +471,7 @@ class VcfRecordTest {
             .id("GQ")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getGQ()).thenReturn(-1);
@@ -487,7 +486,7 @@ class VcfRecordTest {
             .id("PL")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getPL()).thenReturn(new int[]{10, 10});
@@ -503,7 +502,7 @@ class VcfRecordTest {
             .id("test")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getExtendedAttribute("test")).thenReturn("testValue");
@@ -518,7 +517,7 @@ class VcfRecordTest {
             .id("test")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.INTEGER)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getExtendedAttribute("test")).thenReturn("1");
@@ -533,7 +532,7 @@ class VcfRecordTest {
             .id("test")
             .fieldType(FieldType.FORMAT)
             .valueType(ValueType.INTEGER)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getExtendedAttribute("test")).thenReturn(List.of(1, 2));
@@ -549,14 +548,14 @@ class VcfRecordTest {
         .id("GENOTYPE")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id("ALLELES")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getAlleles()).thenReturn(List.of(htsjdk.variant.variantcontext.Allele.ALT_T,
@@ -571,14 +570,14 @@ class VcfRecordTest {
         .id("GENOTYPE")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id("ALLELE_NUM")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getAlleles()).thenReturn(List.of(htsjdk.variant.variantcontext.Allele.ALT_T,
@@ -597,14 +596,14 @@ class VcfRecordTest {
         .id("GENOTYPE")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id("TYPE")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getType()).thenReturn(GenotypeType.valueOf(argument));
@@ -619,14 +618,14 @@ class VcfRecordTest {
         .id("GENOTYPE")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id(fieldName)
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.FLAG)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     Genotype gt = mock(Genotype.class);
     when(variantContext.getGenotype(0)).thenReturn(gt);
@@ -639,14 +638,14 @@ class VcfRecordTest {
         .id("GENOTYPE")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id("PLOIDY")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getPloidy()).thenReturn(1);
@@ -660,14 +659,14 @@ class VcfRecordTest {
         .id("GENOTYPE")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.STRING)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     NestedField field = NestedField.nestedBuilder()
         .parent(parent)
         .id("PLOIDY")
         .fieldType(FieldType.GENOTYPE)
         .valueType(ValueType.INTEGER)
-        .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+        .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
         .build();
     Genotype gt = mock(Genotype.class);
     when(gt.getPloidy()).thenReturn(0);
@@ -682,7 +681,7 @@ class VcfRecordTest {
             .id("ID")
             .fieldType(FieldType.SAMPLE)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     assertEquals("test", vcfRecord.getValue(field, createAllele(), sampleContext));
@@ -696,7 +695,7 @@ class VcfRecordTest {
             .id(fieldName)
             .fieldType(FieldType.SAMPLE)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.FIXED).count(1).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
     Genotype gt = mock(Genotype.class);
     assertEquals(expected, vcfRecord.getValue(field, createAllele(), sampleContext));
@@ -709,7 +708,7 @@ class VcfRecordTest {
             .id("PHENOTYPES")
             .fieldType(FieldType.SAMPLE)
             .valueType(ValueType.STRING)
-            .valueCount(ValueCount.builder().type(Type.VARIABLE).build())
+            .valueCount(ValueCount.builder().type(ValueCount.Type.VARIABLE).build())
             .build();
     Genotype gt = mock(Genotype.class);
     assertEquals(List.of("HP1", "HP2"), vcfRecord.getValue(field, createAllele(), sampleContext));

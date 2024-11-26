@@ -16,9 +16,8 @@ import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 
 class BoolNodeEvaluatorTest {
 
@@ -595,7 +594,7 @@ class BoolNodeEvaluatorTest {
   void evaluateMissingValueCountVariable() {
     FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
-    when(field.getValueCount()).thenReturn(ValueCount.builder().type(Type.VARIABLE).build());
+    when(field.getValueCount()).thenReturn(ValueCount.builder().type(ValueCount.Type.VARIABLE).build());
 
     Operator operator = Operator.EQUALS;
     List<String> queryValue = List.of("PASS");

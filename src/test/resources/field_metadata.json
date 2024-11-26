@@ -6,16 +6,32 @@
       "numberType": "OTHER",
       "separator": ",",
       "type": "CATEGORICAL",
-      "categories": [
-        "AD",
-        "AD_IP",
-        "AR",
-        "AR_C",
-        "XLD",
-        "XLR",
-        "YL",
-        "MT"
-      ]
+      "categories": {
+        "AD": {
+          "label": "AD"
+        },
+        "AD_IP": {
+          "label": "AD_IP"
+        },
+        "AR": {
+          "label": "AR"
+        },
+        "AR_C": {
+          "label": "AR_C"
+        },
+        "XLD": {
+          "label": "XLD"
+        },
+        "XLR": {
+          "label": "XLR"
+        },
+        "YL": {
+          "label": "YL"
+        },
+        "MT": {
+          "label": "MT"
+        }
+      }
     }
   },
   "info": {
@@ -41,13 +57,13 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "B",
-            "LB",
-            "VUS",
-            "LP",
-            "P"
-          ]
+          "categories": {
+            "B": {"label": "B"},
+            "LB": {"label": "LB"},
+            "VUS": {"label": "VUS"},
+            "LP": {"label": "LP"},
+            "P": {"label": "P", "description": "Description P"}
+          }
         },
         "CAPICE_SC": {
           "label": "CAPICE",
@@ -95,14 +111,26 @@
           "numberType": "OTHER",
           "separator": "/",
           "type": "CATEGORICAL",
-          "categories": [
-            "Benign",
-            "Likely_benign",
-            "Uncertain_significance",
-            "Likely_pathogenic",
-            "Pathogenic",
-            "Conflicting_interpretations_of_pathogenicity"
-          ]
+          "categories": {
+            "Benign": {
+              "label": "Benign"
+            },
+            "Likely_benign": {
+              "label": "Likely_benign"
+            },
+            "Uncertain_significance": {
+              "label": "Uncertain_significance"
+            },
+            "Likely_pathogenic": {
+              "label": "Likely_pathogenic"
+            },
+            "Pathogenic": {
+              "label": "Pathogenic"
+            },
+            "Conflicting_interpretations_of_pathogenicity": {
+              "label": "Conflicting_interpretations_of_pathogenicity"
+            }
+          }
         },
         "clinVar_CLNSIGINCL": {
           "label": "ClinVar variant combination",
@@ -110,14 +138,26 @@
           "numberType": "OTHER",
           "separator": "&",
           "type": "CATEGORICAL",
-          "categories": [
-            "Benign",
-            "Likely_benign",
-            "Uncertain_significance",
-            "Likely_pathogenic",
-            "Pathogenic",
-            "Conflicting_interpretations_of_pathogenicity"
-          ]
+          "categories": {
+            "Benign": {
+              "label": "Benign"
+            },
+            "Likely_benign": {
+              "label": "Likely_benign"
+            },
+            "Uncertain_significance": {
+              "label": "Uncertain_significance"
+            },
+            "Likely_pathogenic": {
+              "label": "Likely_pathogenic"
+            },
+            "Pathogenic": {
+              "label": "Pathogenic"
+            },
+            "Conflicting_interpretations_of_pathogenicity": {
+              "label": "Conflicting_interpretations_of_pathogenicity"
+            }
+          }
         },
         "clinVar_CLNREVSTAT": {
           "label": "ClinVar status",
@@ -125,17 +165,35 @@
           "numberType": "OTHER",
           "separator": "&",
           "type": "CATEGORICAL",
-          "categories": [
-            "practice_guideline",
-            "reviewed_by_expert_panel",
-            "criteria_provided",
-            "_multiple_submitters",
-            "_no_conflicts",
-            "_single_submitter",
-            "_conflicting_interpretations",
-            "no_assertion_criteria_provided",
-            "no_assertion_provided"
-          ]
+          "categories": {
+            "practice_guideline": {
+              "label": "practice_guideline"
+            },
+            "reviewed_by_expert_panel": {
+              "label": "reviewed_by_expert_panel"
+            },
+            "criteria_provided": {
+              "label": "criteria_provided"
+            },
+            "_multiple_submitters": {
+              "label": "_multiple_submitters"
+            },
+            "_no_conflicts": {
+              "label": "_no_conflicts"
+            },
+            "_single_submitter": {
+              "label": "_single_submitter"
+            },
+            "_conflicting_interpretations": {
+              "label": "_conflicting_interpretations"
+            },
+            "no_assertion_criteria_provided": {
+              "label": "no_assertion_criteria_provided"
+            },
+            "no_assertion_provided": {
+              "label": "no_assertion_provided"
+            }
+          }
         },
         "Consequence": {
           "label": "Effect",
@@ -157,11 +215,17 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "Transcript",
-            "RegulatoryFeature",
-            "MotifFeature"
-          ],
+          "categories": {
+            "Transcript":  {
+              "label": "Transcript"
+            },
+            "RegulatoryFeature":  {
+              "label": "RegulatoryFeature"
+            },
+            "MotifFeature":  {
+              "label": "MotifFeature"
+            }
+          },
           "required": true
         },
         "FLAGS": {
@@ -177,10 +241,14 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "LC",
-            "HC"
-          ]
+          "categories": {
+            "LC": {
+              "label": "LC"
+            },
+            "HC": {
+              "label": "HC"
+            }
+          }
         },
         "GADO_SC": {
           "label": "GADO_SC",
@@ -230,11 +298,17 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "E",
-            "G",
-            "T"
-          ]
+          "categories": {
+            "E": {
+              "label": "E"
+            },
+            "G": {
+              "label": "G"
+            },
+            "T": {
+              "label": "T"
+            }
+          }
         },
         "gnomAD_QC": {
           "label": "gnomAD QC",
@@ -277,12 +351,20 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "LOW",
-            "MODERATE",
-            "HIGH",
-            "MODIFIER"
-          ],
+          "categories": {
+            "LOW": {
+              "label": "LOW"
+            },
+            "MODERATE": {
+              "label": "MODERATE"
+            },
+            "HIGH": {
+              "label": "HIGH"
+            },
+            "MODIFIER": {
+              "label": "MODIFIER"
+            }
+          },
           "required": true
         },
         "IncompletePenetrance": {
@@ -426,13 +508,13 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "B",
-            "LB",
-            "VUS",
-            "LP",
-            "P"
-          ]
+          "categories": {
+            "B": {"label": "B"},
+            "LB": {"label": "LB"},
+            "VUS": {"label": "VUS"},
+            "LP": {"label": "LP"},
+            "P": {"label": "P", "description": "Description P"}
+          }
         },
         "VKGL_UMCG": {
           "label": "MVL",
@@ -440,13 +522,13 @@
           "numberType": "NUMBER",
           "numberCount": 1,
           "type": "CATEGORICAL",
-          "categories": [
-            "B",
-            "LB",
-            "VUS",
-            "LP",
-            "P"
-          ]
+          "categories": {
+            "B": {"label": "B"},
+            "LB": {"label": "LB"},
+            "VUS": {"label": "VUS"},
+            "LP": {"label": "LP"},
+            "P": {"label": "P", "description": "Description P"}
+          }
         }
       }
     }

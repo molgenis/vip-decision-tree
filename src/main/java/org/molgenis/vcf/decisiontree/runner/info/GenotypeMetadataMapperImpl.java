@@ -1,8 +1,5 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
-import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.FIXED;
-import static org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type.VARIABLE;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
@@ -10,10 +7,13 @@ import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.GenotypeFieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField.NestedFieldBuilder;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 import org.springframework.stereotype.Component;
+
+import static org.molgenis.vcf.utils.metadata.ValueCount.Type.FIXED;
+import static org.molgenis.vcf.utils.metadata.ValueCount.Type.VARIABLE;
 
 @Component
 public class GenotypeMetadataMapperImpl implements GenotypeMetadataMapper {

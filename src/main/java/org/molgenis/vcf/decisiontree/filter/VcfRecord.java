@@ -21,11 +21,10 @@ import org.molgenis.vcf.decisiontree.filter.model.GenotypeFieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.decisiontree.filter.model.SampleFieldType;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.utils.VcfUtils;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 import org.springframework.lang.Nullable;
 
 /**
@@ -240,7 +239,7 @@ public class VcfRecord {
     }
 
     ValueCount valueCount = field.getValueCount();
-    Type valueCountType = valueCount.getType();
+    ValueCount.Type valueCountType = valueCount.getType();
     switch (valueCountType) {
       case A, R, VARIABLE:
         typedValue =
@@ -339,7 +338,7 @@ public class VcfRecord {
     Object value;
 
     ValueCount valueCount = field.getValueCount();
-    Type valueCountType = valueCount.getType();
+    ValueCount.Type valueCountType = valueCount.getType();
     switch (valueCountType) {
       case A:
         List<?> aInfoList = getInfoList(field);
