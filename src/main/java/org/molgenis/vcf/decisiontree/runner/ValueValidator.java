@@ -152,7 +152,7 @@ public class ValueValidator {
                   singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
         }
         break;
-      case STRING:
+      case STRING, CATEGORICAL:
         if (!(String.class.isAssignableFrom(singleValue.getClass()))) {
           throw new ConfigDecisionTreeValidationException(
               format(

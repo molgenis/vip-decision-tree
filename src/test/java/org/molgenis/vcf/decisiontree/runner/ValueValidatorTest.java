@@ -62,6 +62,8 @@ class ValueValidatorTest {
             ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
         Arguments.of("123", new FieldImpl("id", FieldType.INFO, ValueType.STRING,
             ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
+        Arguments.of("123", new FieldImpl("id", FieldType.INFO, ValueType.CATEGORICAL,
+            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
         Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
             ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
         Arguments.of(true, new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
