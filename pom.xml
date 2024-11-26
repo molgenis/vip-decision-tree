@@ -13,7 +13,7 @@
 
     <groupId>org.molgenis</groupId>
     <artifactId>vip-decision-tree</artifactId>
-    <version>5.0.0</version>
+    <version>5.1.0</version>
 
     <name>vip-decision-tree</name>
     <description>Decision tree module for filtering and labelling VCF files</description>
@@ -164,6 +164,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <!-- suppress Java 21 dynamic agent loading warning, since there is no suitable fix yet -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>
