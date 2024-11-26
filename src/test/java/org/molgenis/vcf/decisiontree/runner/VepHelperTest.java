@@ -17,10 +17,9 @@ import org.molgenis.vcf.decisiontree.filter.VcfRecord;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 
 @ExtendWith(MockitoExtension.class)
 class VepHelperTest {
@@ -31,7 +30,7 @@ class VepHelperTest {
   @BeforeEach
   void setUp() {
     vepHelper = new VepHelper();
-    ValueCount valueCount = ValueCount.builder().type(Type.VARIABLE).build();
+    ValueCount valueCount = ValueCount.builder().type(ValueCount.Type.VARIABLE).build();
     FieldImpl parent = FieldImpl.builder().id("VEP").fieldType(
             FieldType.INFO)
         .valueType(ValueType.STRING).valueCount(valueCount).separator('|').build();

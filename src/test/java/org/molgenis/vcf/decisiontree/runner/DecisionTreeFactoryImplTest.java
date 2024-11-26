@@ -25,9 +25,6 @@ import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
@@ -35,6 +32,8 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigLeafNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 import org.springframework.util.ResourceUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,7 +73,7 @@ class DecisionTreeFactoryImplTest{
     when(decisionTree.getRootNode()).thenReturn("test");
     when(vcfMetadata.getField("INFO/testField")).thenReturn(
         FieldImpl.builder().id("testField").fieldType(INFO).valueType(
-            ValueType.STRING).valueCount(ValueCount.builder().type(Type.A).build()).build());
+            ValueType.STRING).valueCount(ValueCount.builder().type(ValueCount.Type.A).build()).build());
     Settings settings = Settings.builder().mode(Mode.VARIANT).configDecisionTree(decisionTree)
         .build();
     DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);

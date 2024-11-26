@@ -27,11 +27,10 @@ import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount;
-import org.molgenis.vcf.decisiontree.filter.model.ValueCount.Type;
-import org.molgenis.vcf.decisiontree.filter.model.ValueType;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
+import org.molgenis.vcf.utils.metadata.ValueCount;
+import org.molgenis.vcf.utils.metadata.ValueType;
 import org.molgenis.vcf.utils.sample.model.Sex;
 import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 
@@ -67,7 +66,7 @@ class SampleClassifierImplTest {
 
   @BeforeEach
   void setUp() {
-    ValueCount valueCount = ValueCount.builder().type(Type.VARIABLE).build();
+    ValueCount valueCount = ValueCount.builder().type(ValueCount.Type.VARIABLE).build();
     parent = FieldImpl.builder().id("VEP").fieldType(FieldType.INFO)
         .valueType(ValueType.STRING).valueCount(valueCount).separator('|').build();
     NestedField nestedField1 = NestedField.nestedBuilder().id("ALLELE_NUM").parent(parent)
