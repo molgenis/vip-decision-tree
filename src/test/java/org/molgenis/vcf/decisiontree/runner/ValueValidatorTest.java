@@ -115,7 +115,9 @@ class ValueValidatorTest {
         Arguments.of(List.of(true, false), new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
             ValueCount.builder().type(ValueCount.Type.A).build(), null, null)),
         Arguments.of(List.of("1", "2"), new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
-            ValueCount.builder().type(ValueCount.Type.G).build(), null, null))
+            ValueCount.builder().type(ValueCount.Type.G).build(), null, null)),
+        Arguments.of("1", new FieldImpl("per_alt", FieldType.INFO, ValueType.STRING,
+            ValueCount.builder().type(ValueCount.Type.A).build(), null, null))
     );
   }
 
