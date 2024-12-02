@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.decisiontree.filter.VcfMetadata.isPerAlleleValue;
 import static org.molgenis.vcf.decisiontree.filter.VcfMetadata.isSingleValueField;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FIELD_PREFIX;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FILE_PREFIX;
@@ -117,7 +118,7 @@ public class ValueValidator {
       ((Collection<?>) value).forEach(
           singleValue -> validateSingleValue(nodeId, singleValue, field.getValueType()));
     } else {
-      if (!isSingleValueField(field) && List.of(EQUALS, NOT_EQUALS).contains(operator)) {
+      if (!(isSingleValueField(field) || isPerAlleleValue(field))&& List.of(EQUALS, NOT_EQUALS).contains(operator)) {
         throw new ConfigDecisionTreeValidationException(
             format(
                 "Field '%s' in node '%s' contains a collection of values, therefore the '%s' query value should also have a collection as value.",

@@ -219,6 +219,10 @@ public class VcfMetadata {
     return field.getValueCount().getType() == ValueCount.Type.FIXED && field.getValueCount().getCount() <= 1;
   }
 
+  public static boolean isPerAlleleValue(Field field) {
+    return field.getValueCount().getType() == ValueCount.Type.A && field.getValueType() != ValueType.FLAG;
+  }
+
   public Map<String, Integer> getSampleNameToOffset() {
     return vcfHeader.getSampleNameToOffset();
   }
