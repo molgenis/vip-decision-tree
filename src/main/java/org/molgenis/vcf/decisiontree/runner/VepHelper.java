@@ -2,6 +2,7 @@ package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Collections.singletonList;
 import static org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapperImpl.ALLELE_NUM;
+import static org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapperImpl.PICK;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
@@ -52,6 +53,10 @@ public class VepHelper {
       values.add("");
     }
     values.set(fields.get(ALLELE_NUM).getIndex(), alleleIndex.toString());
+    NestedField pick = fields.get(PICK);
+    if(pick != null) {
+      values.set(pick.getIndex(), "1");
+    }
     VariantContext variantContext = vcfRecord.getVariantContext();
     VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
     variantContextBuilder.attribute(nestedHeaderLine.getParentField().getId(),
