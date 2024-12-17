@@ -20,6 +20,7 @@ import static org.molgenis.vcf.utils.metadata.ValueCount.Type.VARIABLE;
 public class VepMetadataMapperImpl implements VepMetadataMapper {
 
   public static final String ALLELE_NUM = "ALLELE_NUM";
+  public static final String PICK = "PICK";
   private static final String INFO_DESCRIPTION_PREFIX = "Consequence annotations from Ensembl VEP. Format: ";
 
   private final FieldMetadataService fieldMetadataService;
