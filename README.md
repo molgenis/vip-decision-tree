@@ -100,51 +100,6 @@ Decision nodes perform a test on the variant which determines the outcome consis
 node to process and optionally a label. Leaf nodes are terminal nodes that determine the class for a
 variant.
 
-### Supported Fields
-
-#### Standard VCF
-
-COMMON, INFO, FORMAT
-
-#### Customized fields
-
-##### INFO_VEP
-
-Any field in the VEP value can be used, if the field is unknown to the tool it is interpreted as a
-singel value string field.
-
-##### GENOTYPE
-
-This fieldtype uses the information provided by htsjdk about the Genotype FORMAT field.
-
-Allowed values are:
-
-- ALLELES: The alleles (list of strings) present in the genotype.
-- ALLELE_NUM: The allele numbers corresponding with the index in the VCF ALT field.
-- TYPE: The htsjdk genotype type, possible values: MIXED, HET, HOM_REF, HOM_VAR, NO_CALL,
-  UNAVAILABLE.
-- CALLED: Boolean indication if the genotype for this sample is called.
-- MIXED: Boolean indication if the genotype is comprised of both calls and no-calls.
-- NON_INFORMATIVE: Boolean that returns true if all samples PLs are 0.
-- PHASED: Boolean indicating the genotype was called phased or unphased.
-- PLOIDY: The ploidy of the genotype as an integer, null if no call is present.
-
-##### SAMPLE
-
-This fieldtype is used to query properties of the samples, like phenotypes and pedigree information
-which are provided outside the VCF.
-
-Allowed values are:
-
-- ID: The sample identifier.
-- AFFECTED_STATUS: The affected status of the sample, possible values: AFFECTED, UNAFFECTED,
-  MISSING.
-- SEX: The sex of the sample, possible values: MALE, FEMALE, UNKNOWN.
-- FATHER_ID: The identifier for the father sample.
-- MOTHER_ID: The identifier for the mother sample.
-- FAMILY_ID: The identifier for the family.
-- PHENOTYPES: The list of phenotypes for the sample.
-
 #### Modes
 
 ##### Variant classification (default)
@@ -161,6 +116,312 @@ separated list for which the index corresponds to the VEP value index, this clas
 added to the FORMAT fields value under the key "VIPC_S".
 
 Optionally labels and the path through the tree can be annotated to the FORMAT fields as well.
+
+### Basic structure
+
+The top level of the json file contains:
+- the rootnode, this is the node where the tree starts.
+- a list of all nodes in the tree
+- a list of files that are used in the tree nodes. (optional)
+
+Minimal example:
+```
+{
+  "rootNode": "gene",
+  "files": {
+    "my_file" : {
+      "path" : "/path/to/my/file"
+    }
+  },
+  "nodes": {
+    "gene": {
+      "label": "Gene",
+      "description": "Gene exists",
+      "type": "EXISTS",
+      "field": "INFO/CSQ/Gene",
+      "outcomeTrue": {
+        "nextNode": "gnomAD"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_rm"
+      }
+    },
+    "exit_a": {
+      "label": "A_label",
+      "description": "A_desc",
+      "type": "LEAF",
+      "class": "A"
+    },
+    "exit_b": {
+      "label": "B",
+      "description": "B_desc",
+      "type": "LEAF",
+      "class": "B_label"
+    },
+  }
+}
+```
+### Core concepts
+#### Supported Fields
+
+##### Standard VCF
+
+COMMON, INFO, FORMAT
+
+##### Customized fields
+
+###### INFO_VEP
+
+Any field in the VEP value can be used, if the field is unknown to the tool it is interpreted as a
+singel value string field.
+
+###### GENOTYPE
+
+This fieldtype uses the information provided by htsjdk about the Genotype FORMAT field.
+
+Allowed values are:
+
+- ALLELES: The alleles (list of strings) present in the genotype.
+- ALLELE_NUM: The allele numbers corresponding with the index in the VCF ALT field.
+- TYPE: The htsjdk genotype type, possible values: MIXED, HET, HOM_REF, HOM_VAR, NO_CALL,
+  UNAVAILABLE.
+- CALLED: Boolean indication if the genotype for this sample is called.
+- MIXED: Boolean indication if the genotype is comprised of both calls and no-calls.
+- NON_INFORMATIVE: Boolean that returns true if all samples PLs are 0.
+- PHASED: Boolean indicating the genotype was called phased or unphased.
+- PLOIDY: The ploidy of the genotype as an integer, null if no call is present.
+
+###### SAMPLE
+
+This fieldtype is used to query properties of the samples, like phenotypes and pedigree information
+which are provided outside the VCF.
+
+Allowed values are:
+
+- ID: The sample identifier.
+- AFFECTED_STATUS: The affected status of the sample, possible values: AFFECTED, UNAFFECTED,
+  MISSING.
+- SEX: The sex of the sample, possible values: MALE, FEMALE, UNKNOWN.
+- FATHER_ID: The identifier for the father sample.
+- MOTHER_ID: The identifier for the mother sample.
+- FAMILY_ID: The identifier for the family.
+- PHENOTYPES: The list of phenotypes for the sample.
+
+
+#### Operators
+
+##### Boolean
+The following operators are available for boolean queries:
+
+| Operator      | Description                                                 |
+|---------------|-------------------------------------------------------------|
+| ==            | Field value equals specified value.                         |
+| !=            | Field value does not equal specified value.                 |
+| <             | Field value is less than the specified value.               |
+| <=            | Field value is less or equal that the specified value.      |
+| >             | Field value greater than the specified value.               |
+| >=            | Field value greater or equal than the specified value.      |
+| in            | Field value is in the list of specified values.             |
+| !in           | Field value is not in the list of specified values.         |
+| contains      | Field values contain the specified value.                   |
+| !contains     | Field values do not contain the specified value.            |
+| contains_any  | Field values contains at least one of the specified values. |
+| contains_all  | Field values contains all of the specified values.          |
+| contains_none | Field values contains none of the specified values.         |
+
+##### Multi bool operators
+The following operators are available for groups of queries in MULTIBOOL nodes:
+
+| Operator | Description               |
+|----------|---------------------------|
+| AND      | All of the queries match. |
+| OR       | Any of the queries match. |
+
+#### Values
+Depending on the operator and field of the query values can be strings, numbers or lists of strings or numbers.
+There are also a few special values are available:
+
+##### Files
+The files specified on the top level of the tree can be used, using the "file:" prefix.
+files work as lists of values, where every line in the file is an item on the list.
+
+```
+      "query": {
+        "field": "INFO/CSQ/Gene",
+        "operator": "in",
+        "value": "file:my_file"
+      },
+```
+
+##### Fields
+Using the "field:" prefix the query will use the value of another field as the value for the query.
+
+```
+      "query": {
+        "field": "FORMAT/GENOTYPE/ALLELES",
+        "operator": "contains_any",
+        "value": "field:ALT"
+      },
+```
+
+### Nodes
+#### General
+All nodes need to have a label and can have a description.
+#### BOOL
+Boolean nodes are nodes that result in true or false based on a single query.
+
+The query should contain a field, an operator and a value, see the corresponding paragraphs of this document for the available options.
+
+The node itself needs to have defaultNode to proceed with if no category matches.
+Optionally a 'missingNode' can be specified to proceed with if the field is empty or not present in the vcf,
+if the 'missingNode' is not specified the 'defaultNode' is used instead for these cases.
+
+Example:
+```    
+"example_node": {
+      "type": "BOOL",
+      "description": "this is an example",
+      "query": {
+        "field": "INFO/FIELD",
+        "operator": "==",
+        "value": [
+          "PASS"
+        ]
+      },
+      "outcomeTrue": {
+        "nextNode": "my_next_node"
+      },
+      "outcomeFalse": {
+        "nextNode": "my_other_node"
+      },
+      "outcomeMissing": {
+        "nextNode": "my_third_node"
+      }
+    }
+```
+
+#### EXISTS
+An EXISTS node will check if a field is present and has a value.
+Since the result is always either true or false no missing of default node can be specified.
+
+Example
+```
+    "gene": {
+      "description": "Gene exists",
+      "type": "EXISTS",
+      "field": "INFO/CSQ/Gene",
+      "outcomeTrue": {
+        "nextNode": "my_next_node"
+      },
+      "outcomeFalse": {
+        "nextNode": "my_other_node"
+      }
+    },
+```
+
+#### BOOL_MULTI
+
+BOOL_MULTI nodes are nodes that can combine multiple fields and or multiple queries in a single node.
+Sets of boolean queries can be used to determine the next node, these groups are provide under the "outcomes" key.
+Each groups is an object containing a description, a list of queries and optionally an operator. If no operator is provided "OR" is used as default.
+If any of the fields used in the multibool node is missing or empty the node will move on to the "outcomeMissing" node.
+
+
+Example:
+```
+"consequence": {
+      "description": "Filter consequences",
+      "type": "BOOL_MULTI",
+      "fields": [
+        "INFO/CSQ/FIELD1",
+        "INFO/FIELD2"
+      ],
+      "outcomes": [
+        {
+          "description": "",
+          "queries": [
+            {
+              "field": "INFO/FIELD2",
+              "operator": "<",
+              "value": 2
+            }
+          ],
+          "outcomeTrue": {
+            "nextNode": "next_node"
+          }
+        },
+        {
+          "description": "Allele Frequency >= 0.02 or Number of Homozygotes > 5",
+          "operator": "OR",
+          "queries": [
+            {
+              "field": "INFO/CSQ/FIELD1",
+              "operator": "==",
+              "value": "TEST"
+            },
+            {
+              "field": "INFO/FIELD2",
+              "operator": ">",
+              "value": "1"
+            },
+          ],
+          "outcomeTrue": {
+            "nextNode": "other_node"
+          }
+        }
+      ],
+      "outcomeDefault": {
+        "nextNode": "my_default_node"
+      },
+      "outcomeMissing": {
+        "nextNode": "my_default_node"
+      }
+    }
+```
+
+#### CATEGORICAL
+A CATEGORICAL node will take the value of the specified field and try to map it to a list of options specified by the node.
+The categories need to have a 'label' and a 'nextNode', this is the node to continue with if the category matches.
+The node itself needs to have defaultNode to proceed with if no category matches.
+Optionally a 'missingNode' can be specified to proceed with if the field is empty or not present in the vcf, 
+if the 'missingNode' is not specified the 'defaultNode' is used instead for these cases.
+
+Example:
+```
+    "my_cat": {
+      "type": "CATEGORICAL",
+      "description": "my_cat description",
+      "field": "INFO/CAT",
+      "outcomeMap": {
+        "high": {
+          "nextNode": "include",
+          "label": "cat_high"
+        },
+        "low": {
+          "nextNode": "exclude",
+          "label": "cat_low"
+        }
+      },
+      "outcomeMissing": {
+        "nextNode": "exclude",
+        "label": "no_cat"
+      },
+      "outcomeDefault": {
+        "nextNode": "exclude",
+        "label": "cat_unknown"
+      }
+    },
+```
+#### LEAF
+LEAF nodes are the endpoint of the tree, these nodes specify the class that a variant effect will be annotated with.
+```
+    "exit_a": {
+      "label": "A_label",
+      "description": "A_desc",
+      "type": "LEAF",
+      "class": "A"
+    }
+```
 
 ### Example
 
