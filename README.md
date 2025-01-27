@@ -162,7 +162,9 @@ Minimal example:
 }
 ```
 ### Core concepts
-#### Supported Fields
+#### Fields
+
+The fields specify where information can be found in the input, several different types of fields exist:
 
 ##### Standard VCF
 
@@ -241,7 +243,7 @@ The following operators are available for groups of queries in MULTIBOOL nodes:
 Depending on the operator and field of the query values can be strings, numbers or lists of strings or numbers.
 There are also a few special values are available:
 
-##### Files
+##### File
 The files specified on the top level of the tree can be used, using the "file:" prefix.
 files work as lists of values, where every line in the file is an item on the list.
 
@@ -253,7 +255,7 @@ files work as lists of values, where every line in the file is an item on the li
       },
 ```
 
-##### Fields
+##### Field
 Using the "field:" prefix the query will use the value of another field as the value for the query.
 
 ```
@@ -265,14 +267,15 @@ Using the "field:" prefix the query will use the value of another field as the v
 ```
 
 ### Nodes
-#### General
+Nodes are the building blocks of the tree, each node has one or more conditions to determine what the next node to evaluate is.
+The exceptions are the leaf nodes, which are the "end state" nodes for the tree. 
 All nodes need to have a label and can have a description.
 #### BOOL
 Boolean nodes are nodes that result in true or false based on a single query.
 
 The query should contain a field, an operator and a value, see the corresponding paragraphs of this document for the available options.
 
-The node itself needs to have defaultNode to proceed with if no category matches.
+The node itself needs to have 'defaultNode' to proceed with if no category matches.
 Optionally a 'missingNode' can be specified to proceed with if the field is empty or not present in the vcf,
 if the 'missingNode' is not specified the 'defaultNode' is used instead for these cases.
 
@@ -304,6 +307,8 @@ Example:
 An EXISTS node will check if a field is present and has a value.
 Since the result is always either true or false no missing of default node can be specified.
 
+Please note that in "strict" mode an exception is thrown if a field is missing from the VCF input. In these cases the EXISTS node can only be used to determine if an existing field has no value.
+
 Example
 ```
     "gene": {
@@ -324,8 +329,8 @@ Example
 BOOL_MULTI nodes are nodes that can combine multiple fields and or multiple queries in a single node.
 Sets of boolean queries can be used to determine the next node, these groups are provide under the "outcomes" key.
 Each groups is an object containing a description, a list of queries and optionally an operator. If no operator is provided "OR" is used as default.
-If any of the fields used in the multibool node is missing or empty the node will move on to the "outcomeMissing" node.
-
+If multiple sets of queries result in "true" the first set is used to determine the next node.
+If any of the fields used in the MULTIBOOL node is missing or empty the node will move on to the "outcomeMissing" node.
 
 Example:
 ```
