@@ -120,7 +120,7 @@ Optionally labels and the path through the tree can be annotated to the FORMAT f
 ### Basic structure
 
 The top level of the json file contains:
-- the rootnode, this is the node where the tree starts.
+- the `rootnode`, this is the node where the tree starts.
 - a list of all nodes in the tree
 - a list of files that are used in the tree nodes. (optional)
 
@@ -175,7 +175,7 @@ COMMON, INFO, FORMAT
 ###### INFO_VEP
 
 Any field in the VEP value can be used, if the field is unknown to the tool it is interpreted as a
-singel value string field.
+single value string field.
 
 ###### GENOTYPE
 
@@ -215,21 +215,22 @@ Allowed values are:
 ##### Boolean
 The following operators are available for boolean queries:
 
-| Operator      | Description                                                 |
-|---------------|-------------------------------------------------------------|
-| ==            | Field value equals specified value.                         |
-| !=            | Field value does not equal specified value.                 |
-| <             | Field value is less than the specified value.               |
-| <=            | Field value is less or equal that the specified value.      |
-| >             | Field value greater than the specified value.               |
-| >=            | Field value greater or equal than the specified value.      |
-| in            | Field value is in the list of specified values.             |
-| !in           | Field value is not in the list of specified values.         |
-| contains      | Field values contain the specified value.                   |
-| !contains     | Field values do not contain the specified value.            |
-| contains_any  | Field values contains at least one of the specified values. |
-| contains_all  | Field values contains all of the specified values.          |
-| contains_none | Field values contains none of the specified values.         |
+| Operator      | Description                                                 | Supported Field types                                                         |
+|---------------|-------------------------------------------------------------|-------------------------------------------------------------------------------|
+| ==            | Field value equals specified value.                         | Integer, Float, Flag, Character, String, and lists of those types             |
+| !=            | Field value does not equal specified value.                 | Integer, Float, Flag, Character, String, and lists of those types             |
+| <             | Field value is less than the specified value.               | Integer, Float                                                                |
+| <=            | Field value is less or equal that the specified value.      | Integer, Float                                                                |
+| >             | Field value greater than the specified value.               | Integer, Float                                                                |
+| >=            | Field value greater or equal than the specified value.      | Integer, Float                                                                |
+| in            | Field value is in the list of specified values.             | Integer, Float, Flag, Character, String, and lists of those types<sup>1</sup> |
+| !in           | Field value is not in the list of specified values.         | Integer, Float, Flag, Character, String, and lists of those types<sup>1</sup> |
+| contains      | Field values contain the specified value.                   | Lists of Integer, Float, Flag, Character, String                              |
+| !contains     | Field values do not contain the specified value.            | Lists of Integer, Float, Flag, Character, String                              |
+| contains_any  | Field values contains at least one of the specified values. | Lists of Integer, Float, Flag, Character, String                              |
+| contains_all  | Field values contains all of the specified values.          | Lists of Integer, Float, Flag, Character, String                              |
+| contains_none | Field values contains none of the specified values.         | Lists of Integer, Float, Flag, Character, String                              |
+1) In cases where the query value contains 'child' lists as part of the value in the specified list.
 
 ##### Multi bool operators
 The following operators are available for groups of queries in MULTIBOOL nodes:
@@ -244,7 +245,7 @@ Depending on the operator and field of the query values can be strings, numbers 
 There are also a few special values are available:
 
 ##### File
-The files specified on the top level of the tree can be used, using the "file:" prefix.
+The files specified on the top level of the tree can be used, using the `file:` prefix.
 files work as lists of values, where every line in the file is an item on the list.
 
 ```
@@ -256,7 +257,7 @@ files work as lists of values, where every line in the file is an item on the li
 ```
 
 ##### Field
-Using the "field:" prefix the query will use the value of another field as the value for the query.
+Using the `field:` prefix the query will use the value of another field as the value for the query.
 
 ```
       "query": {
@@ -277,7 +278,7 @@ The query should contain a field, an operator and a value, see the corresponding
 
 The node itself needs to have 'defaultNode' to proceed with if no category matches.
 Optionally a 'missingNode' can be specified to proceed with if the field is empty or not present in the vcf,
-if the 'missingNode' is not specified the 'defaultNode' is used instead for these cases.
+if the `outcomeMissing` is not specified the `outcomeDefault` is used instead for these cases.
 
 Example:
 ```    
@@ -307,7 +308,7 @@ Example:
 An EXISTS node will check if a field is present and has a value.
 Since the result is always either true or false no missing of default node can be specified.
 
-Please note that in "strict" mode an exception is thrown if a field is missing from the VCF input. In these cases the EXISTS node can only be used to determine if an existing field has no value.
+Please note that in `strict` mode an exception is thrown if a field is missing from the VCF input. In these cases the EXISTS node can only be used to determine if an existing field has no value.
 
 Example
 ```
@@ -326,11 +327,11 @@ Example
 
 #### BOOL_MULTI
 
-BOOL_MULTI nodes are nodes that can combine multiple fields and or multiple queries in a single node.
+`BOOL_MULTI` nodes are nodes that can combine multiple fields and or multiple queries in a single node.
 Sets of boolean queries can be used to determine the next node, these groups are provide under the "outcomes" key.
-Each groups is an object containing a description, a list of queries and optionally an operator. If no operator is provided "OR" is used as default.
+Each groups is an object containing a description, a list of queries and optionally an operator. If no operator is provided `OR` is used as default.
 If multiple sets of queries result in "true" the first set is used to determine the next node.
-If any of the fields used in the MULTIBOOL node is missing or empty the node will move on to the "outcomeMissing" node.
+If any of the fields used in the `BOOL_MULTI` node is missing or empty the node will move on to the `outcomeMissing` node.
 
 Example:
 ```
@@ -386,10 +387,10 @@ Example:
 
 #### CATEGORICAL
 A CATEGORICAL node will take the value of the specified field and try to map it to a list of options specified by the node.
-The categories need to have a 'label' and a 'nextNode', this is the node to continue with if the category matches.
+The categories need to have a `label` and a `nextNode`, this is the node to continue with if the category matches.
 The node itself needs to have defaultNode to proceed with if no category matches.
 Optionally a 'missingNode' can be specified to proceed with if the field is empty or not present in the vcf, 
-if the 'missingNode' is not specified the 'defaultNode' is used instead for these cases.
+if the `outcomeMissing` is not specified the `outcomeDefault` is used instead for these cases.
 
 Example:
 ```
