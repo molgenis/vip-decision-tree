@@ -47,11 +47,9 @@ contain the following:
 ```
 
 ## Requirements
-
 - Java 21
 
 ## Usage
-
 ```
 usage: java -jar vcf-decision-tree.jar -i <arg> -c <arg> [-m <arg>] [-o <arg>] [-f]
        [-s] [-l] [-p] [-d] [-pb <arg>] [-pd <arg>] [-ph <arg>] [-m <arg>]
@@ -93,7 +91,6 @@ java -jar vcf-decision-tree.jar -v
 ```
 
 ## Decision Tree
-
 Each variant is classified using a decision tree which consists of decision nodes and leaf nodes.
 
 Decision nodes perform a test on the variant which determines the outcome consisting of the next
@@ -106,22 +103,19 @@ When using the decision tree as part of the VIP pipeline the [configuration](htt
 #### Modes
 
 ##### Variant classification (default)
-
 In the variant classification mode the tool will output a classification per VEP value (CSQ), this
-classification will be added to the VEP value under the key "VIPC".
+classification will be added to the VEP value under the key `VIPC`.
 
 Optionally labels and the path through the tree can be annotated to the VEP value as well.
 
 ##### Sample classification
-
 In the sample classification mode the tool will output a classification per VEP value as a comma
 separated list for which the index corresponds to the VEP value index, this classification will be
-added to the FORMAT fields value under the key "VIPC_S".
+added to the FORMAT fields value under the key `VIPC_S`.
 
 Optionally labels and the path through the tree can be annotated to the FORMAT fields as well.
 
 ### Basic structure
-
 The top level of the json file contains:
 - the `rootnode`, this is the node where the tree starts.
 - a list of all nodes in the tree
@@ -165,23 +159,20 @@ Minimal example:
 }
 ```
 ### Core concepts
-#### Fields
 
+#### Fields
 The fields specify where information can be found in the input, several different types of fields exist:
 
 ##### Standard VCF
-
 COMMON, INFO, FORMAT
 
 ##### Customized fields
 
 ###### INFO_VEP
-
 Any field in the VEP value can be used, if the field is unknown to the tool it is interpreted as a
 single value string field.
 
 ###### GENOTYPE
-
 This fieldtype uses the information provided by htsjdk about the Genotype FORMAT field.
 
 Allowed values are:
@@ -197,7 +188,6 @@ Allowed values are:
 - PLOIDY: The ploidy of the genotype as an integer, null if no call is present.
 
 ###### SAMPLE
-
 This fieldtype is used to query properties of the samples, like phenotypes and pedigree information
 which are provided outside the VCF.
 
@@ -236,7 +226,7 @@ The following operators are available for boolean queries:
 1) In cases where the query value contains 'child' lists as part of the value in the specified list.
 
 ##### Multi bool operators
-The following operators are available for groups of queries in MULTIBOOL nodes:
+The following operators are available for groups of queries in `MULTIBOOL` nodes:
 
 | Operator | Description               |
 |----------|---------------------------|
@@ -274,6 +264,7 @@ Using the `field:` prefix the query will use the value of another field as the v
 Nodes are the building blocks of the tree, each node has one or more conditions to determine what the next node to evaluate is.
 The exceptions are the leaf nodes, which are the "end state" nodes for the tree. 
 All nodes need to have a label and can have a description.
+
 #### BOOL
 Boolean nodes are nodes that result in true or false based on a single query.
 
@@ -308,10 +299,10 @@ Example:
 ```
 
 #### EXISTS
-An EXISTS node will check if a field is present and has a value.
+An `EXISTS` node will check if a field is present and has a value.
 Since the result is always either true or false no missing of default node can be specified.
 
-Please note that in `strict` mode an exception is thrown if a field is missing from the VCF input. In these cases the EXISTS node can only be used to determine if an existing field has no value.
+Please note that in `strict` mode an exception is thrown if a field is missing from the VCF input. In these cases the `EXISTS` node can only be used to determine if an existing field has no value.
 
 Example
 ```
@@ -329,7 +320,6 @@ Example
 ```
 
 #### BOOL_MULTI
-
 `BOOL_MULTI` nodes are nodes that can combine multiple fields and or multiple queries in a single node.
 Sets of boolean queries can be used to determine the next node, these groups are provide under the "outcomes" key.
 Each groups is an object containing a description, a list of queries and optionally an operator. If no operator is provided `OR` is used as default.
@@ -389,7 +379,7 @@ Example:
 ```
 
 #### CATEGORICAL
-A CATEGORICAL node will take the value of the specified field and try to map it to a list of options specified by the node.
+A `CATEGORICAL` node will take the value of the specified field and try to map it to a list of options specified by the node.
 The categories need to have a `label` and a `nextNode`, this is the node to continue with if the category matches.
 The node itself needs to have defaultNode to proceed with if no category matches.
 Optionally a 'missingNode' can be specified to proceed with if the field is empty or not present in the vcf, 
@@ -422,7 +412,7 @@ Example:
     },
 ```
 #### LEAF
-LEAF nodes are the endpoint of the tree, these nodes specify the class that a variant effect will be annotated with.
+`LEAF` nodes are the endpoint of the tree, these nodes specify the class that a variant effect will be annotated with.
 ```
     "exit_a": {
       "label": "A_label",
@@ -433,16 +423,13 @@ LEAF nodes are the endpoint of the tree, these nodes specify the class that a va
 ```
 
 ### Example
-
 see `src/test/resources/example.json` and `src/test/resources/example_sample.json`
 
 ## Output VCF
-
 Variant classifications and optionally their paths and labels are annotated on the input VCF in the
-VIPC, VIPP and VIPL info fields.
+`VIPC`, `VIPP` and `VIPL` info fields.
 
 ### Example
-
 see `src/test/resources/example-classified.vcf`
 see `src/test/resources/example-classified_paths-labels.vcf`
 see `src/test/resources/example_sample-classified.vcf`
