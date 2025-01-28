@@ -100,6 +100,9 @@ Decision nodes perform a test on the variant which determines the outcome consis
 node to process and optionally a label. Leaf nodes are terminal nodes that determine the class for a
 variant.
 
+Please note that the decision tree tool only classifies variant-effect combinations and does not do any filtering.
+When using the decision tree as part of the VIP pipeline the [configuration](https://molgenis.github.io/vip/usage/config/#vcf) of the pipeline might need to be adapted to get the desired results.
+
 #### Modes
 
 ##### Variant classification (default)
