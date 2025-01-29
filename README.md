@@ -161,15 +161,20 @@ Minimal example:
 ### Core concepts
 
 #### Fields
-The fields specify where information can be found in the input, several different types of fields exist:
+The fields specify where information can be found in the input vcf file, several different types of fields exist:
 
 ##### Standard VCF
 COMMON, INFO, FORMAT
 
+##### Metadata
+For values in the input VCF file the header of the vcf file are used to determine the metadata.
+For both nested field and overriding the specification in the headers the `metadata.json` files is used.
+This file contains metadata specifications for `FORMAT` and `INFO` fields in the input vcf
+
 ##### Customized fields
 
 ###### INFO_VEP
-Any field in the VEP value can be used, if the field is unknown to the tool it is interpreted as a
+Any field in the VEP value can be used, if the field is not specified in the `metadata.json` it is interpreted as a
 single value string field.
 
 ###### GENOTYPE
@@ -201,7 +206,6 @@ Allowed values are:
 - MOTHER_ID: The identifier for the mother sample.
 - FAMILY_ID: The identifier for the family.
 - PHENOTYPES: The list of phenotypes for the sample.
-
 
 #### Operators
 
@@ -241,22 +245,36 @@ There are also a few special values are available:
 The files specified on the top level of the tree can be used, using the `file:` prefix.
 files work as lists of values, where every line in the file is an item on the list.
 
+Example
 ```
       "query": {
         "field": "INFO/CSQ/Gene",
         "operator": "in",
         "value": "file:my_file"
-      },
+      }
 ```
 
 ##### Field
 Using the `field:` prefix the query will use the value of another field as the value for the query.
 
+Example
 ```
       "query": {
         "field": "FORMAT/GENOTYPE/ALLELES",
         "operator": "contains_any",
         "value": "field:ALT"
+      }
+```
+
+##### Lists
+Lists of values should be specified comma-separated between square brackets.
+
+Example
+```
+      "query": {
+        "field": "INFO/MY_FIELD",
+        "operator": "in",
+        "value": ["a","b","c"] 
       },
 ```
 
@@ -282,9 +300,7 @@ Example:
       "query": {
         "field": "INFO/FIELD",
         "operator": "==",
-        "value": [
-          "PASS"
-        ]
+        "value": "TEST_VALUE"
       },
       "outcomeTrue": {
         "nextNode": "my_next_node"
