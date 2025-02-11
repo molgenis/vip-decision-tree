@@ -3,48 +3,23 @@
 
 # Variant Interpretation Pipeline - VCF Decision Tree
 Command-line application to classify variants in any VCF (Variant Call Format) file based on a
-decision tree.
+decision tree. The tool can be used stand alone but is build for use in the [VIP pipeline](https://molgenis.github.io/vip/)
 
-# Installation
-Generate a personal access token in GitHub with at least the scope "read:packages".
-
-Then add a settings.xml to your Maven .m2 folder, or edit it if you already have one. It should
-contain the following:
-```
-<?xml version="1.0"?>
-
-<settings xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/SETTINGS/1.0.0">
-  <activeProfiles>
-    <activeProfile>github</activeProfile>
-  </activeProfiles>
-  <profiles>
-    <profile>
-      <id>github</id>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <url>https://repo1.maven.org/maven2</url>
-          </repository>
-          <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/molgenis/vip-utils</url>
-            <snapshots>
-              <enabled>true</enabled>
-            </snapshots>
-        </repository>
-      </repositories>
-    </profile>
-  </profiles>
-
-  <servers>
-    <server>
-      <id>github</id>
-      <username>[YOUR VIP USERNAME]</username>
-      <password>[YOUR PERSONAL ACCESS TOKEN]</password>
-    </server>
-   </servers>
-</settings>
-```
+<!-- TOC -->
+  * [Requirements](#requirements)
+  * [Usage](#usage)
+  * [General](#general)
+      * [Modes](#modes)
+  * [Creating or modifying a decision tree](#creating-or-modifying-a-decision-tree)
+    * [Basic structure](#basic-structure)
+    * [Core concepts](#core-concepts)
+      * [Fields](#fields)
+      * [Operators](#operators)
+      * [Values](#values)
+    * [Nodes](#nodes)
+  * [Output VCF](#output-vcf)
+  * [Technical](#technical)
+<!-- TOC -->
 
 ## Requirements
 - Java 21
@@ -82,7 +57,7 @@ usage: java -jar vcf-decision-tree.jar -v
 
 *:[VEP](https://www.ensembl.org/info/docs/tools/vep/index.html)
 
-## Examples
+### Usage examples
 ```
 java -jar vcf-decision-tree.jar -i my.vcf -m field_metadata.json -c decision_tree.json -o out.vcf
 java -jar vcf-decision-tree.jar -i my.vcf.gz -m field_metadata.json -c decision_tree.json -o out.vcf.gz
@@ -90,7 +65,7 @@ java -jar vcf-decision-tree.jar -i my.vcf.gz -m field_metadata.json -c decision_
 java -jar vcf-decision-tree.jar -v
 ```
 
-## Decision Tree
+## General
 Each variant is classified using a decision tree which consists of decision nodes and leaf nodes.
 
 Decision nodes perform a test on the variant which determines the outcome consisting of the next
@@ -98,7 +73,8 @@ node to process and optionally a label. Leaf nodes are terminal nodes that deter
 variant.
 
 Please note that the decision tree tool only classifies variant-effect combinations and does not do any filtering.
-When using the decision tree as part of the VIP pipeline the [configuration](https://molgenis.github.io/vip/advanced/classification_trees/#customization) of the pipeline might need to be adapted to get the desired results.
+When using the decision tree as part of the VIP pipeline the configuration of the pipeline might need to be customized.
+Documentation on how to do that can be found [here](https://molgenis.github.io/vip/advanced/classification_trees/#customization).
 
 #### Modes
 
@@ -115,32 +91,50 @@ added to the FORMAT fields value under the key `VIPC_S`.
 
 Optionally labels and the path through the tree can be annotated to the FORMAT fields as well.
 
+## Creating or modifying a decision tree
+
 ### Basic structure
-The top level of the json file contains:
+The top level of the [json](https://www.json.org/json-en.html) file contains:
 - the `rootnode`, this is the node where the tree starts.
 - a list of all nodes in the tree
-- a list of files that are used in the tree nodes. (optional)
+- a list of files, e.g. gene panels, that are used in the tree nodes. (optional)
 
-Minimal example:
+Example: (for more detailed information read the sections below).
 ```
 {
-  "rootNode": "gene",
+  "rootNode": "panel",
   "files": {
     "my_file" : {
       "path" : "/path/to/my/file"
     }
   },
   "nodes": {
-    "gene": {
-      "label": "Gene",
+    "panel": {
+      "label": "Panel",
+      "description": "MyCsqField value present in my file",
+      "type": "BOOL",
+      "query":
+      {
+        "field": "INFO/CSQ/MyCsqField",
+        "operator": in,
+        "value": "file:my_file"
+      }
+      "outcomeTrue": {
+        "nextNode": "exit_a"
+      },
+      "outcomeFalse": {
+        "nextNode": "gene_exists"
+      }
+    },
+    "gene_exists": {
       "description": "Gene exists",
       "type": "EXISTS",
       "field": "INFO/CSQ/Gene",
       "outcomeTrue": {
-        "nextNode": "gnomAD"
+        "nextNode": "exit_a"
       },
       "outcomeFalse": {
-        "nextNode": "exit_rm"
+        "nextNode": "exit_b"
       }
     },
     "exit_a": {
@@ -161,7 +155,8 @@ Minimal example:
 ### Core concepts
 
 #### Fields
-The fields specify where information can be found in the input vcf file, several different types of fields exist:
+The fields specify where information can be found in the input vcf file, the different types of fields are described below.
+A list of fields available when the decision tree is used as part of the VIP pipeline can be found [here](https://molgenis.github.io/vip/advanced/annotations/).
 
 ##### Standard VCF
 COMMON, INFO, FORMAT
@@ -187,7 +182,7 @@ Allowed values are:
 - TYPE: The htsjdk genotype type, possible values: MIXED, HET, HOM_REF, HOM_VAR, NO_CALL,
   UNAVAILABLE.
 - CALLED: Boolean indication if the genotype for this sample is called.
-- MIXED: Boolean indication if the genotype is comprised of both calls and no-calls.
+- MIXED: Boolean indication if the genotype is a combination of both calls and no-calls.
 - NON_INFORMATIVE: Boolean that returns true if all samples PLs are 0.
 - PHASED: Boolean indicating the genotype was called phased or unphased.
 - PLOIDY: The ploidy of the genotype as an integer, null if no call is present.
@@ -442,11 +437,54 @@ Example:
 see `src/test/resources/example.json` and `src/test/resources/example_sample.json`
 
 ## Output VCF
-Variant classifications and optionally their paths and labels are annotated on the input VCF in the
+When used in 'variant mode' variant classifications and optionally their paths and labels are annotated on the input VCF in the
 `VIPC`, `VIPP` and `VIPL` info fields.
+When used in 'sample mode' classifications and optionally their paths and labels for each proband sample are written in the VIPC_S,VIPP_S,VIPL_S FORMAT field, and a list of classifications for every sample is written to the VIPC_S INFO field.
 
 ### Example
 see `src/test/resources/example-classified.vcf`
 see `src/test/resources/example-classified_paths-labels.vcf`
 see `src/test/resources/example_sample-classified.vcf`
 see `src/test/resources/example_sample-classified_paths-labels.vcf`
+
+## Technical
+### Installation
+Generate a personal access token in GitHub with at least the scope "read:packages".
+
+Then add a settings.xml to your Maven .m2 folder, or edit it if you already have one. It should
+contain the following:
+```
+<?xml version="1.0"?>
+
+<settings xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+  <activeProfiles>
+    <activeProfile>github</activeProfile>
+  </activeProfiles>
+  <profiles>
+    <profile>
+      <id>github</id>
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+          </repository>
+          <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/molgenis/vip-utils</url>
+            <snapshots>
+              <enabled>true</enabled>
+            </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+
+  <servers>
+    <server>
+      <id>github</id>
+      <username>[YOUR VIP USERNAME]</username>
+      <password>[YOUR PERSONAL ACCESS TOKEN]</password>
+    </server>
+   </servers>
+</settings>
+```
