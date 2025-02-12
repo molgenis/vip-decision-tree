@@ -439,7 +439,7 @@ see `src/test/resources/example.json` and `src/test/resources/example_sample.jso
 ## Output VCF
 When used in 'variant mode' variant classifications and optionally their paths and labels are annotated on the input VCF in the
 `VIPC`, `VIPP` and `VIPL` info fields.
-When used in 'sample mode' classifications and optionally their paths and labels for each proband sample are written in the VIPC_S,VIPP_S,VIPL_S FORMAT field, and a list of classifications for every sample is written to the VIPC_S INFO field.
+When used in 'sample mode' classifications and optionally their paths and labels for each proband sample are written in the `VIPC_S`,`VIPP_S`,`VIPL_S` FORMAT field, and a list of classifications for every sample is written to the `VIPC_S` INFO field.
 
 ### Example
 see `src/test/resources/example-classified.vcf`
