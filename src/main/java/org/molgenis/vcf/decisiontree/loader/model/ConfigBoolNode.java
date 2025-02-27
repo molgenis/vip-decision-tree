@@ -15,7 +15,7 @@ public class ConfigBoolNode implements ConfigNode {
   @NonNull Type type = Type.BOOL;
 
   String description;
-  @NonNull String label;
+  String label;
   @NonNull ConfigBoolQuery query;
   @NonNull ConfigNodeOutcome outcomeTrue;
   @NonNull ConfigNodeOutcome outcomeFalse;

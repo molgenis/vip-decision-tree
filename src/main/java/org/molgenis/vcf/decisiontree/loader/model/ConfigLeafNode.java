@@ -17,7 +17,7 @@ public class ConfigLeafNode implements ConfigNode {
   @NonNull Type type = Type.LEAF;
 
   String description;
-  @NonNull String label;
+  String label;
 
   @JsonProperty("class")
   String clazz;
