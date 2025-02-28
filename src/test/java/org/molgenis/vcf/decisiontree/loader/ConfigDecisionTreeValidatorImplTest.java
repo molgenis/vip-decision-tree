@@ -191,6 +191,15 @@ class ConfigDecisionTreeValidatorImplTest {
   }
 
   @Test
+  void validateNodeLabelMissing() {
+    ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").build();
+    ConfigDecisionTree configDecisionTree = ConfigDecisionTree.builder().rootNode("exit")
+            .nodes(Map.of("exit", configLeafNode)).build();
+    assertThrows(ConfigDecisionTreeValidationException.class,
+            () -> configDecisionTreeValidator.validate(configDecisionTree));
+  }
+
+  @Test
   void validateBoolMultiNodeMissingOperator() {
     ConfigLeafNode configLeafNode = ConfigLeafNode.builder().clazz("class").label("label").build();
     ConfigBoolQuery configBoolQuery1 = ConfigBoolQuery.builder().field("INFO/field1")

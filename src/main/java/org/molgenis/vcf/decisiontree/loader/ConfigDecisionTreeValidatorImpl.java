@@ -65,6 +65,7 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
   private void validateNode(String id, ConfigNode node, Map<String, ConfigNode> nodes,
       Map<String, Path> files) {
     validateAlphanumericValue("id", id);
+    validateLabel(node, id);
     switch (node.getType()) {
       case EXISTS:
         validateExistsNode(id, (ConfigExistsNode) node, nodes);
@@ -83,6 +84,13 @@ class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
         break;
       default:
         throw new UnexpectedEnumException(node.getType());
+    }
+  }
+
+  private void validateLabel(ConfigNode node, String id) {
+    if(node.getLabel() == null){
+      throw new ConfigDecisionTreeValidationException(
+              format("Required field 'label' is missing for node '%s'", id));
     }
   }
 
