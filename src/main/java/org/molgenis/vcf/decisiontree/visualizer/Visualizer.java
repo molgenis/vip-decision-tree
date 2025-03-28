@@ -64,8 +64,7 @@ public class Visualizer {
         for (Entry<String, ConfigNode> entry : tree.getNodes().entrySet()) {
             nodes.add(
                     new Node(entry.getKey(),
-                            entry.getValue().getDescription() != null ? entry.getValue().getDescription()
-                                    : entry.getKey(), entry.getValue().getType() == LEAF));
+                            entry.getValue().getLabel(), entry.getValue().getType() == LEAF));
             ConfigNode node = entry.getValue();
             createEdges(edges, entry, node);
         }
@@ -169,7 +168,7 @@ public class Visualizer {
             return;
         }
         String outputPathStr = commandLine.getOptionValue(OPT_OUTPUT);
-        if (!outputPathStr.endsWith(".json")) {
+        if (!outputPathStr.endsWith(".html")) {
             throw new IllegalArgumentException(
                     format("Output file '%s' is not a .html file.", outputPathStr));
         }
