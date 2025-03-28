@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.molgenis.vcf.decisiontree.visualizer.Visualizer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.util.ResourceUtils;
 
@@ -142,5 +143,22 @@ class AppIT {
     String expectedOutputVcf = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
 
     assertEquals(expectedOutputVcf, outputVcf);
+  }
+
+  @Test
+  void testVisualize() throws IOException {
+    String treeConfigFile = ResourceUtils.getFile("classpath:example.json").toString();
+    Path outputFile = sharedTempDir.resolve("example.html");
+
+    String[] args = {"-i", treeConfigFile, "-m", "-o", outputFile.toString()};
+    Visualizer.main(args);
+
+    Path expectedOutputFile = ResourceUtils.getFile(
+                    "classpath:expected.html")
+            .toPath();
+    String expectedOutput = Files.readString(expectedOutputFile).replaceAll("\\R", "\n");
+    String actualOutput = Files.readString(outputFile).replaceAll("\\R", "\n");
+
+    assertEquals(expectedOutput, actualOutput);
   }
 }

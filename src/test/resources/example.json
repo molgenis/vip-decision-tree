@@ -144,6 +144,18 @@
         "nextNode": "effect"
       }
     },
+    "effectExists": {
+      "label": "Effect_Exists",
+      "type": "EXISTS",
+      "description": "Effect Exists",
+      "field": "INFO/CSQ/Consequence",
+      "outcomeTrue": {
+        "nextNode": "sift"
+      },
+      "outcomeFalse": {
+        "nextNode": "spliceAI"
+      }
+    },
     "effect": {
       "label": "Effect",
       "type": "BOOL",

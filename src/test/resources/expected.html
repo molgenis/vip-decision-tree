@@ -1,0 +1,55 @@
+flowchart TD
+filter_("filter")
+spliceAI_("spliceAI")
+vkgl_("VKGL")
+annotSV_("AnnotSV")
+gnomad_("GnomAD")
+effectExists_("Effect_Exists")
+effect_("Effect")
+clinVar_("ClinVar")
+sift_("SIFT")
+polyphen_("PolyPhen")
+impact_("IMPACT")
+flag_("FLAG")
+exit_b_("Benign")
+style exit_b_ fill:#00ff00
+exit_lb_("Likely Benign")
+style exit_lb_ fill:#00ff00
+exit_vus_("Variant of Unknown Significance")
+style exit_vus_ fill:#00ff00
+exit_lp_("Likely Pathogenic")
+style exit_lp_ fill:#00ff00
+exit_p_("Pathogenic")
+style exit_p_ fill:#00ff00
+polyphen_ -->|"default\nmissing"| impact_
+gnomad_ -->|"false"| exit_lb_
+effectExists_ -->|"false"| spliceAI_
+impact_ -->|"MODIFIER\nLOW"| exit_lb_
+annotSV_ -->|"1"| exit_b_
+effectExists_ -->|"true"| sift_
+effect_ -->|"true"| sift_
+vkgl_ -->|"default"| clinVar_
+flag_ -->|"missing"| exit_vus_
+vkgl_ -->|"LB"| exit_lb_
+annotSV_ -->|"default"| impact_
+spliceAI_ -->|"default\nmissing"| annotSV_
+impact_ -->|"MODERATE"| exit_vus_
+annotSV_ -->|"5"| exit_p_
+sift_ -->|"true"| exit_lp_
+effect_ -->|"false\nmissing"| spliceAI_
+vkgl_ -->|"LP"| exit_lp_
+clinVar_ -->|"default\nmissing"| gnomad_
+sift_ -->|"false\nmissing"| polyphen_
+flag_ -->|"false"| exit_lb_
+vkgl_ -->|"P"| exit_p_
+polyphen_ -->|"Add description to visualize a label."| exit_lp_
+filter_ -->|"true\nmissing"| vkgl_
+annotSV_ -->|"4"| exit_lp_
+annotSV_ -->|"2"| exit_lb_
+clinVar_ -->|"Add description to visualize a label."| exit_lp_
+spliceAI_ -->|"Add description to visualize a label."| exit_lp_
+filter_ -->|"false"| exit_lb_
+flag_ -->|"true"| exit_lp_
+vkgl_ -->|"B"| exit_b_
+gnomad_ -->|"true\nmissing"| effect_
+impact_ -->|"HIGH"| exit_lp_

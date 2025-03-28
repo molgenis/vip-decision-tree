@@ -1,0 +1,92 @@
+<!doctype html>
+
+<meta charset="utf-8">
+<title>Decision tree</title>
+<script src="https://d3js.org/d3.v5.min.js" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.4/dagre-d3.min.js"></script>
+
+<style id="css">
+  body {
+    font: 300 14px 'Helvetica Neue', Helvetica;
+  }
+
+  .node rect,
+  .node circle,
+  .node ellipse {
+    stroke: #333;
+    fill: #fff;
+    stroke-width: 1px;
+  }
+
+  .edgePath path {
+    stroke: #333;
+    fill: #333;
+    stroke-width: 1.5px;
+  }
+</style>
+<svg width=2400 height=1600>
+  <g/>
+</svg>
+
+
+<script id="js">
+  // Create a new directed graph
+  var g = new dagreD3.graphlib.Graph().setGraph({})
+
+  DAGRE_GOES_HERE
+
+  var svg = d3.select('svg'),
+    inner = svg.select('g')
+
+  var zoom = d3.zoom().on('zoom', function () {
+    inner.attr('transform', d3.event.transform)
+  })
+  svg.call(zoom)
+  var render = new dagreD3.render()
+  render(inner, g)
+  var initialScale = 1
+  svg.call(zoom.transform,
+    d3.zoomIdentity.translate((svg.attr('width') - g.graph().width * initialScale) / 2, 20).scale(
+      initialScale))
+
+  svg.attr('height', g.graph().height * initialScale + 40)
+
+</script>
+<script>
+  (function () {
+    var ws = new WebSocket(
+      'ws://' + window.location.host + '/jb-server-page?reloadServiceClientId=3')
+    ws.onmessage = function (msg) {
+      if (msg.data === 'reload') {
+        window.location.reload()
+      }
+      if (msg.data.startsWith('update-css ')) {
+        var messageId = msg.data.substring(11)
+        var links = document.getElementsByTagName('link')
+        for (var i = 0; i < links.length; i++) {
+          var link = links[i]
+          if (link.rel !== 'stylesheet') {
+            continue
+          }
+          var clonedLink = link.cloneNode(true)
+          var newHref = link.href.replace(/(&|\?)jbUpdateLinksId=\d+/,
+            '$1jbUpdateLinksId=' + messageId)
+          if (newHref !== link.href) {
+            clonedLink.href = newHref
+          } else {
+            var indexOfQuest = newHref.indexOf('?')
+            if (indexOfQuest >= 0) {
+              // to support ?foo#hash
+              clonedLink.href = newHref.substring(0, indexOfQuest + 1) + 'jbUpdateLinksId='
+                + messageId + '&' +
+                newHref.substring(indexOfQuest + 1)
+            } else {
+              clonedLink.href += '?' + 'jbUpdateLinksId=' + messageId
+            }
+          }
+          link.replaceWith(clonedLink)
+        }
+      }
+    }
+  })()
+</script>
