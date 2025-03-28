@@ -26,11 +26,14 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode.Type;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
-import org.molgenis.vcf.decisiontree.loader.model.Edge;
-import org.molgenis.vcf.decisiontree.loader.model.Node;
+import org.molgenis.vcf.decisiontree.visualizer.model.Edge;
+import org.molgenis.vcf.decisiontree.visualizer.model.Node;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class Visualizer {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Visualizer.class);
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     public static final String DEFAULT = "default";
@@ -44,12 +47,13 @@ public class Visualizer {
     public static final String OPT_FORCE = "f";
     public static final String OPT_FORCE_LONG = "force";
     private static final int STATUS_COMMAND_LINE_USAGE_ERROR = 64;
+    public static final String JSON = ".json";
 
     public static void main(String[] args) {
         CommandLine commandLine = getCommandLine(args);
         Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
         Path outputPath = commandLine.hasOption(OPT_OUTPUT) ? Path.of(commandLine.getOptionValue(OPT_OUTPUT))
-                : Path.of(commandLine.getOptionValue(OPT_INPUT).replace(".json", ".html"));
+                : Path.of(commandLine.getOptionValue(OPT_INPUT).replace(JSON, ".html"));
         String filename = inputPath.getFileName().toString();
         boolean isMermaidEnabled = commandLine.hasOption(OPT_MERMAID);
 
@@ -69,7 +73,7 @@ public class Visualizer {
             createEdges(edges, entry, node);
         }
         visualizeHtml(nodes, edges, outputPath, filename, isMermaidEnabled);
-        System.out.printf("Decision tree visualization written to %s%n", outputPath);
+        LOGGER.info("Decision tree visualization written to '{}'", outputPath);
     }
 
     private static CommandLine getCommandLine(String[] args) {
@@ -157,7 +161,7 @@ public class Visualizer {
                     format("Input file '%s' is not readable.", inputPath));
         }
         String inputPathStr = inputPath.toString();
-        if (!inputPathStr.endsWith(".json")) {
+        if (!inputPathStr.endsWith(JSON)) {
             throw new IllegalArgumentException(
                     format("Input file '%s' is not a .json file.", inputPathStr));
         }
@@ -201,13 +205,13 @@ public class Visualizer {
                     .replace("TITLE_PLACEHOLDER", title);
             Files.writeString(outputPath, output);
             if (isMermaidEnabled) {
-                Files.writeString(Path.of(outputPath.toString().replace(".json", ".mmd")),
+                Files.writeString(Path.of(outputPath.toString().replace(JSON, ".mmd")),
                         mmdContent.toString());
             }
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Could not load the template file.");
+            throw new TemplateMissingException();
         }
     }
 

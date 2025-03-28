@@ -1,17 +1,16 @@
-package org.molgenis.vcf.decisiontree.loader.model;
+package org.molgenis.vcf.decisiontree.visualizer.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Value;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigNode.Type;
 
 @Value
 @NoArgsConstructor(force = true, access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class Node {
+public class Edge {
 
-  String id;
+  String node1;
+  String node2;
   String label;
-  boolean leaf;
 }
