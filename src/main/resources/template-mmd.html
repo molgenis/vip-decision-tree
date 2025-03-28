@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TITLE_PLACEHOLDER</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Initialize Mermaid
+            mermaid.initialize({ startOnLoad: true });
+            await mermaid.run();
+
+            const graph = document.getElementById("graph");
+            const container = document.getElementById("graph-container");
+
+            let scale = 1;
+            let isDragging = false;
+            let startX, startY, translateX = 0, translateY = 0;
+
+            // Zoom with Ctrl + Scroll
+            container.addEventListener("wheel", (event) => {
+                if (event.ctrlKey) { // Only zoom when Ctrl is held
+                    event.preventDefault();
+                    scale += event.deltaY * -0.001;
+                    scale = Math.max(scale, 0.5);
+                    console.log(scale);
+                    graph.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                    document.querySelector('.mermaid').style.fontSize = `${16 * scale}px`;
+                }
+            });
+
+            // Dragging/Panning
+            container.addEventListener("mousedown", (event) => {
+                isDragging = true;
+                startX = event.clientX - translateX;
+                startY = event.clientY - translateY;
+                container.style.cursor = "grabbing";
+            });
+
+            container.addEventListener("mousemove", (event) => {
+                if (isDragging) {
+                    translateX = event.clientX - startX;
+                    translateY = event.clientY - startY;
+                    graph.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                }
+            });
+
+            container.addEventListener("mouseup", () => {
+                isDragging = false;
+                container.style.cursor = "grab";
+            });
+
+            container.addEventListener("mouseleave", () => {
+                isDragging = false;
+                container.style.cursor = "grab";
+            });
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #graph-container {
+            width: 95vw;
+            height: 90vh;
+            border: 1px solid #ddd;
+            overflow: hidden;
+            position: relative;
+            margin: auto;
+            cursor: grab;
+        }
+        #graph {
+            width: 95vw;
+            height: 90vh;
+            position: absolute;
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+<h2>TITLE_PLACEHOLDER</h2>
+Use Ctrl + mousewheel to zoom.
+<div id="graph-container">
+    <div id="graph" class="mermaid">
+MERMAID_PLACEHOLDER
+    </div>
+</div>
+</body>
+</html>
