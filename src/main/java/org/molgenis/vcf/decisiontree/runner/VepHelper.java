@@ -1,8 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Collections.singletonList;
-import static org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapperImpl.ALLELE_NUM;
-import static org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapperImpl.PICK;
+import static org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapperImpl.*;
 
 import htsjdk.variant.variantcontext.VariantContext;
 import htsjdk.variant.variantcontext.VariantContextBuilder;
@@ -10,6 +9,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import htsjdk.variant.vcf.VCFHeader;
+import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import org.apache.logging.log4j.util.Strings;
 import org.molgenis.vcf.decisiontree.filter.UnknownFieldException;
 import org.molgenis.vcf.decisiontree.filter.VcfRecord;
@@ -18,6 +20,7 @@ import org.molgenis.vcf.decisiontree.filter.model.NestedField;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 
 public class VepHelper {
+  public static final String INFO_DESCRIPTION_PREFIX = "Consequence annotations from Ensembl VEP. Format: ";
 
   public Map<Integer, List<VcfRecord>> getRecordPerConsequence(VcfRecord vcfRecord,
       NestedHeaderLine nestedHeaderLine) {
@@ -62,5 +65,20 @@ public class VepHelper {
     variantContextBuilder.attribute(nestedHeaderLine.getParentField().getId(),
         singletonList(Strings.join(values, '|')));
     return new VcfRecord(variantContextBuilder.make());
+  }
+
+  public static String getVepId(VCFHeader vcfHeader) {
+    for(VCFInfoHeaderLine vcfInfoHeaderLine : vcfHeader.getInfoHeaderLines()){
+      if(canMap(vcfInfoHeaderLine)){
+        return vcfInfoHeaderLine.getID();
+      }
+    }
+    return null;
+  }
+
+  public static boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
+    // match on the description since the INFO ID is configurable (default: CSQ)
+    String description = vcfInfoHeaderLine.getDescription();
+    return description.startsWith(INFO_DESCRIPTION_PREFIX);
   }
 }

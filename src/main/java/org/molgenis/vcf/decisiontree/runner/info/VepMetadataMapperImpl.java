@@ -3,6 +3,7 @@ package org.molgenis.vcf.decisiontree.runner.info;
 import htsjdk.variant.vcf.VCFHeader;
 import htsjdk.variant.vcf.VCFInfoHeaderLine;
 import org.molgenis.vcf.decisiontree.filter.model.*;
+import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.utils.metadata.*;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadata;
 import org.molgenis.vcf.utils.model.metadata.FieldMetadatas;
@@ -15,13 +16,13 @@ import java.util.Map.Entry;
 import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO;
 import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
+import static org.molgenis.vcf.decisiontree.runner.VepHelper.INFO_DESCRIPTION_PREFIX;
 import static org.molgenis.vcf.utils.metadata.ValueCount.Type.VARIABLE;
 
 public class VepMetadataMapperImpl implements VepMetadataMapper {
 
   public static final String ALLELE_NUM = "ALLELE_NUM";
   public static final String PICK = "PICK";
-  private static final String INFO_DESCRIPTION_PREFIX = "Consequence annotations from Ensembl VEP. Format: ";
 
   private final FieldMetadataService fieldMetadataService;
 
@@ -31,9 +32,7 @@ public class VepMetadataMapperImpl implements VepMetadataMapper {
 
   @Override
   public boolean canMap(VCFInfoHeaderLine vcfInfoHeaderLine) {
-    // match on the description since the INFO ID is configurable (default: CSQ)
-    String description = vcfInfoHeaderLine.getDescription();
-    return description.startsWith(INFO_DESCRIPTION_PREFIX);
+    return VepHelper.canMap(vcfInfoHeaderLine);
   }
 
   @Override
