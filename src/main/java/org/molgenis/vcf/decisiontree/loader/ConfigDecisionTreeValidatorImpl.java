@@ -34,7 +34,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
-class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
+public class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValidator {
 
   private static final Pattern PATTERN_ALPHANUMERIC_UNDERSCORE = Pattern.compile("[a-zA-Z0-9_]+");
   public static final String OUTCOME_TRUE = "outcomeTrue";

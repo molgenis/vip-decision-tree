@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class ConfigDecisionTreeLoaderImpl implements ConfigDecisionTreeLoader {
   private final ConfigDecisionTreeValidator configDecisionTreeValidator;
 
-  ConfigDecisionTreeLoaderImpl(ConfigDecisionTreeValidator configDecisionTreeValidator) {
+  public ConfigDecisionTreeLoaderImpl(ConfigDecisionTreeValidator configDecisionTreeValidator) {
     this.configDecisionTreeValidator = requireNonNull(configDecisionTreeValidator);
   }
 
