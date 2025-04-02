@@ -243,7 +243,7 @@ public class Visualizer {
     private static void logException(Options options) {
         HelpFormatter formatter = new HelpFormatter();
         formatter.setOptionComparator(null);
-        String cmdLineSyntax = "java -jar Visualizer.jar";
+        String cmdLineSyntax = "java -jar vcf-decision-tree-visualizer.jar";
         formatter.printHelp(cmdLineSyntax, options, true);
     }
 }

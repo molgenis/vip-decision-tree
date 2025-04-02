@@ -25,6 +25,8 @@ decision tree. The tool can be used stand alone but is build for use in the [VIP
 - Java 21
 
 ## Usage
+
+### Decision tree
 ```
 usage: java -jar vcf-decision-tree.jar -i <arg> -c <arg> [-m <arg>] [-o <arg>] [-f]
        [-s] [-l] [-p] [-d] [-pb <arg>] [-pd <arg>] [-ph <arg>] [-m <arg>]
@@ -54,16 +56,30 @@ usage: java -jar vcf-decision-tree.jar -i <arg> -c <arg> [-m <arg>] [-o <arg>] [
 usage: java -jar vcf-decision-tree.jar -v
  -v,--version   Print version.
 ```
-
-*:[VEP](https://www.ensembl.org/info/docs/tools/vep/index.html)
-
-### Usage examples
+#### Usage examples
 ```
 java -jar vcf-decision-tree.jar -i my.vcf -m field_metadata.json -c decision_tree.json -o out.vcf
 java -jar vcf-decision-tree.jar -i my.vcf.gz -m field_metadata.json -c decision_tree.json -o out.vcf.gz
 java -jar vcf-decision-tree.jar -i my.vcf.gz -m field_metadata.json -c decision_tree.json -o out.vcf.gz -f -l -p
 java -jar vcf-decision-tree.jar -v
 ```
+*:[VEP](https://www.ensembl.org/info/docs/tools/vep/index.html)
+
+### Decision tree visualizer
+```
+usage: java -jar vcf-decision-tree-visualizer.jar -i <arg> [-o <arg>] [-f] [-m]
+ -i,--input <arg>    Input .json decision tree file.
+ -o,--output <arg>   Output .html file.
+ -f,--force          Overwrite output file.
+ -m,--mermaid        Also output mermaid text file.
+```
+#### Usage examples
+```
+java -jar vcf-decision-tree-visualizer.jar -i decision_tree.json -o visual.html
+java -jar vcf-decision-tree-visualizer.jar --input decision_tree.json --output visual.html --force --mermaid
+```
+
+
 
 ## General
 Each variant is classified using a decision tree which consists of decision nodes and leaf nodes.
