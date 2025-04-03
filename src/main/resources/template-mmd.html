@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
     <title>TITLE_PLACEHOLDER</title>
+    <!--When updating the version check if VIP docs mermaid version should be bumped as well-->
     <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
 
         document.addEventListener("DOMContentLoaded", async () => {
             // Initialize Mermaid
@@ -23,7 +24,6 @@
                     event.preventDefault();
                     scale += event.deltaY * -0.001;
                     scale = Math.max(scale, 0.5);
-                    console.log(scale);
                     graph.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
                     document.querySelector('.mermaid').style.fontSize = `${16 * scale}px`;
                 }

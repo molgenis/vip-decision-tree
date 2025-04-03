@@ -1,3 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>example.json</title>
+    <!--When updating the version check if VIP docs mermaid version should be bumped as well-->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Initialize Mermaid
+            mermaid.initialize({ startOnLoad: true });
+            await mermaid.run();
+
+            const graph = document.getElementById("graph");
+            const container = document.getElementById("graph-container");
+
+            let scale = 1;
+            let isDragging = false;
+            let startX, startY, translateX = 0, translateY = 0;
+
+            // Zoom with Ctrl + Scroll
+            container.addEventListener("wheel", (event) => {
+                if (event.ctrlKey) { // Only zoom when Ctrl is held
+                    event.preventDefault();
+                    scale += event.deltaY * -0.001;
+                    scale = Math.max(scale, 0.5);
+                    graph.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                    document.querySelector('.mermaid').style.fontSize = `${16 * scale}px`;
+                }
+            });
+
+            // Dragging/Panning
+            container.addEventListener("mousedown", (event) => {
+                isDragging = true;
+                startX = event.clientX - translateX;
+                startY = event.clientY - translateY;
+                container.style.cursor = "grabbing";
+            });
+
+            container.addEventListener("mousemove", (event) => {
+                if (isDragging) {
+                    translateX = event.clientX - startX;
+                    translateY = event.clientY - startY;
+                    graph.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+                }
+            });
+
+            container.addEventListener("mouseup", () => {
+                isDragging = false;
+                container.style.cursor = "grab";
+            });
+
+            container.addEventListener("mouseleave", () => {
+                isDragging = false;
+                container.style.cursor = "grab";
+            });
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #graph-container {
+            width: 95vw;
+            height: 90vh;
+            border: 1px solid #ddd;
+            overflow: hidden;
+            position: relative;
+            margin: auto;
+            cursor: grab;
+        }
+        #graph {
+            width: 95vw;
+            height: 90vh;
+            position: absolute;
+            transition: transform 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+<h2>example.json</h2>
+Use Ctrl + mousewheel to zoom.
+<div id="graph-container">
+    <div id="graph" class="mermaid">
 flowchart TD
 filter_("filter")
 spliceAI_("spliceAI")
@@ -21,35 +106,48 @@ exit_lp_("Likely Pathogenic")
 style exit_lp_ fill:#00ff00
 exit_p_("Pathogenic")
 style exit_p_ fill:#00ff00
-polyphen_ -->|"default\nmissing"| impact_
-gnomad_ -->|"false"| exit_lb_
-effectExists_ -->|"false"| spliceAI_
-impact_ -->|"MODIFIER\nLOW"| exit_lb_
-annotSV_ -->|"1"| exit_b_
-effectExists_ -->|"true"| sift_
-effect_ -->|"true"| sift_
-vkgl_ -->|"default"| clinVar_
-flag_ -->|"missing"| exit_vus_
-vkgl_ -->|"LB"| exit_lb_
-annotSV_ -->|"default"| impact_
-spliceAI_ -->|"default\nmissing"| annotSV_
-impact_ -->|"MODERATE"| exit_vus_
-annotSV_ -->|"5"| exit_p_
-sift_ -->|"true"| exit_lp_
-effect_ -->|"false\nmissing"| spliceAI_
-vkgl_ -->|"LP"| exit_lp_
-clinVar_ -->|"default\nmissing"| gnomad_
-sift_ -->|"false\nmissing"| polyphen_
-flag_ -->|"false"| exit_lb_
-vkgl_ -->|"P"| exit_p_
-polyphen_ -->|"Add description to visualize a label."| exit_lp_
-filter_ -->|"true\nmissing"| vkgl_
-annotSV_ -->|"4"| exit_lp_
-annotSV_ -->|"2"| exit_lb_
-clinVar_ -->|"Add description to visualize a label."| exit_lp_
-spliceAI_ -->|"Add description to visualize a label."| exit_lp_
+filter_ -->|"true"| vkgl_
 filter_ -->|"false"| exit_lb_
-flag_ -->|"true"| exit_lp_
+filter_ -->|"missing"| vkgl_
+spliceAI_ -->|"Add description to visualize a label."| exit_lp_
+spliceAI_ -->|"default"| annotSV_
+spliceAI_ -->|"missing"| annotSV_
+vkgl_ -->|"P"| exit_p_
+vkgl_ -->|"default"| clinVar_
 vkgl_ -->|"B"| exit_b_
-gnomad_ -->|"true\nmissing"| effect_
+vkgl_ -->|"LP"| exit_lp_
+vkgl_ -->|"LB"| exit_lb_
+annotSV_ -->|"1"| exit_b_
+annotSV_ -->|"default"| impact_
+annotSV_ -->|"2"| exit_lb_
+annotSV_ -->|"4"| exit_lp_
+annotSV_ -->|"5"| exit_p_
+gnomad_ -->|"true"| effect_
+gnomad_ -->|"false"| exit_lb_
+gnomad_ -->|"missing"| effect_
+effectExists_ -->|"true"| sift_
+effectExists_ -->|"false"| spliceAI_
+effect_ -->|"true"| sift_
+effect_ -->|"false"| spliceAI_
+effect_ -->|"missing"| spliceAI_
+clinVar_ -->|"Add description to visualize a label."| exit_lp_
+clinVar_ -->|"default"| gnomad_
+clinVar_ -->|"missing"| gnomad_
+sift_ -->|"true"| exit_lp_
+sift_ -->|"false"| polyphen_
+sift_ -->|"missing"| polyphen_
+polyphen_ -->|"Add description to visualize a label."| exit_lp_
+polyphen_ -->|"default"| impact_
+polyphen_ -->|"missing"| impact_
+impact_ -->|"MODERATE"| exit_vus_
+impact_ -->|"MODIFIER"| exit_lb_
 impact_ -->|"HIGH"| exit_lp_
+impact_ -->|"LOW"| exit_lb_
+flag_ -->|"true"| exit_lp_
+flag_ -->|"false"| exit_lb_
+flag_ -->|"missing"| exit_vus_
+
+    </div>
+</div>
+</body>
+</html>
