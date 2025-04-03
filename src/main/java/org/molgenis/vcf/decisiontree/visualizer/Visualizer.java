@@ -63,7 +63,7 @@ public class Visualizer {
                 inputPath);
 
         List<Node> nodes = new ArrayList<>();
-        Map<String, Edge> edges = new HashMap<>();
+        List<Edge> edges = new ArrayList<>();
 
         for (Entry<String, ConfigNode> entry : tree.getNodes().entrySet()) {
             nodes.add(
@@ -95,7 +95,7 @@ public class Visualizer {
         return commandLine;
     }
 
-    private static void createEdges(Map<String, Edge> edges, Entry<String, ConfigNode> entry, ConfigNode node) {
+    private static void createEdges(List<Edge> edges, Entry<String, ConfigNode> entry, ConfigNode node) {
         if (node.getType() == Type.BOOL) {
             ConfigBoolNode boolNode = (ConfigBoolNode) node;
             Map<String, String> boolOutcomes = new HashMap<>();
@@ -182,7 +182,7 @@ public class Visualizer {
         }
     }
 
-    private static void visualizeHtml(List<Node> nodes, Map<String, Edge> edges, Path outputPath, String title, boolean isMermaidEnabled) {
+    private static void visualizeHtml(List<Node> nodes, List<Edge> edges, Path outputPath, String title, boolean isMermaidEnabled) {
         StringBuilder mmdContent = new StringBuilder();
         mmdContent.append("flowchart TD\n");
         for (Node node : nodes) {
@@ -192,7 +192,7 @@ public class Visualizer {
                 mmdContent.append(String.format("style %s_ fill:#00ff00%n", node.getId()));
             }
         }
-        for (Edge edge : edges.values()) {
+        for (Edge edge : edges) {
             mmdContent.append(edgeToMmd(edge));
             mmdContent.append("\n");
         }
@@ -225,17 +225,10 @@ public class Visualizer {
         return String.format("%s_(\"%s\")", node.getId(), node.getLabel());
     }
 
-    private static void processOutcomes(Map<String, Edge> edges, Entry<String, ConfigNode> entry,
+    private static void processOutcomes(List<Edge> edges, Entry<String, ConfigNode> entry,
                                         Map<String, String> outcomes) {
         for (Entry<String, String> outcome : outcomes.entrySet()) {
-            String id = String.format("%s_%s", entry.getKey(), outcome.getValue());
-            String label = outcome.getKey();
-            if (edges.containsKey(id)) {
-                Edge edge = edges.get(id);
-                String oldLabel = edge.getLabel();
-                label = oldLabel + "\\n" + outcome.getKey();
-            }
-            edges.put(id, new Edge(entry.getKey(), outcome.getValue(), label));
+            edges.add(new Edge(entry.getKey(), outcome.getValue(), outcome.getKey()));
         }
     }
 
