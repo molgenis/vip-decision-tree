@@ -168,15 +168,14 @@ public class Visualizer {
     }
 
     private static void validateOutput(CommandLine commandLine) {
-        if (!commandLine.hasOption(OPT_OUTPUT)) {
-            return;
-        }
         String outputPathStr = commandLine.getOptionValue(OPT_OUTPUT);
-        if (!outputPathStr.endsWith(".html")) {
+        if (commandLine.hasOption(OPT_OUTPUT) && !outputPathStr.endsWith(".html")) {
             throw new IllegalArgumentException(
                     format("Output file '%s' is not a .html file.", outputPathStr));
         }
-        Path outputPath = Path.of(outputPathStr);
+        Path outputPath = commandLine.hasOption(OPT_OUTPUT) ? Path.of(commandLine.getOptionValue(OPT_OUTPUT))
+                : Path.of(commandLine.getOptionValue(OPT_INPUT).replace(JSON, ".html"));
+
         if (!commandLine.hasOption(OPT_FORCE) && Files.exists(outputPath)) {
             throw new IllegalArgumentException(
                     format("Output file '%s' already exists", outputPath));
@@ -205,7 +204,7 @@ public class Visualizer {
                     .replace("TITLE_PLACEHOLDER", title);
             Files.writeString(outputPath, output);
             if (isMermaidEnabled) {
-                Files.writeString(Path.of(outputPath.toString().replace(JSON, ".mmd")),
+                Files.writeString(Path.of(outputPath.toString().replace(".html", ".mmd")),
                         mmdContent.toString());
             }
         } catch (IOException e) {
