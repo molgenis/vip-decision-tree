@@ -13,7 +13,7 @@
 
     <groupId>org.molgenis</groupId>
     <artifactId>vip-decision-tree</artifactId>
-    <version>5.1.5</version>
+    <version>5.1.6</version>
 
     <name>vip-decision-tree</name>
     <description>Decision tree module for filtering and labelling VCF files</description>
