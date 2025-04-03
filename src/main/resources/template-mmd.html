@@ -24,7 +24,6 @@
                     event.preventDefault();
                     scale += event.deltaY * -0.001;
                     scale = Math.max(scale, 0.5);
-                    console.log(scale);
                     graph.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
                     document.querySelector('.mermaid').style.fontSize = `${16 * scale}px`;
                 }
