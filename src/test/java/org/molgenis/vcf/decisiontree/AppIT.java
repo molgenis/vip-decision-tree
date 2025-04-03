@@ -148,7 +148,7 @@ class AppIT {
   @Test
   void testVisualize() throws IOException {
     String treeConfigFile = ResourceUtils.getFile("classpath:example.json").toString();
-    Path outputFile = sharedTempDir.resolve("expected.html");
+    Path outputFile = sharedTempDir.resolve("actual.html");
 
     String[] args = {"-i", treeConfigFile, "-m", "-o", outputFile.toString()};
     Visualizer.main(args);
