@@ -48,12 +48,13 @@ public class Visualizer {
     public static final String OPT_FORCE_LONG = "force";
     private static final int STATUS_COMMAND_LINE_USAGE_ERROR = 64;
     public static final String JSON = ".json";
+    public static final String HTML = ".html";
 
     public static void main(String[] args) {
         CommandLine commandLine = getCommandLine(args);
         Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
         Path outputPath = commandLine.hasOption(OPT_OUTPUT) ? Path.of(commandLine.getOptionValue(OPT_OUTPUT))
-                : Path.of(commandLine.getOptionValue(OPT_INPUT).replace(JSON, ".html"));
+                : Path.of(commandLine.getOptionValue(OPT_INPUT).replace(JSON, HTML));
         String filename = inputPath.getFileName().toString();
         boolean isMermaidEnabled = commandLine.hasOption(OPT_MERMAID);
 
@@ -169,12 +170,12 @@ public class Visualizer {
 
     private static void validateOutput(CommandLine commandLine) {
         String outputPathStr = commandLine.getOptionValue(OPT_OUTPUT);
-        if (commandLine.hasOption(OPT_OUTPUT) && !outputPathStr.endsWith(".html")) {
+        if (commandLine.hasOption(OPT_OUTPUT) && !outputPathStr.endsWith(HTML)) {
             throw new IllegalArgumentException(
                     format("Output file '%s' is not a .html file.", outputPathStr));
         }
         Path outputPath = commandLine.hasOption(OPT_OUTPUT) ? Path.of(commandLine.getOptionValue(OPT_OUTPUT))
-                : Path.of(commandLine.getOptionValue(OPT_INPUT).replace(JSON, ".html"));
+                : Path.of(commandLine.getOptionValue(OPT_INPUT).replace(JSON, HTML));
 
         if (!commandLine.hasOption(OPT_FORCE) && Files.exists(outputPath)) {
             throw new IllegalArgumentException(
@@ -204,7 +205,7 @@ public class Visualizer {
                     .replace("TITLE_PLACEHOLDER", title);
             Files.writeString(outputPath, output);
             if (isMermaidEnabled) {
-                Files.writeString(Path.of(outputPath.toString().replace(".html", ".mmd")),
+                Files.writeString(Path.of(outputPath.toString().replace(HTML, ".mmd")),
                         mmdContent.toString());
             }
         } catch (IOException e) {
