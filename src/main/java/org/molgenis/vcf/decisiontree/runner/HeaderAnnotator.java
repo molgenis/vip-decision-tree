@@ -9,7 +9,7 @@ import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.runner.info.MissingVepException;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl.*;
@@ -78,7 +78,7 @@ public class HeaderAnnotator {
             }
         }
 
-        Set<VCFHeaderLine> additionalInfoLines = new HashSet<>();
+        Set<VCFHeaderLine> additionalInfoLines = new LinkedHashSet<>();
         additionalInfoLines.add(new VCFHeaderLine(INFO_CLASS_ID, INFO_CLASS_DESC));
         if (writerSettings.isWritePath()) {
             additionalInfoLines.add(new VCFHeaderLine(INFO_PATH_ID, INFO_PATH_DESC));
@@ -87,7 +87,7 @@ public class HeaderAnnotator {
             additionalInfoLines.add(new VCFHeaderLine(INFO_LABELS_ID, INFO_LABELS_DESC));
         }
 
-        Set<VCFHeaderLine> headerLines = new HashSet<>();
+        Set<VCFHeaderLine> headerLines = new LinkedHashSet<>();
         headerLines.add(vepHeaderLine);
         headerLines.addAll(fixVcfFormatHeaderLines(vcfHeader));
         headerLines.addAll(fixVcfFilterHeaderLines(vcfHeader));

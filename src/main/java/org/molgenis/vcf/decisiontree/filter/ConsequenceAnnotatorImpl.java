@@ -1,5 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import static java.util.Objects.requireNonNull;
 import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionClass;
 import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionLabelsString;
 import static org.molgenis.vcf.decisiontree.filter.DecisionUtils.getDecisionsPath;
@@ -11,6 +12,7 @@ import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.decisiontree.filter.model.NestedField;
+import org.molgenis.vcf.decisiontree.runner.info.MissingVepException;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
 import org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapper;
 
@@ -26,13 +28,17 @@ public class ConsequenceAnnotatorImpl implements ConsequenceAnnotator {
   public ConsequenceAnnotatorImpl(boolean writeLabels, boolean writePaths, VCFHeader annotatedHeader, VepMetadataMapper vepMetadataMapper) {
     this.writeLabels = writeLabels;
     this.writePaths = writePaths;
-    this.annotatedHeader = annotatedHeader;
-    this.vepMetadataMapper = vepMetadataMapper;
+    this.annotatedHeader = requireNonNull(annotatedHeader);
+    this.vepMetadataMapper = requireNonNull(vepMetadataMapper);
   }
 
   @Override
   public String annotate(Decision decision, String consequence) {
-    NestedHeaderLine vepHeaderLine = vepMetadataMapper.map(getVepId(annotatedHeader), annotatedHeader);
+    String vepId = getVepId(annotatedHeader);
+    if(vepId == null){
+      throw new MissingVepException();
+    }
+    NestedHeaderLine vepHeaderLine = vepMetadataMapper.map(vepId, annotatedHeader);
     String[] consequenceArray = consequence.split("\\|", -1);
 
     Field classField = vepHeaderLine.getField(INFO_CLASS_ID);
