@@ -6,7 +6,7 @@ import htsjdk.variant.vcf.VCFFileReader;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import htsjdk.variant.vcf.VCFInfoHeaderLine;
+import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.decisiontree.runner.info.GenotypeMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.MissingVepException;
 import org.molgenis.vcf.decisiontree.runner.info.NestedHeaderLine;
@@ -36,7 +36,7 @@ public class VcfReader implements AutoCloseable {
 
   private void initNestedMeta() {
     if (!inited) {
-      String vepID = getVepId();
+      String vepID = VepHelper.getVepId(vcfFileReader.getHeader());
       if(vepID == null) {
         throw new MissingVepException();
       }
@@ -44,15 +44,6 @@ public class VcfReader implements AutoCloseable {
       gtNestedHeaderLine = genotypeMetadataMapper.map();
       inited = true;
     }
-  }
-
-  private String getVepId() {
-    for(VCFInfoHeaderLine vcfInfoHeaderLine : vcfFileReader.getFileHeader().getInfoHeaderLines()){
-      if(vepMetadataMapper.canMap(vcfInfoHeaderLine)){
-        return vcfInfoHeaderLine.getID();
-      }
-    }
-    return null;
   }
 
   public Stream<VcfRecord> stream() {

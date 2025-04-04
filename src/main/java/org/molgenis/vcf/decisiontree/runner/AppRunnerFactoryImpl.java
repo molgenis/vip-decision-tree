@@ -2,6 +2,7 @@ package org.molgenis.vcf.decisiontree.runner;
 
 import static java.util.Objects.requireNonNull;
 
+import htsjdk.variant.vcf.VCFHeader;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.Classifier;
 import org.molgenis.vcf.decisiontree.filter.ConsequenceAnnotator;
@@ -25,16 +26,19 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
   private final ClassifierFactory classifierFactory;
   private final RecordWriterFactory recordWriterFactory;
   private final DecisionTreeFactory decisionTreeFactory;
+  private final ConsequenceAnnotatorFactory consequenceAnnotatorFactory;
 
   AppRunnerFactoryImpl(
       VcfReaderFactory vcfReaderFactory,
       ClassifierFactory classifierFactory,
       RecordWriterFactory recordWriterFactory,
-      DecisionTreeFactory decisionTreeFactory) {
+      DecisionTreeFactory decisionTreeFactory,
+      ConsequenceAnnotatorFactory consequenceAnnotatorFactory) {
     this.vcfReaderFactory = requireNonNull(vcfReaderFactory);
     this.classifierFactory = requireNonNull(classifierFactory);
     this.recordWriterFactory = requireNonNull(recordWriterFactory);
     this.decisionTreeFactory = requireNonNull(decisionTreeFactory);
+    this.consequenceAnnotatorFactory = requireNonNull(consequenceAnnotatorFactory);
   }
 
   // Suppress 'Resources should be closed'
@@ -44,12 +48,13 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
     VcfReader vcfReader = vcfReaderFactory.create(settings);
     try {
       VcfMetadata vcfMetadata = vcfReader.getMetadata();
-      RecordWriter recordWriter = recordWriterFactory.create(vcfMetadata, settings);
+      VCFHeader annotatedHeader = HeaderAnnotator.annotateHeader(vcfMetadata, settings);
+      RecordWriter recordWriter = recordWriterFactory.create(annotatedHeader, settings);
       DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
       ValueValidator.validate(settings.getConfigDecisionTree(), vcfMetadata);
       Classifier classifier;
       if (settings.getMode() == Mode.VARIANT) {
-        ConsequenceAnnotator consequenceAnnotator = ConsequenceAnnotatorFactory.create(settings);
+        ConsequenceAnnotator consequenceAnnotator = consequenceAnnotatorFactory.create(settings, annotatedHeader);
         classifier = classifierFactory.create(settings, decisionTree, consequenceAnnotator,
             recordWriter, vcfMetadata);
       } else {
