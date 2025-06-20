@@ -51,8 +51,8 @@ class VcfMetadataTest {
                 .nestedFields(vepNestedMetadata).parentField(vepField).build();
         NestedHeaderLine nestedGtHeaderLine = NestedHeaderLine.builder()
                 .nestedFields(Map.of()).parentField(vepField).build();
-        vcfMetadata = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, false);
-        vcfMetadataStrict = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, true);
+        vcfMetadata = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine, null,false);
+        vcfMetadataStrict = new VcfMetadata(vcfHeader, nestedVepHeaderLine, nestedGtHeaderLine,null, true);
     }
 
     @Test

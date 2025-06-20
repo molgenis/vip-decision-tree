@@ -64,11 +64,23 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
       case CONTAINS_NONE:
         matches = executeContainsNoneQuery((Collection<?>) value, (Collection<?>) queryValue);
         break;
+      case ANY_GREATER:
+        matches = executeAnyGreaterQuery((Collection<?>) value, queryValue);
+        break;
       default:
         throw new UnexpectedEnumException(operator);
     }
 
     return matches;
+  }
+
+  default boolean executeAnyGreaterQuery(Collection<?> values, Object queryValue){
+    for(Object value : values) {
+      if(((Double) value) > (Double.valueOf(queryValue.toString()))){
+        return true;
+      }
+    }
+    return false;
   }
 
   @SuppressWarnings("DuplicatedCode")

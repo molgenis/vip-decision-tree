@@ -6,6 +6,7 @@ import htsjdk.variant.vcf.VCFFileReader;
 import java.nio.file.Path;
 import org.molgenis.vcf.decisiontree.Settings;
 import org.molgenis.vcf.decisiontree.filter.VcfReader;
+import org.molgenis.vcf.decisiontree.runner.info.FormatMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.GenotypeMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.VepMetadataMapperFactory;
@@ -18,7 +19,8 @@ class VcfReaderFactoryImpl implements VcfReaderFactory {
   private final VepMetadataMapperFactory vepMetadataMapperFactory;
 
   VcfReaderFactoryImpl(VepMetadataMapperFactory vepMetadataMapperFactory,
-                       GenotypeMetadataMapper genotypeMetadataMapper) {
+                       GenotypeMetadataMapper genotypeMetadataMapper
+                       ) {
     this.vepMetadataMapperFactory = requireNonNull(vepMetadataMapperFactory);
     this.genotypeMetadataMapper = requireNonNull(genotypeMetadataMapper);
   }
@@ -26,11 +28,11 @@ class VcfReaderFactoryImpl implements VcfReaderFactory {
   @Override
   public VcfReader create(Settings settings) {
     VepMetadataMapper vepMetadataMapper = vepMetadataMapperFactory.create(settings);
-
+    FormatMetadataMapper formatMetadataMapper = new FormatMetadataMapper(settings);
     Path inputVcfPath = settings.getInputVcfPath();
     boolean strict = settings.isStrict();
     return new VcfReader(new VCFFileReader(inputVcfPath.toFile(), false), vepMetadataMapper,
-        genotypeMetadataMapper,
+        genotypeMetadataMapper,formatMetadataMapper,
         strict);
   }
 }

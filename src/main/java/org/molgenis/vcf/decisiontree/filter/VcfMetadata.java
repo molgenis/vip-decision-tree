@@ -1,9 +1,7 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.COMMON;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.INFO_VEP;
-import static org.molgenis.vcf.decisiontree.filter.model.FieldType.SAMPLE;
+import static org.molgenis.vcf.decisiontree.filter.model.FieldType.*;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.FIELD_TOKEN_SEPARATOR;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.toFieldType;
 
@@ -33,11 +31,13 @@ public class VcfMetadata {
   private final boolean strict;
   private final NestedHeaderLine nestedVepHeaderLine;
   private final NestedHeaderLine nestedGenotypeHeaderLine;
+  private final NestedFormatHeaderLine nestedFormatHeaderLine;
 
   public VcfMetadata(VCFHeader vcfHeader, NestedHeaderLine nestedVepHeaderLine,
-      NestedHeaderLine nestedGenotypeHeaderLine, boolean strict) {
+      NestedHeaderLine nestedGenotypeHeaderLine, NestedFormatHeaderLine nestedFormatHeaderLine, boolean strict) {
     this.vcfHeader = requireNonNull(vcfHeader);
     this.nestedVepHeaderLine = requireNonNull(nestedVepHeaderLine);
+    this.nestedFormatHeaderLine = requireNonNull(nestedFormatHeaderLine);
     this.nestedGenotypeHeaderLine = requireNonNull(nestedGenotypeHeaderLine);
     this.strict = strict;
   }
@@ -110,7 +110,7 @@ public class VcfMetadata {
 
     Field nestedField = nestedHeaderLine.getField(nestedFieldId);
     if (nestedField instanceof MissingField && strict) {
-      throw new UnknownFieldException(nestedFieldId, INFO_VEP);
+      throw new UnknownFieldException(nestedFieldId, GENOTYPE);
     }
     return nestedField;
   }
@@ -153,6 +153,9 @@ public class VcfMetadata {
   private Field toCompoundField(List<String> fieldTokens, FieldType fieldType) {
     if (fieldTokens.size() != 2) {
       throw new InvalidNumberOfTokensException(fieldTokens, fieldType, 2);
+    }
+    if(fieldType == FORMAT && nestedFormatHeaderLine.getFormatFields().containsKey(fieldTokens.get(1))){
+      return nestedFormatHeaderLine.getFormatFields().get(fieldTokens.get(1));
     }
     String field = fieldTokens.get(1);
     VCFCompoundHeaderLine vcfCompoundHeaderLine = getVcfCompoundHeaderLine(fieldType, field);
