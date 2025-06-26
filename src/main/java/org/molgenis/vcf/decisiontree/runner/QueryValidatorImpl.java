@@ -36,6 +36,9 @@ public class QueryValidatorImpl implements QueryValidator {
         case EQUALS, NOT_EQUALS:
           validateEquals(field, configBoolQuery);
           break;
+        case ANY_GREATER:
+          //FIXME
+          break;
         default:
           throw new UnexpectedEnumException(configBoolQuery.getOperator());
       }

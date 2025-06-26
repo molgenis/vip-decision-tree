@@ -8,6 +8,7 @@ import lombok.Value;
 @Builder
 public class BoolQuery {
   public enum Operator {
+    ANY_GREATER,
     EQUALS,
     NOT_EQUALS,
     LESS,
