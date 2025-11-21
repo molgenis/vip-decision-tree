@@ -13,7 +13,7 @@
 
     <groupId>org.molgenis</groupId>
     <artifactId>vip-decision-tree</artifactId>
-    <version>5.1.6</version>
+    <version>6.0.0</version>
 
     <name>vip-decision-tree</name>
     <description>Decision tree module for filtering and labelling VCF files</description>
@@ -45,7 +45,7 @@
         <commons.cli.version>1.9.0</commons.cli.version>
         <samtools.htsjdk.version>4.1.3</samtools.htsjdk.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-        <vip.utils.version>3.1.0</vip.utils.version>
+        <vip.utils.version>4.0.0</vip.utils.version>
     </properties>
 
     <profiles>

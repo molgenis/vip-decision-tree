@@ -48,7 +48,7 @@ public class VepMetadataMapperImpl implements VepMetadataMapper {
             .separator('|')
             .build();
 
-    FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfHeader, Map.of(FieldIdentifier.builder().type(org.molgenis.vcf.utils.metadata.FieldType.INFO).name(csqId).build(), NestedAttributes.builder().prefix(INFO_DESCRIPTION_PREFIX).seperator("|").build()));
+    FieldMetadatas fieldMetadatas = fieldMetadataService.load(vcfHeader);
     Map<String, NestedField> nestedFields = new HashMap<>();
     FieldMetadata csqField = fieldMetadatas.getInfo().get(csqId);
     if(csqField == null){

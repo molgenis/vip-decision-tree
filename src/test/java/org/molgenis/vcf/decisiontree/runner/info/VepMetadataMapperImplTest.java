@@ -74,7 +74,7 @@ class VepMetadataMapperImplTest {
             .numberType(ValueCount.Type.R).build();
     FieldMetadata csqMeta = FieldMetadata.builder().label("CSQ").description("Consequence annotations from Ensembl VEP. Format: STRAND|TEST").numberType(ValueCount.Type.VARIABLE).type(ValueType.STRING).numberType(ValueCount.Type.VARIABLE).nestedFields(Map.of("STRAND", nestedStrandMeta, "TEST", nestedTestMeta)).build();
     FieldMetadatas fieldMetadatas = FieldMetadatas.builder().info(Map.of("CSQ", csqMeta)).format(Map.of()).build();
-    when(fieldMetadataService.load(vcfHeader, Map.of(FieldIdentifier.builder().name("CSQ").type(org.molgenis.vcf.utils.metadata.FieldType.INFO).build(), NestedAttributes.builder().seperator("|").prefix("Consequence annotations from Ensembl VEP. Format: ").build()))).thenReturn(fieldMetadatas);
+    when(fieldMetadataService.load(vcfHeader)).thenReturn(fieldMetadatas);
 
     NestedHeaderLine actual = vepMetadataMapper
             .map("CSQ", vcfHeader);
