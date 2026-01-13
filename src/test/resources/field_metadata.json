@@ -32,6 +32,13 @@
           "label": "MT"
         }
       }
+    },
+  "zScore": {
+      "label": "Annotated zScore",
+      "description": "Annotated zScore.",
+      "numberType": "OTHER",
+      "separator": ",",
+      "type": "FLOAT"
     }
   },
   "info": {

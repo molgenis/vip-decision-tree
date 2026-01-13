@@ -1,167 +1,48 @@
 {
-  "rootNode": "family",
+  "rootNode": "zScore",
   "nodes": {
-    "family": {
-      "label": "Family",
+    "zScore": {
       "type": "BOOL",
+      "label": "ZScore",
+      "description": "zScore",
       "query": {
-        "field": "SAMPLE/FAMILY_ID",
-        "operator": "==",
-        "value": "FAM001"
+        "field": "FORMAT/zScore",
+        "operator": "any_greater",
+        "value": 1
       },
       "outcomeTrue": {
-        "nextNode": "proband_hom_ref"
+        "nextNode": "exit_u1"
       },
       "outcomeFalse": {
-        "nextNode": "exit_false"
+        "nextNode": "exit_u3"
       },
       "outcomeMissing": {
-        "nextNode": "proband_hom_ref"
+        "nextNode": "exit_u2"
       }
     },
-    "proband_hom_ref": {
-      "label": "Hom Ref",
-      "description": "Proband homozygous reference call",
-      "type": "BOOL_MULTI",
-      "fields": [
-        "SAMPLE/PROBAND",
-        "FORMAT/TYPE"
-      ],
-      "outcomes": [
-        {
-          "description": "Proband homozygous reference call",
-          "operator": "AND",
-          "queries": [
-            {
-              "field": "SAMPLE/PROBAND",
-              "operator": "==",
-              "value": true
-            },
-            {
-              "field": "FORMAT/TYPE",
-              "operator": "==",
-              "value": "HOM_REF"
-            }
-          ],
-          "outcomeTrue": {
-            "nextNode": "exit_false"
-          }
-        }
-      ],
-      "outcomeDefault": {
-        "nextNode": "depth"
-      },
-      "outcomeMissing": {
-        "nextNode": "depth"
-      }
-    },
-    "depth": {
-      "label": "Depth",
-      "type": "BOOL",
-      "query": {
-        "field": "FORMAT/AD",
-        "operator": "==",
-        "value": [
-          0,
-          10
-        ]
-      },
-      "outcomeTrue": {
-        "nextNode": "phenotype"
-      },
-      "outcomeFalse": {
-        "nextNode": "read_depth"
-      },
-      "outcomeMissing": {
-        "nextNode": "read_depth"
-      }
-    },
-    "read_depth": {
-      "label": "Read Depth",
-      "type": "BOOL",
-      "query": {
-        "field": "FORMAT/DP",
-        "operator": ">",
-        "value": 20
-      },
-      "outcomeTrue": {
-        "nextNode": "alleles"
-      },
-      "outcomeFalse": {
-        "nextNode": "exit_false"
-      },
-      "outcomeMissing": {
-        "nextNode": "alleles"
-      }
-    },
-    "alleles": {
-      "label": "Alleles",
-      "type": "BOOL",
-      "query": {
-        "field": "FORMAT/GENOTYPE/ALLELES",
-        "operator": "contains_any",
-        "value": "field:ALT"
-      },
-      "outcomeTrue": {
-        "nextNode": "genotype"
-      },
-      "outcomeFalse": {
-        "nextNode": "exit_false"
-      },
-      "outcomeMissing": {
-        "nextNode": "genotype"
-      }
-    },
-    "genotype": {
-      "label": "Genotype",
-      "type": "BOOL",
-      "query": {
-        "field": "FORMAT/GT",
-        "operator": "!=",
-        "value": "0|0"
-      },
-      "outcomeTrue": {
-        "nextNode": "phenotype"
-      },
-      "outcomeFalse": {
-        "nextNode": "exit_false"
-      },
-      "outcomeMissing": {
-        "nextNode": "phenotype"
-      }
-    },
-    "phenotype": {
-      "label": "Phenotype",
-      "type": "BOOL",
-      "query": {
-        "field": "SAMPLE/PHENOTYPES",
-        "operator": "contains",
-        "value": "HP:0000951"
-      },
-      "outcomeTrue": {
-        "nextNode": "exit_true"
-      },
-      "outcomeFalse": {
-        "nextNode": "exit_false"
-      },
-      "outcomeMissing": {
-        "nextNode": "exit_miss"
-      }
-    },
-    "exit_true": {
-      "label": "True",
+    "exit_u1": {
+      "label": "Usable: probably",
+      "description": "Usable: probably",
       "type": "LEAF",
-      "class": "class_true"
+      "class": "U1"
     },
-    "exit_false": {
-      "label": "False",
+    "exit_u2": {
+      "label": "Usable: maybe",
+      "description": "Usable: maybe",
       "type": "LEAF",
-      "class": "class_false"
+      "class": "U2"
     },
-    "exit_miss": {
-      "label": "Miss",
+    "exit_u3": {
+      "label": "Usable: probably not",
+      "description": "Usable: probably not",
       "type": "LEAF",
-      "class": "class_miss"
+      "class": "U3"
+    },
+    "exit_u4": {
+      "label": "Usable: if IP",
+      "description": "Usable: in case of incomplete penetrance",
+      "type": "LEAF",
+      "class": "U4"
     }
   }
 }
