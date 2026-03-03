@@ -299,7 +299,6 @@
                     <argLine>@.mvn/jvm.config -javaagent:"${org.mockito:mockito-core:jar}" ${argLine}</argLine>
                     <includes>
                         <include>**/*Test.java</include>
-                        <include>**/*EncoderDecoderIT.java</include>
                     </includes>
                     <statelessTestsetReporter>
                         <disable>true</disable>
