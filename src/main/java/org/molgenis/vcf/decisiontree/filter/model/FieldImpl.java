@@ -14,16 +14,12 @@ public class FieldImpl implements Field {
 
   @NonNull String id;
   @NonNull FieldType fieldType;
-  @NonNull
-  ValueType valueType;
-  @NonNull
-  ValueCount valueCount;
-  /**
-   * Returns count for FIXED value type, null otherwise
-   */
+  @NonNull ValueType valueType;
+  @NonNull ValueCount valueCount;
+
+  /** Returns count for FIXED value type, null otherwise */
   Integer count;
-  /**
-   * Returns separator for INFO_NESTED type, null otherwise
-   */
+
+  /** Returns separator for INFO_NESTED type, null otherwise */
   Character separator;
 }

@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.4</version>
+        <version>4.0.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -41,11 +41,19 @@
     <properties>
         <!-- suppress Java 21 dynamic agent loading warning, since there is no suitable fix yet -->
         <argLine>-XX:+EnableDynamicAgentLoading</argLine>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <commons.cli.version>1.9.0</commons.cli.version>
         <samtools.htsjdk.version>4.1.3</samtools.htsjdk.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <vip.utils.version>4.0.0</vip.utils.version>
+        <errorprone.version>2.48.0</errorprone.version>
+        <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
+        <maven.clean.plugin.version>3.5.0</maven.clean.plugin.version>
+        <maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
+        <nullaway.version>0.12.15</nullaway.version>
+        <maven.spotless.plugin.version>3.0.0</maven.spotless.plugin.version>
+        <lombok.version>1.18.42</lombok.version>
+        <mockito.version>5.22.0</mockito.version>
     </properties>
 
     <profiles>
@@ -149,6 +157,16 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -157,20 +175,82 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${maven.spotless.plugin.version}</version>
+                    <configuration>
+                        <java>
+                            <googleJavaFormat/>
+                        </java>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <phase>verify</phase>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven.clean.plugin.version}</version>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
                     <configuration>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>com.google.errorprone</groupId>
+                                <artifactId>error_prone_core</artifactId>
+                                <version>${errorprone.version}</version>
+                            </path>
+                            <path>
+                                <groupId>com.uber.nullaway</groupId>
+                                <artifactId>nullaway</artifactId>
+                                <version>${nullaway.version}</version>
+                            </path>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
                         <compilerArgs>
                             <arg>-Xlint</arg>
-                            <arg>-Xlint:-processing
-                            </arg><!-- disable: perfectly normal for annotations to not have a processor -->
-                        </compilerArgs>
+                            <arg>-Xlint:-processing</arg>
+                            <arg>-Xlint:-restricted</arg>
+                            <arg>-XDcompilePolicy=simple</arg>
+                            <arg>--should-stop=ifError=FLOW</arg>
+                            <arg>-Xplugin:ErrorProne -XepOpt:NullAway:AnnotatedPackages=org.molgenis
+                                -XepOpt:NullAway:ExcludedFieldAnnotations=org.mockito.Mock -Xep:NullAway:WARN
+                            </arg>
+                          </compilerArgs>
                     </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+            </plugin>
+            <!-- workaround for 'Error opening zip file or JAR manifest missing : ${org.mockito:mockito-core:jar}' -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -199,13 +279,31 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLine>@.mvn/jvm.config ${argLine}</argLine>
+                </configuration>
             </plugin>
             <plugin>
-                <!-- suppress Java 21 dynamic agent loading warning, since there is no suitable fix yet -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
                 <configuration>
-                    <!-- no argLine here -->
+                    <argLine>@.mvn/jvm.config -javaagent:"${org.mockito:mockito-core:jar}" ${argLine}</argLine>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*EncoderDecoderIT.java</include>
+                    </includes>
+                    <statelessTestsetReporter>
+                        <disable>true</disable>
+                    </statelessTestsetReporter>
                 </configuration>
             </plugin>
         </plugins>

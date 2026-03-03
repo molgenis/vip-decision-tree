@@ -37,14 +37,11 @@ import org.molgenis.vcf.utils.metadata.ValueType;
 import org.springframework.util.ResourceUtils;
 
 @ExtendWith(MockitoExtension.class)
-class DecisionTreeFactoryImplTest{
+class DecisionTreeFactoryImplTest {
 
-  @Mock
-  QueryValidator queryValidator;
-  @Mock
-  VcfMetadata vcfMetadata;
-  @Mock
-  ConfigDecisionTree decisionTree;
+  @Mock QueryValidator queryValidator;
+  @Mock VcfMetadata vcfMetadata;
+  @Mock ConfigDecisionTree decisionTree;
 
   private DecisionTreeFactoryImpl decisionTreeFactory;
 
@@ -56,34 +53,48 @@ class DecisionTreeFactoryImplTest{
   @ParameterizedTest
   @MethodSource("provideOperatorsForMap")
   void map(Operator expectedOperator, ConfigOperator configOperator) throws FileNotFoundException {
-    Map<String, Path> files = Collections
-        .singletonMap("test", ResourceUtils.getFile("classpath:test.txt").toPath());
+    Map<String, Path> files =
+        Collections.singletonMap("test", ResourceUtils.getFile("classpath:test.txt").toPath());
     ConfigBoolQuery query =
-        ConfigBoolQuery.builder().field("INFO/testField").operator(configOperator)
+        ConfigBoolQuery.builder()
+            .field("INFO/testField")
+            .operator(configOperator)
             .value(FILE_PREFIX + "test")
             .build();
     ConfigLeafNode leafNode = ConfigLeafNode.builder().label("label").clazz("end").build();
     ConfigNodeOutcome outcome = ConfigNodeOutcome.builder().nextNode("end").build();
-    ConfigNode configNode = ConfigBoolNode.builder().label("label").query(query).outcomeTrue(
-        outcome).outcomeFalse(outcome).build();
+    ConfigNode configNode =
+        ConfigBoolNode.builder()
+            .label("label")
+            .query(query)
+            .outcomeTrue(outcome)
+            .outcomeFalse(outcome)
+            .build();
     Map<String, ConfigNode> nodes = Map.of("test", configNode, "end", leafNode);
     when(decisionTree.getLabels()).thenReturn(Collections.emptyMap());
     when(decisionTree.getFiles()).thenReturn(files);
     when(decisionTree.getNodes()).thenReturn(nodes);
     when(decisionTree.getRootNode()).thenReturn("test");
-    when(vcfMetadata.getField("INFO/testField")).thenReturn(
-        FieldImpl.builder().id("testField").fieldType(INFO).valueType(
-            ValueType.STRING).valueCount(ValueCount.builder().type(ValueCount.Type.A).build()).build());
-    Settings settings = Settings.builder().mode(Mode.VARIANT).configDecisionTree(decisionTree)
-        .build();
+    when(vcfMetadata.getField("INFO/testField"))
+        .thenReturn(
+            FieldImpl.builder()
+                .id("testField")
+                .fieldType(INFO)
+                .valueType(ValueType.STRING)
+                .valueCount(ValueCount.builder().type(ValueCount.Type.A).build())
+                .build());
+    Settings settings =
+        Settings.builder().mode(Mode.VARIANT).configDecisionTree(decisionTree).build();
     DecisionTree decisionTree = decisionTreeFactory.map(vcfMetadata, settings);
 
     assertAll(
-        () -> assertEquals(expectedOperator,
-            ((BoolNode) decisionTree.getRootNode()).getQuery().getOperator()),
-        () -> assertEquals(Set.of("unit", "test", "value"),
-            ((BoolNode) decisionTree.getRootNode()).getQuery().getValue())
-    );
+        () ->
+            assertEquals(
+                expectedOperator, ((BoolNode) decisionTree.getRootNode()).getQuery().getOperator()),
+        () ->
+            assertEquals(
+                Set.of("unit", "test", "value"),
+                ((BoolNode) decisionTree.getRootNode()).getQuery().getValue()));
   }
 
   private static Stream<Arguments> provideOperatorsForMap() {
@@ -94,7 +105,6 @@ class DecisionTreeFactoryImplTest{
         Arguments.of(Operator.NOT_CONTAINS, ConfigOperator.NOT_CONTAINS),
         Arguments.of(Operator.CONTAINS_ALL, ConfigOperator.CONTAINS_ALL),
         Arguments.of(Operator.CONTAINS_ANY, ConfigOperator.CONTAINS_ANY),
-        Arguments.of(Operator.CONTAINS_NONE, ConfigOperator.CONTAINS_NONE)
-    );
+        Arguments.of(Operator.CONTAINS_NONE, ConfigOperator.CONTAINS_NONE));
   }
 }

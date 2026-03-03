@@ -27,9 +27,7 @@ import org.molgenis.vcf.utils.metadata.ValueCount;
 import org.molgenis.vcf.utils.metadata.ValueType;
 import org.springframework.lang.Nullable;
 
-/**
- * {@link VariantContext} wrapper that works with nested data (e.g. CSQ INFO fields)..
- */
+/** {@link VariantContext} wrapper that works with nested data (e.g. CSQ INFO fields).. */
 public class VcfRecord {
 
   private static final List<String> PASS_FILTER = List.of(VCFConstants.PASSES_FILTERS_v4);
@@ -133,12 +131,16 @@ public class VcfRecord {
     GenotypeFieldType genotypeFieldType = GenotypeFieldType.valueOf(field.getId());
     switch (genotypeFieldType) {
       case ALLELES:
-        value = genotype.getAlleles().stream().map(
-            htsjdk.variant.variantcontext.Allele::getBaseString).toList();
+        value =
+            genotype.getAlleles().stream()
+                .map(htsjdk.variant.variantcontext.Allele::getBaseString)
+                .toList();
         break;
       case ALLELE_NUM:
-        value = genotype.getAlleles().stream().map(allele ->
-            variantContext.getAlleles().indexOf(allele)).toList();
+        value =
+            genotype.getAlleles().stream()
+                .map(allele -> variantContext.getAlleles().indexOf(allele))
+                .toList();
         break;
       case TYPE:
         switch (genotype.getType()) {
@@ -187,7 +189,7 @@ public class VcfRecord {
   }
 
   @SuppressWarnings("java:S1612")
-  //suggested use of methode reference Integer::toString is not possible due to ambiguity
+  // suggested use of methode reference Integer::toString is not possible due to ambiguity
   private Object getFormatField(Field field, SampleContext sampleContext) {
     Genotype genotype = variantContext.getGenotype(sampleContext.getIndex());
     if (genotype == null) {
@@ -198,9 +200,13 @@ public class VcfRecord {
     switch (field.getId()) {
       case ("GT"):
         String separator = genotype.isPhased() ? "|" : "/";
-        typedValue = String.join(separator, genotype.getAlleles().stream().map(allele ->
-                variantContext.getAlleles().indexOf(allele)).map(index -> mapAlleleString(index))
-            .toList());
+        typedValue =
+            String.join(
+                separator,
+                genotype.getAlleles().stream()
+                    .map(allele -> variantContext.getAlleles().indexOf(allele))
+                    .map(index -> mapAlleleString(index))
+                    .toList());
         break;
       case ("AD"):
         int[] ad = genotype.getAD();
@@ -242,13 +248,11 @@ public class VcfRecord {
     ValueCount.Type valueCountType = valueCount.getType();
     switch (valueCountType) {
       case A, R, VARIABLE:
-        typedValue =
-            value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
+        typedValue = value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
         break;
       case FIXED:
         if (valueCount.getCount() == 1) {
-          typedValue =
-              value != null ? VcfUtils.getTypedVcfValue(field, value.toString()) : null;
+          typedValue = value != null ? VcfUtils.getTypedVcfValue(field, value.toString()) : null;
         } else {
           typedValue =
               value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
@@ -270,7 +274,8 @@ public class VcfRecord {
     String separator = Pattern.quote(nestedField.getParent().getSeparator().toString());
     int index = nestedField.getIndex();
     String parentId = nestedField.getParent().getId();
-    List<String> infoValues = VcfUtils.getInfoAsStringList(variantContext, parentId, VCFConstants.MISSING_VALUE_v4);
+    List<String> infoValues =
+        VcfUtils.getInfoAsStringList(variantContext, parentId, VCFConstants.MISSING_VALUE_v4);
     if (!infoValues.isEmpty()) {
       String singleValue = infoValues.get(0);
       String[] split = singleValue.split(separator, -1);

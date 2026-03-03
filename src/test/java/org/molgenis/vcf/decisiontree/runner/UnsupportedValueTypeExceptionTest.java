@@ -15,9 +15,13 @@ class UnsupportedValueTypeExceptionTest {
     assertEquals(
         "Unsupported value type 'FLOAT' of field 'test' for decision type 'CATEGORICAL'.",
         new UnsupportedValueTypeException(
-            FieldImpl.builder().id("test").fieldType(FieldType.INFO).valueType(FLOAT)
-                .valueCount(
-                    ValueCount.builder().type(ValueCount.Type.A).build()).build(), DecisionType.CATEGORICAL)
+                FieldImpl.builder()
+                    .id("test")
+                    .fieldType(FieldType.INFO)
+                    .valueType(FLOAT)
+                    .valueCount(ValueCount.builder().type(ValueCount.Type.A).build())
+                    .build(),
+                DecisionType.CATEGORICAL)
             .getMessage());
   }
 }

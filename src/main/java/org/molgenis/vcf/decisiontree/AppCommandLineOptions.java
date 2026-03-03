@@ -157,16 +157,13 @@ class AppCommandLineOptions {
   private static void validateInput(CommandLine commandLine) {
     Path inputPath = Path.of(commandLine.getOptionValue(OPT_INPUT));
     if (!Files.exists(inputPath)) {
-      throw new IllegalArgumentException(
-          format("Input file '%s' does not exist.", inputPath));
+      throw new IllegalArgumentException(format("Input file '%s' does not exist.", inputPath));
     }
     if (Files.isDirectory(inputPath)) {
-      throw new IllegalArgumentException(
-          format("Input file '%s' is a directory.", inputPath));
+      throw new IllegalArgumentException(format("Input file '%s' is a directory.", inputPath));
     }
     if (!Files.isReadable(inputPath)) {
-      throw new IllegalArgumentException(
-          format("Input file '%s' is not readable.", inputPath));
+      throw new IllegalArgumentException(format("Input file '%s' is not readable.", inputPath));
     }
     String inputPathStr = inputPath.toString();
     if (!inputPathStr.endsWith(".vcf") && !inputPathStr.endsWith(".vcf.gz")) {
@@ -179,35 +176,33 @@ class AppCommandLineOptions {
     Path metadataPath = Path.of(commandLine.getOptionValue(OPT_METADATA));
     if (!Files.exists(metadataPath)) {
       throw new IllegalArgumentException(
-              format("Metadata file '%s' does not exist.", metadataPath));
+          format("Metadata file '%s' does not exist.", metadataPath));
     }
     if (Files.isDirectory(metadataPath)) {
       throw new IllegalArgumentException(
-              format("Metadata file '%s' is a directory.", metadataPath));
+          format("Metadata file '%s' is a directory.", metadataPath));
     }
     if (!Files.isReadable(metadataPath)) {
       throw new IllegalArgumentException(
-              format("Metadata file '%s' is not readable.", metadataPath));
+          format("Metadata file '%s' is not readable.", metadataPath));
     }
     String inputPathStr = metadataPath.toString();
     if (!inputPathStr.endsWith(".json")) {
       throw new IllegalArgumentException(
-              format("Metadata file '%s' is not a .json file.", inputPathStr));
+          format("Metadata file '%s' is not a .json file.", inputPathStr));
     }
   }
+
   private static void validateConfig(CommandLine commandLine) {
     Path configPath = Path.of(commandLine.getOptionValue(OPT_CONFIG));
     if (!Files.exists(configPath)) {
-      throw new IllegalArgumentException(
-          format("Config file '%s' does not exist.", configPath));
+      throw new IllegalArgumentException(format("Config file '%s' does not exist.", configPath));
     }
     if (Files.isDirectory(configPath)) {
-      throw new IllegalArgumentException(
-          format("Config file '%s' is a directory.", configPath));
+      throw new IllegalArgumentException(format("Config file '%s' is a directory.", configPath));
     }
     if (!Files.isReadable(configPath)) {
-      throw new IllegalArgumentException(
-          format("Config file '%s' is not readable.", configPath));
+      throw new IllegalArgumentException(format("Config file '%s' is not readable.", configPath));
     }
     String inputPathStr = configPath.toString();
     if (!inputPathStr.endsWith(".json")) {
@@ -224,8 +219,7 @@ class AppCommandLineOptions {
     Path outputPath = Path.of(commandLine.getOptionValue(OPT_OUTPUT));
 
     if (!commandLine.hasOption(OPT_FORCE) && Files.exists(outputPath)) {
-      throw new IllegalArgumentException(
-          format("Output file '%s' already exists", outputPath));
+      throw new IllegalArgumentException(format("Output file '%s' already exists", outputPath));
     }
   }
 
@@ -235,8 +229,7 @@ class AppCommandLineOptions {
     }
 
     String mode = commandLine.getOptionValue(OPT_TYPE);
-    List<String> modes = Arrays.stream(Mode.values()).map(Mode::toString)
-        .toList();
+    List<String> modes = Arrays.stream(Mode.values()).map(Mode::toString).toList();
 
     if (!modes.contains(mode.toUpperCase())) {
       throw new IllegalArgumentException(

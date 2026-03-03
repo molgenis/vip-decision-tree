@@ -20,13 +20,7 @@ public class CategoricalNode implements DecisionNode {
   @NonNull NodeType nodeType = NodeType.DECISION;
   @NonNull Field field;
   // @NonFinal and nullable to allow for two-pass construction
-  @NonFinal
-  @Setter
-  Map<String, NodeOutcome> outcomeMap;
-  @NonFinal
-  @Setter
-  NodeOutcome outcomeMissing;
-  @NonFinal
-  @Setter
-  NodeOutcome outcomeDefault;
+  @NonFinal @Setter Map<String, NodeOutcome> outcomeMap;
+  @NonFinal @Setter NodeOutcome outcomeMissing;
+  @NonFinal @Setter NodeOutcome outcomeDefault;
 }

@@ -11,7 +11,12 @@ class CountMismatchExceptionTest {
   void getMessage() {
     assertEquals(
         "Query value for field 'test' should be a collection for query 'ConfigBoolQuery(field=test, operator=EQUALS, value=testValue)'.",
-        new CountMismatchException(ConfigBoolQuery.builder().field("test").operator(
-            ConfigOperator.EQUALS).value("testValue").build()).getMessage());
+        new CountMismatchException(
+                ConfigBoolQuery.builder()
+                    .field("test")
+                    .operator(ConfigOperator.EQUALS)
+                    .value("testValue")
+                    .build())
+            .getMessage());
   }
 }

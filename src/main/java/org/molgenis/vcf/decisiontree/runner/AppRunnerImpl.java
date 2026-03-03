@@ -16,10 +16,7 @@ class AppRunnerImpl implements AppRunner {
   private final VcfReader vcfReader;
   private final RecordWriter recordWriter;
 
-  AppRunnerImpl(
-      Classifier classifier,
-      VcfReader vcfReader,
-      RecordWriter recordWriter) {
+  AppRunnerImpl(Classifier classifier, VcfReader vcfReader, RecordWriter recordWriter) {
     this.classifier = requireNonNull(classifier);
     this.vcfReader = requireNonNull(vcfReader);
     this.recordWriter = requireNonNull(recordWriter);

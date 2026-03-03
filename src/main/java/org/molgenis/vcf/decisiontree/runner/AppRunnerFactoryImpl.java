@@ -54,14 +54,17 @@ class AppRunnerFactoryImpl implements AppRunnerFactory {
       ValueValidator.validate(settings.getConfigDecisionTree(), vcfMetadata);
       Classifier classifier;
       if (settings.getMode() == Mode.VARIANT) {
-        ConsequenceAnnotator consequenceAnnotator = consequenceAnnotatorFactory.create(settings, annotatedHeader);
-        classifier = classifierFactory.create(settings, decisionTree, consequenceAnnotator,
-            recordWriter, vcfMetadata);
+        ConsequenceAnnotator consequenceAnnotator =
+            consequenceAnnotatorFactory.create(settings, annotatedHeader);
+        classifier =
+            classifierFactory.create(
+                settings, decisionTree, consequenceAnnotator, recordWriter, vcfMetadata);
       } else {
         SampleAnnotator sampleAnnotator = SampleAnnotatorFactory.create(settings);
         SamplesContext samplesContext = SamplesContextFactory.create(settings, vcfMetadata);
-        classifier = classifierFactory.create(settings, decisionTree,
-            recordWriter, sampleAnnotator, samplesContext);
+        classifier =
+            classifierFactory.create(
+                settings, decisionTree, recordWriter, sampleAnnotator, samplesContext);
       }
 
       return new AppRunnerImpl(classifier, vcfReader, recordWriter);

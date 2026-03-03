@@ -16,8 +16,14 @@ class UnsupportedValueCountTypeExceptionTest {
     assertEquals(
         "Unsupported value count type 'G' of field 'test' for combination of decision type 'CATEGORICAL' and operator of type 'IN'.",
         new UnsupportedValueCountTypeException(
-            FieldImpl.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.FLOAT)
-                .valueCount(
-                    ValueCount.builder().type(ValueCount.Type.G).build()).build(), DecisionType.CATEGORICAL, ConfigOperator.IN).getMessage());
+                FieldImpl.builder()
+                    .id("test")
+                    .fieldType(FieldType.INFO)
+                    .valueType(ValueType.FLOAT)
+                    .valueCount(ValueCount.builder().type(ValueCount.Type.G).build())
+                    .build(),
+                DecisionType.CATEGORICAL,
+                ConfigOperator.IN)
+            .getMessage());
   }
 }

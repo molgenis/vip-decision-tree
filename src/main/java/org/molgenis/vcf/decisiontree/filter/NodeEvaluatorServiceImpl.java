@@ -29,7 +29,8 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
 
   // Testability
   NodeEvaluatorServiceImpl(
-      BoolNodeEvaluator boolNodeEvaluator, BoolMultiNodeEvaluator boolMultiNodeEvaluator,
+      BoolNodeEvaluator boolNodeEvaluator,
+      BoolMultiNodeEvaluator boolMultiNodeEvaluator,
       CategoricalNodeEvaluator categoricalNodeEvaluator,
       ExistsNodeEvaluator existsNodeEvaluator) {
     this.boolNodeEvaluator = boolNodeEvaluator;
@@ -39,8 +40,8 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
   }
 
   @Override
-  public NodeOutcome evaluate(DecisionNode node, Variant variant,
-      @Nullable SampleContext sampleContext) {
+  public NodeOutcome evaluate(
+      DecisionNode node, Variant variant, @Nullable SampleContext sampleContext) {
     NodeOutcome nodeOutcome;
     DecisionType decisionType = node.getDecisionType();
     switch (decisionType) {
@@ -54,8 +55,8 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
         nodeOutcome = boolMultiNodeEvaluator.evaluate((BoolMultiNode) node, variant, sampleContext);
         break;
       case CATEGORICAL:
-        nodeOutcome = categoricalNodeEvaluator.evaluate((CategoricalNode) node, variant
-            , sampleContext);
+        nodeOutcome =
+            categoricalNodeEvaluator.evaluate((CategoricalNode) node, variant, sampleContext);
         break;
       default:
         throw new UnexpectedEnumException(decisionType);

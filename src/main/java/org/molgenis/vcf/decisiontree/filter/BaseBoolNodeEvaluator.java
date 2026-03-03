@@ -11,8 +11,7 @@ import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.lang.Nullable;
 
-interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
-    NodeEvaluator<T> {
+interface BaseBoolNodeEvaluator<T extends DecisionNode> extends NodeEvaluator<T> {
 
   default boolean isMissingValue(Object value) {
     return value == null || (value instanceof Collection<?> && ((Collection<?>) value).isEmpty());
@@ -133,9 +132,12 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
     String stringQueryValue = query.getValue().toString();
     if (stringQueryValue.startsWith(FIELD_PREFIX)) {
       String fieldId = stringQueryValue.substring(FIELD_PREFIX.length());
-      query = BoolQuery.builder().field(query.getField()).operator(query.getOperator())
-          .value(variant.getValue(variant.getVcfMetadata().getField(fieldId), sampleContext))
-          .build();
+      query =
+          BoolQuery.builder()
+              .field(query.getField())
+              .operator(query.getOperator())
+              .value(variant.getValue(variant.getVcfMetadata().getField(fieldId), sampleContext))
+              .build();
     }
     return query;
   }

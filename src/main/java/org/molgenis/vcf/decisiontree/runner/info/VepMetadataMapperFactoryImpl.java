@@ -7,9 +7,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class VepMetadataMapperFactoryImpl implements VepMetadataMapperFactory {
-    @Override
-    public VepMetadataMapper create(Settings settings) {
-        FieldMetadataService fieldMetadataService = new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
-        return new VepMetadataMapperImpl(fieldMetadataService);
-    }
+  @Override
+  public VepMetadataMapper create(Settings settings) {
+    FieldMetadataService fieldMetadataService =
+        new FieldMetadataServiceImpl(settings.getMetadataPath().toFile());
+    return new VepMetadataMapperImpl(fieldMetadataService);
+  }
 }

@@ -18,8 +18,6 @@ public class BoolMultiQuery {
 
   @NonNull String id;
   @NonNull List<BoolQuery> queryList;
-  @NonFinal
-  @Setter
-  NodeOutcome outcomeTrue;
+  @NonFinal @Setter NodeOutcome outcomeTrue;
   Operator operator;
 }

@@ -2,14 +2,13 @@ package org.molgenis.vcf.decisiontree.runner;
 
 import static java.lang.String.format;
 
+import java.io.Serial;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 
-import java.io.Serial;
-
 public class UnsupportedValueTypeException extends RuntimeException {
-  @Serial
-  private static final long serialVersionUID = 1L;
+  @Serial private static final long serialVersionUID = 1L;
+
   public UnsupportedValueTypeException(Field field, DecisionType decisionType) {
     super(
         format(

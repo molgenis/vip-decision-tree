@@ -8,7 +8,6 @@ class UnsupportedFieldExceptionTest {
   @Test
   void getMessage() {
     assertEquals(
-        "Unsupported field 'sample123'.",
-        new UnsupportedFieldException("sample123").getMessage());
+        "Unsupported field 'sample123'.", new UnsupportedFieldException("sample123").getMessage());
   }
 }

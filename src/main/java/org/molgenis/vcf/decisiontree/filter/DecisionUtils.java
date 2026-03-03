@@ -11,8 +11,7 @@ import org.molgenis.vcf.decisiontree.filter.model.Node;
 
 public class DecisionUtils {
 
-  private DecisionUtils() {
-  }
+  private DecisionUtils() {}
 
   public static String getDecisionLabelsString(Decision decision) {
     String decisionLabel = "";

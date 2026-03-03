@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Objects.requireNonNull;
+
 import htsjdk.variant.variantcontext.writer.VariantContextWriter;
 
 public class RecordWriterImpl implements RecordWriter {

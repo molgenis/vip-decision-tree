@@ -1,13 +1,11 @@
 package org.molgenis.vcf.decisiontree.filter;
 
-import java.io.Serial;
-
 import static java.lang.String.format;
 
-public class UnsupportedFieldException extends
-    RuntimeException {
-  @Serial
-  private static final long serialVersionUID = 1L;
+import java.io.Serial;
+
+public class UnsupportedFieldException extends RuntimeException {
+  @Serial private static final long serialVersionUID = 1L;
   private static final String MESSAGE = "Unsupported field '%s'.";
   private final String rootField;
 

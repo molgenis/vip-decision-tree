@@ -7,8 +7,8 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
+import org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -46,12 +46,20 @@ class BoolMultiNodeEvaluatorTest {
     NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
     NodeOutcome outcome2 = mock(NodeOutcome.class, "outcome2");
 
-    BoolMultiQuery boolMultiQuery1 = BoolMultiQuery.builder().id("123")
-        .operator(BoolMultiQuery.Operator.AND)
-        .queryList(List.of(boolQueryAnd1, boolQueryAnd2)).outcomeTrue(outcome1).build();
-    BoolMultiQuery boolMultiQuery2 = BoolMultiQuery.builder().id("124")
-        .operator(BoolMultiQuery.Operator.OR)
-        .queryList(List.of(boolQueryOr1, boolQueryOr2)).outcomeTrue(outcome2).build();
+    BoolMultiQuery boolMultiQuery1 =
+        BoolMultiQuery.builder()
+            .id("123")
+            .operator(BoolMultiQuery.Operator.AND)
+            .queryList(List.of(boolQueryAnd1, boolQueryAnd2))
+            .outcomeTrue(outcome1)
+            .build();
+    BoolMultiQuery boolMultiQuery2 =
+        BoolMultiQuery.builder()
+            .id("124")
+            .operator(BoolMultiQuery.Operator.OR)
+            .queryList(List.of(boolQueryOr1, boolQueryOr2))
+            .outcomeTrue(outcome2)
+            .build();
     List<BoolMultiQuery> clauses = List.of(boolMultiQuery1, boolMultiQuery2);
 
     BoolMultiNode node =
@@ -90,12 +98,20 @@ class BoolMultiNodeEvaluatorTest {
     NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
     NodeOutcome outcome2 = mock(NodeOutcome.class, "outcome2");
 
-    BoolMultiQuery boolMultiQuery1 = BoolMultiQuery.builder().id("123")
-        .operator(BoolMultiQuery.Operator.AND)
-        .queryList(List.of(boolQueryAnd1, boolQueryAnd2)).outcomeTrue(outcome1).build();
-    BoolMultiQuery boolMultiQuery2 = BoolMultiQuery.builder().id("124")
-        .operator(BoolMultiQuery.Operator.OR)
-        .queryList(List.of(boolQueryOr1, boolQueryOr2)).outcomeTrue(outcome2).build();
+    BoolMultiQuery boolMultiQuery1 =
+        BoolMultiQuery.builder()
+            .id("123")
+            .operator(BoolMultiQuery.Operator.AND)
+            .queryList(List.of(boolQueryAnd1, boolQueryAnd2))
+            .outcomeTrue(outcome1)
+            .build();
+    BoolMultiQuery boolMultiQuery2 =
+        BoolMultiQuery.builder()
+            .id("124")
+            .operator(BoolMultiQuery.Operator.OR)
+            .queryList(List.of(boolQueryOr1, boolQueryOr2))
+            .outcomeTrue(outcome2)
+            .build();
     List<BoolMultiQuery> clauses = List.of(boolMultiQuery1, boolMultiQuery2);
 
     BoolMultiNode node =
@@ -113,7 +129,6 @@ class BoolMultiNodeEvaluatorTest {
     when(variant.getValue(field2, null)).thenReturn(2);
     assertEquals(outcome1, boolMultiNodeEvaluator.evaluate(node, variant));
   }
-
 
   @Test
   void evaluateFalse() {
@@ -135,12 +150,20 @@ class BoolMultiNodeEvaluatorTest {
     NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
     NodeOutcome outcome2 = mock(NodeOutcome.class, "outcome2");
 
-    BoolMultiQuery boolMultiQuery1 = BoolMultiQuery.builder().id("123")
-        .operator(BoolMultiQuery.Operator.AND)
-        .queryList(List.of(boolQueryAnd1, boolQueryAnd2)).outcomeTrue(outcome1).build();
-    BoolMultiQuery boolMultiQuery2 = BoolMultiQuery.builder().id("124")
-        .operator(BoolMultiQuery.Operator.AND)
-        .queryList(List.of(boolQueryOr1, boolQueryOr2)).outcomeTrue(outcome2).build();
+    BoolMultiQuery boolMultiQuery1 =
+        BoolMultiQuery.builder()
+            .id("123")
+            .operator(BoolMultiQuery.Operator.AND)
+            .queryList(List.of(boolQueryAnd1, boolQueryAnd2))
+            .outcomeTrue(outcome1)
+            .build();
+    BoolMultiQuery boolMultiQuery2 =
+        BoolMultiQuery.builder()
+            .id("124")
+            .operator(BoolMultiQuery.Operator.AND)
+            .queryList(List.of(boolQueryOr1, boolQueryOr2))
+            .outcomeTrue(outcome2)
+            .build();
     List<BoolMultiQuery> clauses = List.of(boolMultiQuery1, boolMultiQuery2);
 
     BoolMultiNode node =
@@ -179,12 +202,20 @@ class BoolMultiNodeEvaluatorTest {
     NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
     NodeOutcome outcome2 = mock(NodeOutcome.class, "outcome2");
 
-    BoolMultiQuery boolMultiQuery1 = BoolMultiQuery.builder().id("123")
-        .operator(BoolMultiQuery.Operator.AND)
-        .queryList(List.of(boolQueryAnd1, boolQueryAnd2)).outcomeTrue(outcome1).build();
-    BoolMultiQuery boolMultiQuery2 = BoolMultiQuery.builder().id("124")
-        .operator(BoolMultiQuery.Operator.AND)
-        .queryList(List.of(boolQueryAnd1b, boolQueryAnd2b)).outcomeTrue(outcome2).build();
+    BoolMultiQuery boolMultiQuery1 =
+        BoolMultiQuery.builder()
+            .id("123")
+            .operator(BoolMultiQuery.Operator.AND)
+            .queryList(List.of(boolQueryAnd1, boolQueryAnd2))
+            .outcomeTrue(outcome1)
+            .build();
+    BoolMultiQuery boolMultiQuery2 =
+        BoolMultiQuery.builder()
+            .id("124")
+            .operator(BoolMultiQuery.Operator.AND)
+            .queryList(List.of(boolQueryAnd1b, boolQueryAnd2b))
+            .outcomeTrue(outcome2)
+            .build();
     List<BoolMultiQuery> clauses = List.of(boolMultiQuery1, boolMultiQuery2);
 
     BoolMultiNode node =
@@ -218,9 +249,13 @@ class BoolMultiNodeEvaluatorTest {
     NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
     NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
 
-    BoolMultiQuery boolMultiQuery1 = BoolMultiQuery.builder().id("123")
-        .operator(BoolMultiQuery.Operator.OR)
-        .queryList(List.of(boolQueryOr1, boolQueryOr2)).outcomeTrue(outcome1).build();
+    BoolMultiQuery boolMultiQuery1 =
+        BoolMultiQuery.builder()
+            .id("123")
+            .operator(BoolMultiQuery.Operator.OR)
+            .queryList(List.of(boolQueryOr1, boolQueryOr2))
+            .outcomeTrue(outcome1)
+            .build();
     List<BoolMultiQuery> clauses = List.of(boolMultiQuery1);
 
     BoolMultiNode node =
@@ -250,9 +285,13 @@ class BoolMultiNodeEvaluatorTest {
     NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
     NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
 
-    BoolMultiQuery boolMultiQuery1 = BoolMultiQuery.builder().id("123")
-        .operator(BoolMultiQuery.Operator.OR)
-        .queryList(List.of(boolQuery)).outcomeTrue(outcome1).build();
+    BoolMultiQuery boolMultiQuery1 =
+        BoolMultiQuery.builder()
+            .id("123")
+            .operator(BoolMultiQuery.Operator.OR)
+            .queryList(List.of(boolQuery))
+            .outcomeTrue(outcome1)
+            .build();
     List<BoolMultiQuery> clauses = List.of(boolMultiQuery1);
 
     BoolMultiNode node =
@@ -281,9 +320,13 @@ class BoolMultiNodeEvaluatorTest {
     NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
     NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
 
-    BoolMultiQuery boolMultiQuery1 = BoolMultiQuery.builder().id("123")
-        .operator(BoolMultiQuery.Operator.OR)
-        .queryList(List.of(boolQuery)).outcomeTrue(outcome1).build();
+    BoolMultiQuery boolMultiQuery1 =
+        BoolMultiQuery.builder()
+            .id("123")
+            .operator(BoolMultiQuery.Operator.OR)
+            .queryList(List.of(boolQuery))
+            .outcomeTrue(outcome1)
+            .build();
     List<BoolMultiQuery> clauses = List.of(boolMultiQuery1);
 
     BoolMultiNode node =
@@ -311,9 +354,13 @@ class BoolMultiNodeEvaluatorTest {
     NodeOutcome outcomeMissing = mock(NodeOutcome.class, "outcomeMissing");
     NodeOutcome outcome1 = mock(NodeOutcome.class, "outcome1");
 
-    BoolMultiQuery boolMultiQuery1 = BoolMultiQuery.builder().id("123")
-        .operator(BoolMultiQuery.Operator.OR)
-        .queryList(List.of(boolQuery)).outcomeTrue(outcome1).build();
+    BoolMultiQuery boolMultiQuery1 =
+        BoolMultiQuery.builder()
+            .id("123")
+            .operator(BoolMultiQuery.Operator.OR)
+            .queryList(List.of(boolQuery))
+            .outcomeTrue(outcome1)
+            .build();
     List<BoolMultiQuery> clauses = List.of(boolMultiQuery1);
 
     BoolMultiNode node =
@@ -330,5 +377,4 @@ class BoolMultiNodeEvaluatorTest {
 
     assertEquals(outcomeMissing, boolMultiNodeEvaluator.evaluate(node, variant, null));
   }
-
 }

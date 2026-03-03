@@ -18,10 +18,6 @@ public class ExistsNode implements DecisionNode {
   String description;
 
   @NonNull DecisionType decisionType = DecisionType.EXISTS;
-  @NonFinal
-  @Setter
-  NodeOutcome outcomeTrue;
-  @NonFinal
-  @Setter
-  NodeOutcome outcomeFalse;
+  @NonFinal @Setter NodeOutcome outcomeTrue;
+  @NonFinal @Setter NodeOutcome outcomeFalse;
 }

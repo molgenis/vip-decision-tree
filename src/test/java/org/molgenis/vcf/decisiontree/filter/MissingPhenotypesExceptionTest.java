@@ -3,7 +3,6 @@ package org.molgenis.vcf.decisiontree.filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 
 class MissingPhenotypesExceptionTest {
 

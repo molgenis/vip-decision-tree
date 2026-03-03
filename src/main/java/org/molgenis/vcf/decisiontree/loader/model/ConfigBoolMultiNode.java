@@ -30,10 +30,6 @@ public class ConfigBoolMultiNode implements ConfigNode {
   @NonNull List<String> fields;
   @NonNull List<ConfigBoolMultiQuery> outcomes;
 
-  @NonFinal
-  @Setter
-  ConfigNodeOutcome outcomeMissing;
-  @NonFinal
-  @Setter
-  ConfigNodeOutcome outcomeDefault;
+  @NonFinal @Setter ConfigNodeOutcome outcomeMissing;
+  @NonFinal @Setter ConfigNodeOutcome outcomeDefault;
 }

@@ -18,7 +18,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNode> {
 
-  public enum TripleBoolean {TRUE, FALSE, MISSING}
+  public enum TripleBoolean {
+    TRUE,
+    FALSE,
+    MISSING
+  }
 
   @Override
   public NodeOutcome evaluate(
@@ -49,8 +53,8 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
     return false;
   }
 
-  private TripleBoolean evaluateClause(Variant variant,
-      BoolMultiQuery clause, @Nullable SampleContext sampleContext) {
+  private TripleBoolean evaluateClause(
+      Variant variant, BoolMultiQuery clause, @Nullable SampleContext sampleContext) {
     TripleBoolean outcome = FALSE;
     if (clause.getQueryList().size() == 1) {
       BoolQuery query = clause.getQueryList().get(0);
@@ -69,8 +73,8 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
     return outcome;
   }
 
-  private boolean evaluateMultiQuery(BoolMultiQuery clause, Variant variant,
-      SampleContext sampleContext) {
+  private boolean evaluateMultiQuery(
+      BoolMultiQuery clause, Variant variant, SampleContext sampleContext) {
     if (clause.getOperator() == AND) {
       if (allQueriesMatch(clause, variant, sampleContext)) {
         return true;
@@ -86,8 +90,8 @@ public class BoolMultiNodeEvaluator implements BaseBoolNodeEvaluator<BoolMultiNo
     return false;
   }
 
-  private boolean allQueriesMatch(BoolMultiQuery clause, Variant variant,
-      SampleContext sampleContext) {
+  private boolean allQueriesMatch(
+      BoolMultiQuery clause, Variant variant, SampleContext sampleContext) {
     for (BoolQuery query : clause.getQueryList()) {
       query = postProcessQuery(query, variant, sampleContext);
       Object value = variant.getValue(query.getField(), sampleContext);

@@ -25,14 +25,12 @@ import org.molgenis.vcf.decisiontree.filter.model.Node;
 @ExtendWith(MockitoExtension.class)
 class SampleAnnotatorImplTest {
 
-  @Mock
-  VariantContextBuilder vc;
+  @Mock VariantContextBuilder vc;
 
   SampleAnnotator sampleAnnotator = new SampleAnnotatorImpl(false, false);
 
   @BeforeEach
-  void setUp() {
-  }
+  void setUp() {}
 
   @Test
   void annotate() {
@@ -52,8 +50,7 @@ class SampleAnnotatorImplTest {
 
     Node node1 = mock(Node.class);
     Label label1 = mock(Label.class);
-    sampleAnnotator.annotate(
-        List.of(new Decision("TEST", List.of(node1), Set.of(label1))), 0, vc);
+    sampleAnnotator.annotate(List.of(new Decision("TEST", List.of(node1), Set.of(label1))), 0, vc);
     ArgumentCaptor<GenotypesContext> captor = ArgumentCaptor.forClass(GenotypesContext.class);
     verify(vc).genotypes(captor.capture());
     assertEquals(List.of("TEST"), captor.getValue().get(0).getExtendedAttribute(VIPC_S));

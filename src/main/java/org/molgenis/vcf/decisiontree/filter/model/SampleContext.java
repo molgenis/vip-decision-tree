@@ -14,9 +14,7 @@ import org.molgenis.vcf.utils.sample.model.Sex;
 public class SampleContext {
 
   @NonNull String id;
-  @NonFinal
-  @Setter
-  Integer index;
+  @NonFinal @Setter Integer index;
   @NonNull Sex sex;
   @NonNull AffectedStatus affectedStatus;
   String fatherId;

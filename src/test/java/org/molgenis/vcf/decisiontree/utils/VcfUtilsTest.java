@@ -318,7 +318,7 @@ class VcfUtilsTest {
     when(field.getFieldType()).thenReturn(FieldType.FORMAT);
     List<String> values = singletonList("");
     VariantContext variantContext =
-            when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
+        when(mock(VariantContext.class).getAttribute(key)).thenReturn(values).getMock();
 
     assertEquals(singletonList(null), VcfUtils.getInfoAsDoubleList(variantContext, field));
   }

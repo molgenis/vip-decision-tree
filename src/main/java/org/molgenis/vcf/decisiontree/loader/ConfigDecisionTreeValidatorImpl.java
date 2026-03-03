@@ -62,8 +62,8 @@ public class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValida
     nodes.forEach((key, value) -> validateNode(key, value, nodes, files));
   }
 
-  private void validateNode(String id, ConfigNode node, Map<String, ConfigNode> nodes,
-      Map<String, Path> files) {
+  private void validateNode(
+      String id, ConfigNode node, Map<String, ConfigNode> nodes, Map<String, Path> files) {
     validateAlphanumericValue("id", id);
     validateLabel(node, id);
     switch (node.getType()) {
@@ -88,9 +88,9 @@ public class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValida
   }
 
   private void validateLabel(ConfigNode node, String id) {
-    if(node.getLabel() == null){
+    if (node.getLabel() == null) {
       throw new ConfigDecisionTreeValidationException(
-              format("Required field 'label' is missing for node '%s'", id));
+          format("Required field 'label' is missing for node '%s'", id));
     }
   }
 
@@ -100,8 +100,8 @@ public class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValida
     validateField(node.getField(), id);
   }
 
-  private void validateBoolNode(String id, ConfigBoolNode node, Map<String, ConfigNode> nodes,
-      Map<String, Path> files) {
+  private void validateBoolNode(
+      String id, ConfigBoolNode node, Map<String, ConfigNode> nodes, Map<String, Path> files) {
     validateValue(id, node.getQuery(), files);
     validateQueryValue(node.getQuery(), id);
     validateOutcome(id, OUTCOME_TRUE, nodes, node.getOutcomeTrue());
@@ -113,9 +113,9 @@ public class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValida
     validateField(query.getField(), nodeId);
     if (List.of(CONTAINS_NONE, CONTAINS_ALL, CONTAINS_ANY, IN).contains(query.getOperator())) {
       Object value = query.getValue();
-      if (!(value instanceof Collection<?>) && !value.toString().startsWith(FILE_PREFIX)
-          && !value.toString()
-          .startsWith(FIELD_PREFIX)) {
+      if (!(value instanceof Collection<?>)
+          && !value.toString().startsWith(FILE_PREFIX)
+          && !value.toString().startsWith(FIELD_PREFIX)) {
         throw new ConfigDecisionTreeValidationException(
             format(
                 "The query for field '%s' with operator '%s' should have a collection as value",
@@ -124,8 +124,8 @@ public class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValida
     }
   }
 
-  private void validateBoolMultiNode(String id, ConfigBoolMultiNode node,
-      Map<String, ConfigNode> nodes, Map<String, Path> files) {
+  private void validateBoolMultiNode(
+      String id, ConfigBoolMultiNode node, Map<String, ConfigNode> nodes, Map<String, Path> files) {
     validateFields(node);
     validateOutcomes(id, node.getOutcomes(), nodes, files);
     validateOutcome(id, OUTCOME_MISSING, nodes, node.getOutcomeMissing());
@@ -147,21 +147,25 @@ public class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValida
     }
   }
 
-  private void validateOutcomes(String id, List<ConfigBoolMultiQuery> outcomes,
+  private void validateOutcomes(
+      String id,
+      List<ConfigBoolMultiQuery> outcomes,
       Map<String, ConfigNode> nodes,
       Map<String, Path> files) {
     for (ConfigBoolMultiQuery outcome : outcomes) {
       if (outcome.getQueries().size() == 1) {
         if (outcome.getOperator() != null) {
-          throw new ConfigDecisionTreeValidationException(String.format(
-              "MultiBool node '%s' contains an outcome with a single query but with an operator.",
-              id));
+          throw new ConfigDecisionTreeValidationException(
+              String.format(
+                  "MultiBool node '%s' contains an outcome with a single query but with an operator.",
+                  id));
         }
       } else if (outcome.getQueries().size() > 1) {
         if (outcome.getOperator() == null) {
-          throw new ConfigDecisionTreeValidationException(String.format(
-              "MultiBool node '%s' contains an outcome with multiple queries but without an operator.",
-              id));
+          throw new ConfigDecisionTreeValidationException(
+              String.format(
+                  "MultiBool node '%s' contains an outcome with multiple queries but without an operator.",
+                  id));
         }
       } else {
         throw new ConfigDecisionTreeValidationException(
@@ -210,20 +214,24 @@ public class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValida
     if (fieldType == FieldType.SAMPLE) {
       String parentField = fieldTokens.get(0);
       String childField = fieldTokens.get(1);
-      if (Arrays.stream(SampleFieldType.values()).map(SampleFieldType::name)
+      if (Arrays.stream(SampleFieldType.values())
+          .map(SampleFieldType::name)
           .noneMatch(enumValue -> enumValue.equals(childField))) {
         throw new ConfigDecisionTreeValidationException(
-            format("Field '%s' is not a valid child of field '%s' in node '%s'.", childField,
-                parentField, nodeId));
+            format(
+                "Field '%s' is not a valid child of field '%s' in node '%s'.",
+                childField, parentField, nodeId));
       }
     } else if (fieldType == FieldType.GENOTYPE) {
       String parentField = fieldTokens.get(1);
       String childField = fieldTokens.get(2);
-      if (Arrays.stream(GenotypeFieldType.values()).map(GenotypeFieldType::name)
+      if (Arrays.stream(GenotypeFieldType.values())
+          .map(GenotypeFieldType::name)
           .noneMatch(enumValue -> enumValue.equals(childField))) {
         throw new ConfigDecisionTreeValidationException(
-            format("Field '%s' is not a valid child of field '%s' in node '%s'.", childField,
-                parentField, nodeId));
+            format(
+                "Field '%s' is not a valid child of field '%s' in node '%s'.",
+                childField, parentField, nodeId));
       }
     }
   }

@@ -37,5 +37,4 @@ public class BoolNodeEvaluator implements BaseBoolNodeEvaluator<BoolNode> {
 
     return nodeOutcome;
   }
-
 }

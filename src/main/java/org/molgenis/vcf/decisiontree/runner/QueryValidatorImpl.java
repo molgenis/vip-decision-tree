@@ -1,5 +1,7 @@
 package org.molgenis.vcf.decisiontree.runner;
 
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.*;
+
 import java.util.Collection;
 import java.util.Set;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
@@ -13,12 +15,11 @@ import org.molgenis.vcf.utils.metadata.ValueCount;
 import org.molgenis.vcf.utils.metadata.ValueType;
 import org.springframework.stereotype.Component;
 
-import static org.molgenis.vcf.decisiontree.loader.model.ConfigOperator.*;
-
 @Component
 public class QueryValidatorImpl implements QueryValidator {
 
-  public static final Set<ConfigOperator> ALLOWED_FILE_OPERATORS = Set.of(IN, NOT_IN, CONTAINS, NOT_CONTAINS, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_NONE);
+  public static final Set<ConfigOperator> ALLOWED_FILE_OPERATORS =
+      Set.of(IN, NOT_IN, CONTAINS, NOT_CONTAINS, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_NONE);
 
   @Override
   public void validateBooleanNode(ConfigBoolQuery configBoolQuery, Field field) {
@@ -44,10 +45,10 @@ public class QueryValidatorImpl implements QueryValidator {
 
   private void validateFileValueAllowed(ConfigBoolQuery query, Field field) {
     ConfigOperator operator = query.getOperator();
-    if (!ALLOWED_FILE_OPERATORS.contains(operator) && query.getValue().toString().startsWith(
-        BoolNode.FILE_PREFIX)) {
-      throw new FileValueNotAllowedException(operator, ALLOWED_FILE_OPERATORS.toString(),
-          field.getId());
+    if (!ALLOWED_FILE_OPERATORS.contains(operator)
+        && query.getValue().toString().startsWith(BoolNode.FILE_PREFIX)) {
+      throw new FileValueNotAllowedException(
+          operator, ALLOWED_FILE_OPERATORS.toString(), field.getId());
     }
   }
 
@@ -85,9 +86,10 @@ public class QueryValidatorImpl implements QueryValidator {
     }
   }
 
-  private void validateSingleOrPerAlleleCount(Field field, DecisionType decisionType, ConfigOperator configOperator) {
-    if (field.getValueCount().getType() == ValueCount.Type.G ||
-        field.getValueCount().getType() == ValueCount.Type.VARIABLE) {
+  private void validateSingleOrPerAlleleCount(
+      Field field, DecisionType decisionType, ConfigOperator configOperator) {
+    if (field.getValueCount().getType() == ValueCount.Type.G
+        || field.getValueCount().getType() == ValueCount.Type.VARIABLE) {
       throw new UnsupportedValueCountTypeException(field, decisionType, configOperator);
     } else if (field.getValueCount().getType() == ValueCount.Type.FIXED
         && field.getValueCount().getCount() != 1) {

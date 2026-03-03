@@ -1,5 +1,7 @@
 package org.molgenis.vcf.decisiontree.loader;
 
+import static java.util.Objects.requireNonNull;
+
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.ObjectCodec;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -7,8 +9,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.nio.file.Path;
-
-import static java.util.Objects.requireNonNull;
 
 public class PathDeserializer extends JsonDeserializer<Path> {
   private final Path rootPath;

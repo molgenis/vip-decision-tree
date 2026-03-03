@@ -26,7 +26,6 @@ public class Variant {
   }
 
   public String toDisplayString() {
-    return String.format(
-        "%s -> %s", vcfRecord.toDisplayString(), allele.getBases());
+    return String.format("%s -> %s", vcfRecord.toDisplayString(), allele.getBases());
   }
 }

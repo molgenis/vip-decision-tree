@@ -24,9 +24,7 @@ import org.molgenis.vcf.utils.metadata.ValueCount;
 import org.molgenis.vcf.utils.metadata.ValueCount.ValueCountBuilder;
 import org.molgenis.vcf.utils.metadata.ValueType;
 
-/**
- * {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields).
- */
+/** {@link VCFHeader} wrapper that works with nested metadata (e.g. CSQ INFO fields). */
 public class VcfMetadata {
 
   private final VCFHeader vcfHeader;
@@ -34,8 +32,11 @@ public class VcfMetadata {
   private final NestedHeaderLine nestedVepHeaderLine;
   private final NestedHeaderLine nestedGenotypeHeaderLine;
 
-  public VcfMetadata(VCFHeader vcfHeader, NestedHeaderLine nestedVepHeaderLine,
-      NestedHeaderLine nestedGenotypeHeaderLine, boolean strict) {
+  public VcfMetadata(
+      VCFHeader vcfHeader,
+      NestedHeaderLine nestedVepHeaderLine,
+      NestedHeaderLine nestedGenotypeHeaderLine,
+      boolean strict) {
     this.vcfHeader = requireNonNull(vcfHeader);
     this.nestedVepHeaderLine = requireNonNull(nestedVepHeaderLine);
     this.nestedGenotypeHeaderLine = requireNonNull(nestedGenotypeHeaderLine);
@@ -47,15 +48,16 @@ public class VcfMetadata {
 
     Field field;
     FieldType fieldType = toFieldType(fieldTokens);
-    field = switch (fieldType) {
-      case COMMON -> toCommonField(fieldTokens);
-      case INFO, FORMAT -> toCompoundField(fieldTokens, fieldType);
-      case SAMPLE -> toSampleField(fieldTokens);
-      case INFO_VEP -> toNestedField(fieldTokens, fieldType, nestedVepHeaderLine);
-      case GENOTYPE -> toNestedField(fieldTokens, fieldType, nestedGenotypeHeaderLine);
-      //noinspection UnnecessaryDefault
-      default -> throw new UnexpectedEnumException(fieldType);
-    };
+    field =
+        switch (fieldType) {
+          case COMMON -> toCommonField(fieldTokens);
+          case INFO, FORMAT -> toCompoundField(fieldTokens, fieldType);
+          case SAMPLE -> toSampleField(fieldTokens);
+          case INFO_VEP -> toNestedField(fieldTokens, fieldType, nestedVepHeaderLine);
+          case GENOTYPE -> toNestedField(fieldTokens, fieldType, nestedGenotypeHeaderLine);
+          //noinspection UnnecessaryDefault
+          default -> throw new UnexpectedEnumException(fieldType);
+        };
 
     return field;
   }
@@ -91,8 +93,8 @@ public class VcfMetadata {
         .build();
   }
 
-  private Field toNestedField(List<String> fieldTokens, FieldType fieldType,
-      NestedHeaderLine nestedHeaderLine) {
+  private Field toNestedField(
+      List<String> fieldTokens, FieldType fieldType, NestedHeaderLine nestedHeaderLine) {
     if (fieldTokens.size() != 3) {
       throw new InvalidNumberOfTokensException(fieldTokens, fieldType, 2);
     }
@@ -138,7 +140,8 @@ public class VcfMetadata {
       }
       case "QUAL" -> {
         valueType = ValueType.FLOAT;
-        valueCount = ValueCount.builder().type(ValueCount.Type.FIXED).count(1).nullable(true).build();
+        valueCount =
+            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).nullable(true).build();
       }
       default -> throw new UnsupportedFieldException(field);
     }
@@ -163,15 +166,16 @@ public class VcfMetadata {
 
     ValueType valueType;
     VCFHeaderLineType lineType = vcfCompoundHeaderLine.getType();
-    valueType = switch (lineType) {
-      case Integer -> ValueType.INTEGER;
-      case Float -> ValueType.FLOAT;
-      case String -> ValueType.STRING;
-      case Character -> ValueType.CHARACTER;
-      case Flag -> ValueType.FLAG;
-      //noinspection UnnecessaryDefault
-      default -> throw new UnexpectedEnumException(lineType);
-    };
+    valueType =
+        switch (lineType) {
+          case Integer -> ValueType.INTEGER;
+          case Float -> ValueType.FLOAT;
+          case String -> ValueType.STRING;
+          case Character -> ValueType.CHARACTER;
+          case Flag -> ValueType.FLAG;
+          //noinspection UnnecessaryDefault
+          default -> throw new UnexpectedEnumException(lineType);
+        };
 
     ValueCountBuilder builder = ValueCount.builder();
     VCFHeaderLineCount countType = vcfCompoundHeaderLine.getCountType();
@@ -216,11 +220,13 @@ public class VcfMetadata {
   }
 
   public static boolean isSingleValueField(Field field) {
-    return field.getValueCount().getType() == ValueCount.Type.FIXED && field.getValueCount().getCount() <= 1;
+    return field.getValueCount().getType() == ValueCount.Type.FIXED
+        && field.getValueCount().getCount() <= 1;
   }
 
   public static boolean isPerAlleleValue(Field field) {
-    return field.getValueCount().getType() == ValueCount.Type.A && field.getValueType() != ValueType.FLAG;
+    return field.getValueCount().getType() == ValueCount.Type.A
+        && field.getValueType() != ValueType.FLAG;
   }
 
   public Map<String, Integer> getSampleNameToOffset() {

@@ -17,8 +17,9 @@ class VcfReaderFactoryImpl implements VcfReaderFactory {
   private final GenotypeMetadataMapper genotypeMetadataMapper;
   private final VepMetadataMapperFactory vepMetadataMapperFactory;
 
-  VcfReaderFactoryImpl(VepMetadataMapperFactory vepMetadataMapperFactory,
-                       GenotypeMetadataMapper genotypeMetadataMapper) {
+  VcfReaderFactoryImpl(
+      VepMetadataMapperFactory vepMetadataMapperFactory,
+      GenotypeMetadataMapper genotypeMetadataMapper) {
     this.vepMetadataMapperFactory = requireNonNull(vepMetadataMapperFactory);
     this.genotypeMetadataMapper = requireNonNull(genotypeMetadataMapper);
   }
@@ -29,7 +30,9 @@ class VcfReaderFactoryImpl implements VcfReaderFactory {
 
     Path inputVcfPath = settings.getInputVcfPath();
     boolean strict = settings.isStrict();
-    return new VcfReader(new VCFFileReader(inputVcfPath.toFile(), false), vepMetadataMapper,
+    return new VcfReader(
+        new VCFFileReader(inputVcfPath.toFile(), false),
+        vepMetadataMapper,
         genotypeMetadataMapper,
         strict);
   }

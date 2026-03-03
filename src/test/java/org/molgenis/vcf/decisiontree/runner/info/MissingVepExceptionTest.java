@@ -9,7 +9,6 @@ class MissingVepExceptionTest {
   @Test
   void getMessage() {
     assertEquals(
-        "Input VCF is missing required VEP annotation.",
-        new MissingVepException().getMessage());
+        "Input VCF is missing required VEP annotation.", new MissingVepException().getMessage());
   }
 }

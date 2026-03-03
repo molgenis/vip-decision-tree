@@ -11,6 +11,8 @@ class InvalidNumberOfTokensExceptionTest {
   void getMessage() {
     assertEquals(
         "Unsupported number of tokens for input 'INFO,NAME,SUBFIELD,SUBFIELD' expecting 6 tokens for fieldtype 'FORMAT'.",
-        new InvalidNumberOfTokensException(Arrays.asList("INFO","NAME","SUBFIELD","SUBFIELD"), FieldType.FORMAT, 6).getMessage());
+        new InvalidNumberOfTokensException(
+                Arrays.asList("INFO", "NAME", "SUBFIELD", "SUBFIELD"), FieldType.FORMAT, 6)
+            .getMessage());
   }
 }

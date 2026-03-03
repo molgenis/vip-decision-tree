@@ -7,9 +7,9 @@ import java.util.List;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 
 public class InvalidNumberOfTokensException extends RuntimeException {
-  @Serial
-  private static final long serialVersionUID = 1L;
-  private static final String MESSAGE = "Unsupported number of tokens for input '%s' expecting %d tokens for fieldtype '%s'.";
+  @Serial private static final long serialVersionUID = 1L;
+  private static final String MESSAGE =
+      "Unsupported number of tokens for input '%s' expecting %d tokens for fieldtype '%s'.";
   private final List<String> fieldTokens;
   private final FieldType type;
   private final int expected;
@@ -24,5 +24,4 @@ public class InvalidNumberOfTokensException extends RuntimeException {
   public String getMessage() {
     return format(MESSAGE, String.join(",", fieldTokens), expected, type);
   }
-
 }

@@ -19,15 +19,8 @@ public class BoolMultiNode implements DecisionNode {
 
   @NonNull DecisionType decisionType = DecisionType.BOOL_MULTI;
   @NonNull List<Field> fields;
-  @NonNull
-  @NonFinal
-  @Setter
-  List<BoolMultiQuery> clauses;
+  @NonNull @NonFinal @Setter List<BoolMultiQuery> clauses;
 
-  @NonFinal
-  @Setter
-  NodeOutcome outcomeMissing;
-  @NonFinal
-  @Setter
-  NodeOutcome outcomeDefault;
+  @NonFinal @Setter NodeOutcome outcomeMissing;
+  @NonFinal @Setter NodeOutcome outcomeDefault;
 }

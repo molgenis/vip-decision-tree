@@ -29,8 +29,7 @@ import org.molgenis.vcf.utils.sample.model.Sex;
 
 public class SamplesContextFactory {
 
-  private SamplesContextFactory() {
-  }
+  private SamplesContextFactory() {}
 
   public static final String SAMPLE_PHENOTYPE_SEPARATOR = "/";
   public static final String PHENOTYPE_SEPARATOR = ";";
@@ -52,9 +51,8 @@ public class SamplesContextFactory {
     Set<String> processedSamples = new LinkedHashSet<>();
     for (Path pedigreePath : sampleSettings.getPedigreePaths()) {
       try (PedReader reader = new PedReader(new FileReader(pedigreePath.toFile()))) {
-        Map<String, SampleContext> sampleContextMap = parse(reader, probands, phenotypesPerSample,
-            defaultPhenotypes,
-            vcfSampleNames);
+        Map<String, SampleContext> sampleContextMap =
+            parse(reader, probands, phenotypesPerSample, defaultPhenotypes, vcfSampleNames);
         sampleContexts.addAll(sampleContextMap.values());
         processedSamples.addAll(sampleContextMap.keySet());
       } catch (IOException e) {
@@ -64,19 +62,28 @@ public class SamplesContextFactory {
     }
 
     if (!vcfSampleNames.keySet().containsAll(probands)) {
-      List<String> unmatchedProbands = probands.stream()
-          .filter(proband -> !vcfSampleNames.containsKey(proband)).toList();
+      List<String> unmatchedProbands =
+          probands.stream().filter(proband -> !vcfSampleNames.containsKey(proband)).toList();
       throw new MissingProbandsException(unmatchedProbands);
     }
 
-    vcfSampleNames.keySet().stream().filter(sampleId -> !processedSamples.contains(sampleId))
-        .forEach(sampleId -> sampleContexts.add(
-            createDefaultSampleContext(sampleId, vcfSampleNames.get(sampleId),
-                defaultPhenotypes, phenotypesPerSample, probands)));
+    vcfSampleNames.keySet().stream()
+        .filter(sampleId -> !processedSamples.contains(sampleId))
+        .forEach(
+            sampleId ->
+                sampleContexts.add(
+                    createDefaultSampleContext(
+                        sampleId,
+                        vcfSampleNames.get(sampleId),
+                        defaultPhenotypes,
+                        phenotypesPerSample,
+                        probands)));
 
-    return SamplesContext.builder().sampleContexts(
-            sampleContexts.stream().filter(sampleContext -> sampleContext.getIndex() != -1).collect(
-                Collectors.toSet()))
+    return SamplesContext.builder()
+        .sampleContexts(
+            sampleContexts.stream()
+                .filter(sampleContext -> sampleContext.getIndex() != -1)
+                .collect(Collectors.toSet()))
         .build();
   }
 
@@ -99,10 +106,14 @@ public class SamplesContextFactory {
     return result;
   }
 
-  public static SampleContext createDefaultSampleContext(String sampleId, Integer sampleIndex,
-      List<String> defaultPhenotypes, Map<String, List<String>> phenotypesPerSample,
+  public static SampleContext createDefaultSampleContext(
+      String sampleId,
+      Integer sampleIndex,
+      List<String> defaultPhenotypes,
+      Map<String, List<String>> phenotypesPerSample,
       List<String> probands) {
-    return SampleContext.builder().id(sampleId)
+    return SampleContext.builder()
+        .id(sampleId)
         .index(sampleIndex)
         .affectedStatus(AffectedStatus.MISSING)
         .sex(Sex.UNKNOWN)
@@ -110,14 +121,17 @@ public class SamplesContextFactory {
         .fatherId(null)
         .motherId(null)
         .proband(isProband(probands, sampleId))
-        .phenotypes(getSamplePhenotypes(sampleId, AffectedStatus.MISSING,
-            phenotypesPerSample, defaultPhenotypes))
+        .phenotypes(
+            getSamplePhenotypes(
+                sampleId, AffectedStatus.MISSING, phenotypesPerSample, defaultPhenotypes))
         .build();
   }
 
-  private static List<String> getSamplePhenotypes(String sampleId,
+  private static List<String> getSamplePhenotypes(
+      String sampleId,
       AffectedStatus affectedStatus,
-      Map<String, List<String>> phenotypesPerSample, List<String> defaultPhenotypes) {
+      Map<String, List<String>> phenotypesPerSample,
+      List<String> defaultPhenotypes) {
     if (phenotypesPerSample.containsKey(sampleId)) {
       return phenotypesPerSample.get(sampleId);
     } else {
@@ -129,24 +143,35 @@ public class SamplesContextFactory {
     }
   }
 
-  private static Map<String, SampleContext> parse(PedReader reader, List<String> probands,
-      Map<String, List<String>> phenotypesPerSample, List<String> defaultPhenotypes,
+  private static Map<String, SampleContext> parse(
+      PedReader reader,
+      List<String> probands,
+      Map<String, List<String>> phenotypesPerSample,
+      List<String> defaultPhenotypes,
       Map<String, Integer> vcfSampleNames) {
     final Map<String, SampleContext> samplesContextMap = new HashMap<>();
     StreamSupport.stream(Spliterators.spliteratorUnknownSize(reader.iterator(), 0), false)
         .filter(pedIndividual -> vcfSampleNames.containsKey(pedIndividual.getId()))
-        .map(individual -> map(individual, probands,
-            getSamplePhenotypes(individual.getId(), map(individual.getAffectionStatus()),
-                phenotypesPerSample, defaultPhenotypes),
-            vcfSampleNames.get(individual.getId())))
-        .filter(person -> person.getIndex() != -1).forEach(person -> samplesContextMap
-            .put(person.getId(), person));
+        .map(
+            individual ->
+                map(
+                    individual,
+                    probands,
+                    getSamplePhenotypes(
+                        individual.getId(),
+                        map(individual.getAffectionStatus()),
+                        phenotypesPerSample,
+                        defaultPhenotypes),
+                    vcfSampleNames.get(individual.getId())))
+        .filter(person -> person.getIndex() != -1)
+        .forEach(person -> samplesContextMap.put(person.getId(), person));
     return samplesContextMap;
   }
 
-  private static SampleContext map(PedIndividual pedIndividual, List<String> probands,
-      List<String> phenotypes, int index) {
-    return SampleContext.builder().id(pedIndividual.getId())
+  private static SampleContext map(
+      PedIndividual pedIndividual, List<String> probands, List<String> phenotypes, int index) {
+    return SampleContext.builder()
+        .id(pedIndividual.getId())
         .index(index)
         .affectedStatus(map(pedIndividual.getAffectionStatus()))
         .sex(map(pedIndividual.getSex()))
@@ -154,7 +179,8 @@ public class SamplesContextFactory {
         .fatherId(pedIndividual.getPaternalId())
         .motherId(pedIndividual.getMaternalId())
         .proband(isProband(probands, pedIndividual.getId()))
-        .phenotypes(phenotypes).build();
+        .phenotypes(phenotypes)
+        .build();
   }
 
   private static Sex map(PedIndividual.Sex sex) {

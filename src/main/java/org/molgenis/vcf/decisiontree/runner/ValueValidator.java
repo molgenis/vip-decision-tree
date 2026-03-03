@@ -34,11 +34,12 @@ import org.molgenis.vcf.utils.sample.model.Sex;
 
 public class ValueValidator {
 
-  public static final String MESSAGE = "Query value '%s' is of type '%s' while INFO field is of type '%s' for node '%s'.";
-  public static final String INVALID_ENUM_MESSAGE = "Value '%s' is not a valid value for '%s', valid values: %s.";
+  public static final String MESSAGE =
+      "Query value '%s' is of type '%s' while INFO field is of type '%s' for node '%s'.";
+  public static final String INVALID_ENUM_MESSAGE =
+      "Value '%s' is not a valid value for '%s', valid values: %s.";
 
-  private ValueValidator() {
-  }
+  private ValueValidator() {}
 
   public static void validate(ConfigDecisionTree configDecisionTree, VcfMetadata vcfMetadata) {
     Map<String, ConfigNode> nodes = configDecisionTree.getNodes();
@@ -53,9 +54,13 @@ public class ValueValidator {
         break;
       case BOOL_MULTI:
         ConfigBoolMultiNode boolMultiNode = (ConfigBoolMultiNode) node;
-        boolMultiNode.getOutcomes().forEach(
-            configBoolMultiQuery -> configBoolMultiQuery.getQueries()
-                .forEach(query -> validateQueryValue(nodeId, query, vcfMetadata)));
+        boolMultiNode
+            .getOutcomes()
+            .forEach(
+                configBoolMultiQuery ->
+                    configBoolMultiQuery
+                        .getQueries()
+                        .forEach(query -> validateQueryValue(nodeId, query, vcfMetadata)));
         break;
       case CATEGORICAL, EXISTS, LEAF:
         break;
@@ -64,8 +69,8 @@ public class ValueValidator {
     }
   }
 
-  private static void validateQueryValue(String nodeId, ConfigBoolQuery query,
-      VcfMetadata vcfMetadata) {
+  private static void validateQueryValue(
+      String nodeId, ConfigBoolQuery query, VcfMetadata vcfMetadata) {
     Field field = vcfMetadata.getField(query.getField());
     if (!(field instanceof MissingField)) {
       Object value = query.getValue();
@@ -79,33 +84,42 @@ public class ValueValidator {
     String sexField = SEX.name();
     String affectedField = AFFECTED_STATUS.name();
     if (field.getId().equals(genotypeTypeField) && field.getFieldType() == GENOTYPE) {
-      if (Arrays.stream(GenotypeType.values()).map(GenotypeType::name)
-          .noneMatch(enumValue -> enumValue.equals(
-              value))) {
+      if (Arrays.stream(GenotypeType.values())
+          .map(GenotypeType::name)
+          .noneMatch(enumValue -> enumValue.equals(value))) {
         throw new ConfigDecisionTreeValidationException(
-            format(INVALID_ENUM_MESSAGE, value,
-                sexField, Arrays.stream(GenotypeType.values()).map(GenotypeType::name).toList()));
+            format(
+                INVALID_ENUM_MESSAGE,
+                value,
+                sexField,
+                Arrays.stream(GenotypeType.values()).map(GenotypeType::name).toList()));
       }
     } else if (field.getFieldType() == SAMPLE) {
       validateSampleEnums(field, value, sexField, affectedField);
     }
   }
 
-  private static void validateSampleEnums(Field field, Object value, String sexField,
-      String affectedField) {
+  private static void validateSampleEnums(
+      Field field, Object value, String sexField, String affectedField) {
     if (field.getId().equals(sexField)) {
-      if (Arrays.stream(Sex.values()).map(Sex::name)
+      if (Arrays.stream(Sex.values())
+          .map(Sex::name)
           .noneMatch(enumValue -> enumValue.equals(value))) {
         throw new ConfigDecisionTreeValidationException(
-            format(INVALID_ENUM_MESSAGE, value,
-                sexField, Arrays.stream(Sex.values()).map(Sex::name).toList()));
+            format(
+                INVALID_ENUM_MESSAGE,
+                value,
+                sexField,
+                Arrays.stream(Sex.values()).map(Sex::name).toList()));
       }
-    } else if (field.getId().equals(affectedField) && Arrays.stream(AffectedStatus.values())
-        .map(AffectedStatus::name)
-        .noneMatch(enumValue -> enumValue.equals(
-            value))) {
+    } else if (field.getId().equals(affectedField)
+        && Arrays.stream(AffectedStatus.values())
+            .map(AffectedStatus::name)
+            .noneMatch(enumValue -> enumValue.equals(value))) {
       throw new ConfigDecisionTreeValidationException(
-          format(INVALID_ENUM_MESSAGE, value,
+          format(
+              INVALID_ENUM_MESSAGE,
+              value,
               affectedField,
               Arrays.stream(AffectedStatus.values()).map(AffectedStatus::name).toList()));
     }
@@ -115,10 +129,11 @@ public class ValueValidator {
     Object value = query.getValue();
     ConfigOperator operator = query.getOperator();
     if (value instanceof Collection<?>) {
-      ((Collection<?>) value).forEach(
-          singleValue -> validateSingleValue(nodeId, singleValue, field.getValueType()));
+      ((Collection<?>) value)
+          .forEach(singleValue -> validateSingleValue(nodeId, singleValue, field.getValueType()));
     } else {
-      if (!(isSingleValueField(field) || isPerAlleleValue(field))&& List.of(EQUALS, NOT_EQUALS).contains(operator)) {
+      if (!(isSingleValueField(field) || isPerAlleleValue(field))
+          && List.of(EQUALS, NOT_EQUALS).contains(operator)) {
         throw new ConfigDecisionTreeValidationException(
             format(
                 "Field '%s' in node '%s' contains a collection of values, therefore the '%s' query value should also have a collection as value.",
@@ -129,8 +144,8 @@ public class ValueValidator {
   }
 
   private static void validateSingleValue(String nodeId, Object singleValue, ValueType valueType) {
-    if (!singleValue.toString().startsWith(FILE_PREFIX) && !singleValue.toString()
-        .startsWith(FIELD_PREFIX)) {
+    if (!singleValue.toString().startsWith(FILE_PREFIX)
+        && !singleValue.toString().startsWith(FIELD_PREFIX)) {
       validateValueTypes(nodeId, singleValue, valueType);
     }
   }
@@ -141,32 +156,28 @@ public class ValueValidator {
         if (!Number.class.isAssignableFrom(singleValue.getClass())) {
           throw new ConfigDecisionTreeValidationException(
               format(
-                  MESSAGE,
-                  singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
+                  MESSAGE, singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
         }
         break;
       case FLAG:
         if (!Boolean.class.isAssignableFrom(singleValue.getClass())) {
           throw new ConfigDecisionTreeValidationException(
               format(
-                  MESSAGE,
-                  singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
+                  MESSAGE, singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
         }
         break;
       case STRING, CATEGORICAL:
         if (!(String.class.isAssignableFrom(singleValue.getClass()))) {
           throw new ConfigDecisionTreeValidationException(
               format(
-                  MESSAGE,
-                  singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
+                  MESSAGE, singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
         }
         break;
       case CHARACTER:
         if (!(String.class.isAssignableFrom(singleValue.getClass()))) {
           throw new ConfigDecisionTreeValidationException(
               format(
-                  MESSAGE,
-                  singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
+                  MESSAGE, singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
         }
         if (singleValue.toString().length() > 1) {
           throw new ConfigDecisionTreeValidationException(
@@ -179,5 +190,4 @@ public class ValueValidator {
         throw new UnexpectedEnumException(valueType);
     }
   }
-
 }

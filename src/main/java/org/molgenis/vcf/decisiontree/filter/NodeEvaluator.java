@@ -7,11 +7,9 @@ import org.springframework.lang.Nullable;
 
 public interface NodeEvaluator<T extends DecisionNode> {
 
-  NodeOutcome evaluate(T node,
-      Variant variant, @Nullable SampleContext sampleContext);
+  NodeOutcome evaluate(T node, Variant variant, @Nullable SampleContext sampleContext);
 
-  default NodeOutcome evaluate(T node,
-      Variant variant) {
+  default NodeOutcome evaluate(T node, Variant variant) {
     return evaluate(node, variant, null);
   }
 }
