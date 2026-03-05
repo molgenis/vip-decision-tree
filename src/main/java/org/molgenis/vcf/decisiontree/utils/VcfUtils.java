@@ -14,12 +14,12 @@ import htsjdk.variant.vcf.VCFConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.UnsupportedFieldException;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.molgenis.vcf.utils.metadata.ValueType;
-import org.springframework.lang.Nullable;
 
 public class VcfUtils {
 
@@ -27,7 +27,7 @@ public class VcfUtils {
 
   private VcfUtils() {}
 
-  public static Integer getInfoAsInteger(VariantContext variantContext, Field field) {
+  public static @Nullable Integer getInfoAsInteger(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
     String missingValue = getMissingValue(field);
     return getVcfValueAsInteger(value, missingValue);
@@ -87,7 +87,7 @@ public class VcfUtils {
     return intValue;
   }
 
-  public static Double getInfoAsDouble(VariantContext variantContext, Field field) {
+  public static @Nullable Double getInfoAsDouble(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
     String missingValue = getMissingValue(field);
     return getVcfValueAsDouble(value, missingValue);
@@ -151,7 +151,7 @@ public class VcfUtils {
     return doubleValue;
   }
 
-  public static String getInfoAsString(VariantContext variantContext, Field field) {
+  public static @Nullable String getInfoAsString(VariantContext variantContext, Field field) {
     Object value = variantContext.getAttribute(field.getId());
     String missingValue = getMissingValue(field);
     return getVcfValueAsString(value, missingValue);
@@ -237,7 +237,8 @@ public class VcfUtils {
     return bool;
   }
 
-  public static Object getTypedVcfValue(Field field, String stringValue, String separator) {
+  public static @Nullable Object getTypedVcfValue(
+      Field field, String stringValue, String separator) {
     Object value;
     if (separator == null) {
       value = getTypedVcfValue(field, stringValue);
@@ -248,7 +249,7 @@ public class VcfUtils {
     return value;
   }
 
-  public static Object getTypedVcfValue(Field field, String stringValue) {
+  public static @Nullable Object getTypedVcfValue(Field field, String stringValue) {
     Object typedValue;
     ValueType valueType = field.getValueType();
     String missingValue = getMissingValue(field);
@@ -271,7 +272,7 @@ public class VcfUtils {
     return typedValue;
   }
 
-  public static Object getTypedVcfListValue(Field field, String stringValue) {
+  public static @Nullable Object getTypedVcfListValue(Field field, String stringValue) {
     String[] stringValues = stringValue.split(",");
     List<Object> values = new ArrayList<>();
     for (String value : stringValues) {

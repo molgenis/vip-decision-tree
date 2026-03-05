@@ -81,6 +81,7 @@ class AppCommandLineRunner implements CommandLineRunner {
     }
   }
 
+  @SuppressWarnings("NullAway")
   private Settings createSettings(String... args) {
     CommandLine commandLine = null;
     try {

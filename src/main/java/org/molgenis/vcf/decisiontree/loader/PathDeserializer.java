@@ -23,6 +23,10 @@ public class PathDeserializer extends JsonDeserializer<Path> {
     ObjectNode root = objectCodec.readTree(jp);
     String pathString = root.get("path").asText();
     Path path = Path.of(pathString);
+    if (rootPath.getParent() == null) {
+      throw new IllegalArgumentException(
+          "Unable to determine directory containing the decision tree.");
+    }
     if (!path.isAbsolute()) {
       path = Path.of(rootPath.getParent().toString(), pathString).normalize();
     }

@@ -77,6 +77,7 @@ public class Visualizer {
     LOGGER.info("Decision tree visualization written to '{}'", outputPath);
   }
 
+  @SuppressWarnings("NullAway")
   private static CommandLine getCommandLine(String[] args) {
     CommandLineParser commandLineParser = new DefaultParser();
     CommandLine commandLine = null;
@@ -160,6 +161,7 @@ public class Visualizer {
     return categoricalOutcomes;
   }
 
+  @SuppressWarnings("NullAway")
   private static void validateCommandLine(CommandLine commandLine) {
     validateInput(commandLine);
     validateOutput(commandLine);

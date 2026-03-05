@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
@@ -13,7 +12,7 @@ import lombok.experimental.NonFinal;
 @NonFinal
 @AllArgsConstructor
 public class Decision {
-  @NonNull String clazz;
-  @NonNull List<Node> path;
-  @NonNull Set<Label> labels;
+  String clazz;
+  List<Node> path;
+  Set<Label> labels;
 }

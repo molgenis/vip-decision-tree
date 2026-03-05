@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
@@ -17,8 +16,8 @@ import lombok.experimental.NonFinal;
 @NonFinal
 public class ConfigDecisionTree {
 
-  @NonNull String rootNode;
-  @NonNull Map<String, ConfigNode> nodes;
+  String rootNode;
+  Map<String, ConfigNode> nodes;
   Map<String, ConfigLabel> labels;
   Map<String, Path> files;
 }

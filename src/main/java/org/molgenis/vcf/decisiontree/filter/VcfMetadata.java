@@ -14,6 +14,7 @@ import htsjdk.variant.vcf.VCFHeaderLineType;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.FieldImpl;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -34,8 +35,8 @@ public class VcfMetadata {
 
   public VcfMetadata(
       VCFHeader vcfHeader,
-      NestedHeaderLine nestedVepHeaderLine,
-      NestedHeaderLine nestedGenotypeHeaderLine,
+      @Nullable NestedHeaderLine nestedVepHeaderLine,
+      @Nullable NestedHeaderLine nestedGenotypeHeaderLine,
       boolean strict) {
     this.vcfHeader = requireNonNull(vcfHeader);
     this.nestedVepHeaderLine = requireNonNull(nestedVepHeaderLine);

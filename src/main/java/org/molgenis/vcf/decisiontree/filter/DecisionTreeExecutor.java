@@ -1,9 +1,9 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
-import org.springframework.lang.Nullable;
 
 public interface DecisionTreeExecutor {
 

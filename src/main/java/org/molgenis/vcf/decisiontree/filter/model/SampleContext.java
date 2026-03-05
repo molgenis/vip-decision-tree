@@ -2,10 +2,10 @@ package org.molgenis.vcf.decisiontree.filter.model;
 
 import java.util.List;
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.utils.sample.model.AffectedStatus;
 import org.molgenis.vcf.utils.sample.model.Sex;
 
@@ -13,13 +13,13 @@ import org.molgenis.vcf.utils.sample.model.Sex;
 @Builder
 public class SampleContext {
 
-  @NonNull String id;
+  String id;
   @NonFinal @Setter Integer index;
-  @NonNull Sex sex;
-  @NonNull AffectedStatus affectedStatus;
-  String fatherId;
-  String motherId;
-  String familyId;
-  @NonNull Boolean proband;
-  @NonNull List<String> phenotypes;
+  Sex sex;
+  AffectedStatus affectedStatus;
+  @Nullable String fatherId;
+  @Nullable String motherId;
+  @Nullable String familyId;
+  Boolean proband;
+  List<String> phenotypes;
 }

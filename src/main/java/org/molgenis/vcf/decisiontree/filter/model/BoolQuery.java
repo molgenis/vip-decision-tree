@@ -1,7 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter.model;
 
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.Value;
 
 @Value
@@ -23,7 +22,7 @@ public class BoolQuery {
     CONTAINS_NONE
   }
 
-  @NonNull Field field;
-  @NonNull Operator operator;
+  Field field;
+  Operator operator;
   Object value;
 }

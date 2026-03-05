@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.molgenis.vcf.decisiontree.SampleSettings;
 import org.molgenis.vcf.decisiontree.Settings;
+import org.molgenis.vcf.decisiontree.filter.UnknownSampleException;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
@@ -70,14 +71,15 @@ public class SamplesContextFactory {
     vcfSampleNames.keySet().stream()
         .filter(sampleId -> !processedSamples.contains(sampleId))
         .forEach(
-            sampleId ->
-                sampleContexts.add(
-                    createDefaultSampleContext(
-                        sampleId,
-                        vcfSampleNames.get(sampleId),
-                        defaultPhenotypes,
-                        phenotypesPerSample,
-                        probands)));
+            sampleId -> {
+              Integer sampleName = vcfSampleNames.get(sampleId);
+              if (sampleName == null) {
+                throw new UnknownSampleException(sampleId);
+              }
+              sampleContexts.add(
+                  createDefaultSampleContext(
+                      sampleId, sampleName, defaultPhenotypes, phenotypesPerSample, probands));
+            });
 
     return SamplesContext.builder()
         .sampleContexts(
@@ -153,16 +155,21 @@ public class SamplesContextFactory {
     StreamSupport.stream(Spliterators.spliteratorUnknownSize(reader.iterator(), 0), false)
         .filter(pedIndividual -> vcfSampleNames.containsKey(pedIndividual.getId()))
         .map(
-            individual ->
-                map(
-                    individual,
-                    probands,
-                    getSamplePhenotypes(
-                        individual.getId(),
-                        map(individual.getAffectionStatus()),
-                        phenotypesPerSample,
-                        defaultPhenotypes),
-                    vcfSampleNames.get(individual.getId())))
+            individual -> {
+              Integer sampleName = vcfSampleNames.get(individual.getId());
+              if (sampleName == null) {
+                throw new UnknownSampleException(individual.getId());
+              }
+              return map(
+                  individual,
+                  probands,
+                  getSamplePhenotypes(
+                      individual.getId(),
+                      map(individual.getAffectionStatus()),
+                      phenotypesPerSample,
+                      defaultPhenotypes),
+                  sampleName);
+            })
         .filter(person -> person.getIndex() != -1)
         .forEach(person -> samplesContextMap.put(person.getId(), person));
     return samplesContextMap;

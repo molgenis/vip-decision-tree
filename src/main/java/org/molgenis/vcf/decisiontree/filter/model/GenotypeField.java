@@ -3,7 +3,6 @@ package org.molgenis.vcf.decisiontree.filter.model;
 import static java.util.Objects.requireNonNull;
 
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.molgenis.vcf.utils.metadata.ValueCount;
@@ -13,8 +12,8 @@ import org.molgenis.vcf.utils.metadata.ValueType;
 @NonFinal
 public class GenotypeField extends FieldImpl implements Comparable<GenotypeField> {
 
-  @NonNull final GenotypeFieldType genotypeFieldType;
-  @NonNull final Field parent;
+  final GenotypeFieldType genotypeFieldType;
+  final Field parent;
 
   // Suppress 'Methods should not have too many parameters'
   @SuppressWarnings("java:S107")

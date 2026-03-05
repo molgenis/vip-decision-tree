@@ -54,6 +54,7 @@
         <maven.spotless.plugin.version>3.0.0</maven.spotless.plugin.version>
         <lombok.version>1.18.42</lombok.version>
         <mockito.version>5.22.0</mockito.version>
+        <jspecify.version>1.0.0</jspecify.version>
     </properties>
 
     <profiles>
@@ -123,6 +124,11 @@
                 <artifactId>htsjdk</artifactId>
                 <version>${samtools.htsjdk.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.jspecify</groupId>
+                <artifactId>jspecify</artifactId>
+                <version>${jspecify.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -151,6 +157,10 @@
         <dependency>
             <groupId>com.github.samtools</groupId>
             <artifactId>htsjdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -226,7 +236,8 @@
                             <arg>-XDcompilePolicy=simple</arg>
                             <arg>--should-stop=ifError=FLOW</arg>
                             <arg>-Xplugin:ErrorProne -XepOpt:NullAway:AnnotatedPackages=org.molgenis
-                                -XepOpt:NullAway:ExcludedFieldAnnotations=org.mockito.Mock -Xep:NullAway:WARN
+                                -XepOpt:NullAway:ExcludedFieldAnnotations=org.mockito.Mock -Xep:NullAway:ERROR
+                                -XepExcludedPaths:.*/src/test/java/.*
                             </arg>
                           </compilerArgs>
                     </configuration>

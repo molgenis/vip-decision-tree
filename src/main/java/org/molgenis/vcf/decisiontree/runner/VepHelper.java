@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.util.Strings;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.UnknownFieldException;
 import org.molgenis.vcf.decisiontree.filter.VcfRecord;
 import org.molgenis.vcf.decisiontree.filter.model.FieldType;
@@ -49,16 +51,7 @@ public class VepHelper {
 
   public VcfRecord createEmptyCsqRecord(
       VcfRecord vcfRecord, Integer alleleIndex, NestedHeaderLine nestedHeaderLine) {
-    Map<String, NestedField> fields = nestedHeaderLine.getNestedFields();
-    List<String> values = new ArrayList<>();
-    for (int index = 0; index < fields.size(); index++) {
-      values.add("");
-    }
-    values.set(fields.get(ALLELE_NUM).getIndex(), alleleIndex.toString());
-    NestedField pick = fields.get(PICK);
-    if (pick != null) {
-      values.set(pick.getIndex(), "1");
-    }
+    List<String> values = getValues(alleleIndex, nestedHeaderLine);
     VariantContext variantContext = vcfRecord.getVariantContext();
     VariantContextBuilder variantContextBuilder = new VariantContextBuilder(variantContext);
     variantContextBuilder.attribute(
@@ -66,7 +59,26 @@ public class VepHelper {
     return new VcfRecord(variantContextBuilder.make());
   }
 
-  public static String getVepId(VCFHeader vcfHeader) {
+  private static @NonNull List<String> getValues(
+      Integer alleleIndex, NestedHeaderLine nestedHeaderLine) {
+    Map<String, NestedField> fields = nestedHeaderLine.getNestedFields();
+    List<String> values = new ArrayList<>();
+    for (int index = 0; index < fields.size(); index++) {
+      values.add("");
+    }
+    NestedField alleleNum = fields.get(ALLELE_NUM);
+    if (alleleNum == null) {
+      throw new UnknownFieldException(ALLELE_NUM, FieldType.INFO_VEP);
+    }
+    values.set(alleleNum.getIndex(), alleleIndex.toString());
+    NestedField pick = fields.get(PICK);
+    if (pick != null) {
+      values.set(pick.getIndex(), "1");
+    }
+    return values;
+  }
+
+  public static @Nullable String getVepId(VCFHeader vcfHeader) {
     for (VCFInfoHeaderLine vcfInfoHeaderLine : vcfHeader.getInfoHeaderLines()) {
       if (canMap(vcfInfoHeaderLine)) {
         return vcfInfoHeaderLine.getID();

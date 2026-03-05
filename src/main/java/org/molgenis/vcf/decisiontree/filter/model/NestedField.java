@@ -4,7 +4,6 @@ import static java.util.Objects.requireNonNull;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 import org.molgenis.vcf.utils.metadata.ValueCount;
@@ -16,7 +15,7 @@ import org.molgenis.vcf.utils.metadata.ValueType;
 public class NestedField extends FieldImpl implements Comparable<NestedField> {
 
   final int index;
-  @NonNull final Field parent;
+  final Field parent;
 
   // Suppress 'Methods should not have too many parameters'
   @SuppressWarnings("java:S107")

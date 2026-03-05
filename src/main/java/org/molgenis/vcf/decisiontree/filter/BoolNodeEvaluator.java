@@ -1,11 +1,12 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import java.util.Collection;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,14 +26,15 @@ public class BoolNodeEvaluator implements BaseBoolNodeEvaluator<BoolNode> {
       }
     }
     Object value = variant.getValue(query.getField(), sampleContext);
-    if (!isMissingValue(value)) {
+    if (!(value == null || (value instanceof Collection<?> && ((Collection<?>) value).isEmpty()))) {
       boolean matches = executeQuery(query, value);
       nodeOutcome = matches ? node.getOutcomeTrue() : node.getOutcomeFalse();
     } else {
       nodeOutcome = node.getOutcomeMissing();
-      if (nodeOutcome == null) {
-        throw new EvaluationException(node, variant, "missing 'missingOutcome'");
-      }
+    }
+
+    if (nodeOutcome == null) {
+      throw new EvaluationException(node, variant, "missing 'missingOutcome'");
     }
 
     return nodeOutcome;

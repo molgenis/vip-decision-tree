@@ -1,7 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter.model;
 
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.NonFinal;
 
@@ -9,5 +8,5 @@ import lombok.experimental.NonFinal;
 @Builder
 @NonFinal
 public class DecisionTree {
-  @NonNull Node rootNode;
+  Node rootNode;
 }
