@@ -8,8 +8,6 @@ class UnknownNodeExceptionTest {
 
   @Test
   void getMessage() {
-    assertEquals(
-        "Unknown node 'node123'.",
-        new UnknownNodeException("node123").getMessage());
+    assertEquals("Unknown node 'node123'.", new UnknownNodeException("node123").getMessage());
   }
 }

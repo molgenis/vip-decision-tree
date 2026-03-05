@@ -8,8 +8,6 @@ class MissingFileExceptionTest {
 
   @Test
   void getMessage() {
-    assertEquals(
-        "Unknown file 'file123'.",
-        new MissingFileException("file123").getMessage());
+    assertEquals("Unknown file 'file123'.", new MissingFileException("file123").getMessage());
   }
 }

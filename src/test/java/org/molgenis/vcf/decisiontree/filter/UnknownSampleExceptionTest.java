@@ -9,7 +9,6 @@ class UnknownSampleExceptionTest {
   @Test
   void getMessage() {
     assertEquals(
-        "Unknown sample 'sample123'.",
-        new UnknownSampleException("sample123").getMessage());
+        "Unknown sample 'sample123'.", new UnknownSampleException("sample123").getMessage());
   }
 }
