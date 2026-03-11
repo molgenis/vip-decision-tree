@@ -21,7 +21,7 @@ decision tree. The tool can be used stand alone but is build for use in the [VIP
 <!-- TOC -->
 
 ## Requirements
-- Java 21
+- Java 25
 
 ## Usage
 
