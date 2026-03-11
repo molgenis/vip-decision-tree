@@ -29,19 +29,25 @@ import org.molgenis.vcf.utils.metadata.ValueType;
 @ExtendWith(MockitoExtension.class)
 class ValueValidatorTest {
 
-  @Mock
-  VcfMetadata vcfMetadata;
-  @Mock
-  ConfigDecisionTree configDecisionTree;
+  @Mock VcfMetadata vcfMetadata;
+  @Mock ConfigDecisionTree configDecisionTree;
   ConfigNodeOutcome configNodeOutcome = new ConfigNodeOutcome("nextNode", "label");
 
   @ParameterizedTest
   @MethodSource("provideValidValues")
   void validate(Object value, Field field) {
     when(vcfMetadata.getField("field")).thenReturn(field);
-    when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
-        new ConfigBoolNode("", "label", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
-            configNodeOutcome, configNodeOutcome, configNodeOutcome)));
+    when(configDecisionTree.getNodes())
+        .thenReturn(
+            Map.of(
+                "node",
+                new ConfigBoolNode(
+                    "",
+                    "label",
+                    new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
+                    configNodeOutcome,
+                    configNodeOutcome,
+                    configNodeOutcome)));
     assertDoesNotThrow(() -> ValueValidator.validate(configDecisionTree, vcfMetadata));
   }
 
@@ -49,120 +55,468 @@ class ValueValidatorTest {
   @MethodSource("provideInvalidValues")
   void validateInvalid(Object value, Field field) {
     when(vcfMetadata.getField("field")).thenReturn(field);
-    when(configDecisionTree.getNodes()).thenReturn(Map.of("node",
-        new ConfigBoolNode("", "label", new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
-            configNodeOutcome, configNodeOutcome, configNodeOutcome)));
-    assertThrows(ConfigDecisionTreeValidationException.class,
+    when(configDecisionTree.getNodes())
+        .thenReturn(
+            Map.of(
+                "node",
+                new ConfigBoolNode(
+                    "",
+                    "label",
+                    new ConfigBoolQuery("field", ConfigOperator.EQUALS, value),
+                    configNodeOutcome,
+                    configNodeOutcome,
+                    configNodeOutcome)));
+    assertThrows(
+        ConfigDecisionTreeValidationException.class,
         () -> ValueValidator.validate(configDecisionTree, vcfMetadata));
   }
 
   private static Stream<Arguments> provideValidValues() {
     return Stream.of(
-        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("123", new FieldImpl("id", FieldType.INFO, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("123", new FieldImpl("id", FieldType.INFO, ValueType.CATEGORICAL,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(true, new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of(1, 2), new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of("123", "2"), new FieldImpl("id", FieldType.INFO, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of(1, 2), new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of(true, false), new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of("1", "2"), new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("MALE", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("FEMALE", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("UNKNOWN", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("AFFECTED",
-            new FieldImpl("AFFECTED_STATUS", FieldType.SAMPLE, ValueType.STRING,
-                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("UNAFFECTED",
-            new FieldImpl("AFFECTED_STATUS", FieldType.SAMPLE, ValueType.STRING,
-                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("MISSING", new FieldImpl("AFFECTED_STATUS", FieldType.SAMPLE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("NO_CALL", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("HOM_REF", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("HET", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("HOM_VAR", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("UNAVAILABLE", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("MIXED", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of(1, 2), new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(2).build(), null, null)),
-        Arguments.of(List.of("123", "2"), new FieldImpl("id", FieldType.INFO, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(2).build(), null, null)),
-        Arguments.of(List.of(1, 2), new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
-            ValueCount.builder().type(ValueCount.Type.VARIABLE).build(), null, null)),
-        Arguments.of(List.of(true, false), new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
-            ValueCount.builder().type(ValueCount.Type.A).build(), null, null)),
-        Arguments.of(List.of("1", "2"), new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
-            ValueCount.builder().type(ValueCount.Type.G).build(), null, null)),
-        Arguments.of("1", new FieldImpl("per_alt", FieldType.INFO, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.A).build(), null, null))
-    );
+        Arguments.of(
+            1,
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.INTEGER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "123",
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "123",
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.CATEGORICAL,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            1,
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLOAT,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            true,
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLAG,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "1",
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.CHARACTER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of(1, 2),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.INTEGER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of("123", "2"),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of(1, 2),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLOAT,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of(true, false),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLAG,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of("1", "2"),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.CHARACTER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "MALE",
+            new FieldImpl(
+                "SEX",
+                FieldType.SAMPLE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "FEMALE",
+            new FieldImpl(
+                "SEX",
+                FieldType.SAMPLE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "UNKNOWN",
+            new FieldImpl(
+                "SEX",
+                FieldType.SAMPLE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "AFFECTED",
+            new FieldImpl(
+                "AFFECTED_STATUS",
+                FieldType.SAMPLE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "UNAFFECTED",
+            new FieldImpl(
+                "AFFECTED_STATUS",
+                FieldType.SAMPLE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "MISSING",
+            new FieldImpl(
+                "AFFECTED_STATUS",
+                FieldType.SAMPLE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "NO_CALL",
+            new FieldImpl(
+                "TYPE",
+                FieldType.GENOTYPE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "HOM_REF",
+            new FieldImpl(
+                "TYPE",
+                FieldType.GENOTYPE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "HET",
+            new FieldImpl(
+                "TYPE",
+                FieldType.GENOTYPE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "HOM_VAR",
+            new FieldImpl(
+                "TYPE",
+                FieldType.GENOTYPE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "UNAVAILABLE",
+            new FieldImpl(
+                "TYPE",
+                FieldType.GENOTYPE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "MIXED",
+            new FieldImpl(
+                "TYPE",
+                FieldType.GENOTYPE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of(1, 2),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.INTEGER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(2).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of("123", "2"),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(2).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of(1, 2),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLOAT,
+                ValueCount.builder().type(ValueCount.Type.VARIABLE).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of(true, false),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLAG,
+                ValueCount.builder().type(ValueCount.Type.A).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of("1", "2"),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.CHARACTER,
+                ValueCount.builder().type(ValueCount.Type.G).build(),
+                null,
+                null)),
+        Arguments.of(
+            "1",
+            new FieldImpl(
+                "per_alt",
+                FieldType.INFO,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.A).build(),
+                null,
+                null)));
   }
 
   private static Stream<Arguments> provideInvalidValues() {
     return Stream.of(
-        Arguments.of("TEST", new FieldImpl("SEX", FieldType.SAMPLE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("TEST", new FieldImpl("AFFECTED_STATUS", FieldType.SAMPLE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("TEST", new FieldImpl("TYPE", FieldType.GENOTYPE, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of("true", new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of(1, "2"), new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of("123", 2), new FieldImpl("id", FieldType.INFO, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of(1, "2"), new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of(true, "false"), new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of("1", 2), new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(List.of("1", "12"), new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(), null, null)),
-        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.INTEGER,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(2).build(), null, null)),
-        Arguments.of("123", new FieldImpl("id", FieldType.INFO, ValueType.STRING,
-            ValueCount.builder().type(ValueCount.Type.FIXED).count(2).build(), null, null)),
-        Arguments.of(1, new FieldImpl("id", FieldType.INFO, ValueType.FLOAT,
-            ValueCount.builder().type(ValueCount.Type.VARIABLE).build(), null, null)),
-        Arguments.of(true, new FieldImpl("id", FieldType.INFO, ValueType.FLAG,
-            ValueCount.builder().type(ValueCount.Type.A).build(), null, null)),
-        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
-            ValueCount.builder().type(ValueCount.Type.G).build(), null, null)),
-        Arguments.of("1", new FieldImpl("id", FieldType.INFO, ValueType.CHARACTER,
-            ValueCount.builder().type(ValueCount.Type.R).build(), null, null))
-    );
+        Arguments.of(
+            "TEST",
+            new FieldImpl(
+                "SEX",
+                FieldType.SAMPLE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "TEST",
+            new FieldImpl(
+                "AFFECTED_STATUS",
+                FieldType.SAMPLE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "TEST",
+            new FieldImpl(
+                "TYPE",
+                FieldType.GENOTYPE,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "1",
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.INTEGER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            1,
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "1",
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLOAT,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            "true",
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLAG,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            1,
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.CHARACTER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of(1, "2"),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.INTEGER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of("123", 2),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of(1, "2"),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLOAT,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of(true, "false"),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLAG,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of("1", 2),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.CHARACTER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            List.of("1", "12"),
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.CHARACTER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build(),
+                null,
+                null)),
+        Arguments.of(
+            1,
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.INTEGER,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(2).build(),
+                null,
+                null)),
+        Arguments.of(
+            "123",
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.STRING,
+                ValueCount.builder().type(ValueCount.Type.FIXED).count(2).build(),
+                null,
+                null)),
+        Arguments.of(
+            1,
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLOAT,
+                ValueCount.builder().type(ValueCount.Type.VARIABLE).build(),
+                null,
+                null)),
+        Arguments.of(
+            true,
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.FLAG,
+                ValueCount.builder().type(ValueCount.Type.A).build(),
+                null,
+                null)),
+        Arguments.of(
+            "1",
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.CHARACTER,
+                ValueCount.builder().type(ValueCount.Type.G).build(),
+                null,
+                null)),
+        Arguments.of(
+            "1",
+            new FieldImpl(
+                "id",
+                FieldType.INFO,
+                ValueType.CHARACTER,
+                ValueCount.builder().type(ValueCount.Type.R).build(),
+                null,
+                null)));
   }
 }

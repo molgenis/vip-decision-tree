@@ -30,7 +30,12 @@ class CategoricalNodeEvaluatorTest {
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
     Map<String, NodeOutcome> outcomeMap = Map.of(key, nodeOutcome);
     CategoricalNode node =
-        CategoricalNode.builder().id("cat_id").label("cat_id").field(field).outcomeMap(outcomeMap).build();
+        CategoricalNode.builder()
+            .id("cat_id")
+            .label("cat_id")
+            .field(field)
+            .outcomeMap(outcomeMap)
+            .build();
 
     Variant variant = mock(Variant.class);
     when(variant.getValue(field, null)).thenReturn(key);
@@ -95,22 +100,32 @@ class CategoricalNodeEvaluatorTest {
     FieldImpl field = mock(FieldImpl.class);
     String key = "key";
     CategoricalNode node =
-        CategoricalNode.builder().id("cat_id").label("cat_id").field(field).outcomeMap(Map.of()).build();
+        CategoricalNode.builder()
+            .id("cat_id")
+            .label("cat_id")
+            .field(field)
+            .outcomeMap(Map.of())
+            .build();
 
     Variant variant = mock(Variant.class);
     when(variant.getValue(field)).thenReturn(key);
-    assertThrows(EvaluationException.class, () -> categoricalNodeEvaluator.evaluate(node, variant,
-        null));
+    assertThrows(
+        EvaluationException.class, () -> categoricalNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
   void evaluateMissingMissing() {
     FieldImpl field = mock(FieldImpl.class);
     CategoricalNode node =
-        CategoricalNode.builder().id("cat_id").label("cat_id").field(field).outcomeMap(Map.of()).build();
+        CategoricalNode.builder()
+            .id("cat_id")
+            .label("cat_id")
+            .field(field)
+            .outcomeMap(Map.of())
+            .build();
 
     Variant variant = mock(Variant.class);
-    assertThrows(EvaluationException.class, () -> categoricalNodeEvaluator.evaluate(node, variant,
-        null));
+    assertThrows(
+        EvaluationException.class, () -> categoricalNodeEvaluator.evaluate(node, variant, null));
   }
 }

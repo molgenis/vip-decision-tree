@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 import htsjdk.variant.vcf.VCFFileReader;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.runner.VepHelper;
 import org.molgenis.vcf.decisiontree.runner.info.GenotypeMetadataMapper;
 import org.molgenis.vcf.decisiontree.runner.info.MissingVepException;
@@ -22,10 +22,12 @@ public class VcfReader implements AutoCloseable {
   private final boolean strict;
   private final GenotypeMetadataMapper genotypeMetadataMapper;
   private boolean inited = false;
-  private NestedHeaderLine vepNestedHeaderLine = null;
-  private NestedHeaderLine gtNestedHeaderLine = null;
+  private @Nullable NestedHeaderLine vepNestedHeaderLine = null;
+  private @Nullable NestedHeaderLine gtNestedHeaderLine = null;
 
-  public VcfReader(VCFFileReader vcfFileReader, VepMetadataMapper vepMetadataMapper,
+  public VcfReader(
+      VCFFileReader vcfFileReader,
+      VepMetadataMapper vepMetadataMapper,
       GenotypeMetadataMapper genotypeMetadataMapper,
       boolean strict) {
     this.vcfFileReader = requireNonNull(vcfFileReader);
@@ -37,7 +39,7 @@ public class VcfReader implements AutoCloseable {
   private void initNestedMeta() {
     if (!inited) {
       String vepID = VepHelper.getVepId(vcfFileReader.getHeader());
-      if(vepID == null) {
+      if (vepID == null) {
         throw new MissingVepException();
       }
       vepNestedHeaderLine = vepMetadataMapper.map(vepID, vcfFileReader.getFileHeader());
@@ -52,8 +54,8 @@ public class VcfReader implements AutoCloseable {
 
   public VcfMetadata getMetadata() {
     initNestedMeta();
-    return new VcfMetadata(vcfFileReader.getFileHeader(), vepNestedHeaderLine, gtNestedHeaderLine,
-        strict);
+    return new VcfMetadata(
+        vcfFileReader.getFileHeader(), vepNestedHeaderLine, gtNestedHeaderLine, strict);
   }
 
   @Override

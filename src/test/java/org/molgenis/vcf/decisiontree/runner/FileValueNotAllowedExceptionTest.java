@@ -11,7 +11,7 @@ class FileValueNotAllowedExceptionTest {
   void getMessage() {
     assertEquals(
         "Illegal value for field 'identifier': file values (file:) are not allowed for operator 'EQUALS', allowed operators 'IN, NOT_IN'.",
-        new FileValueNotAllowedException(
-            ConfigOperator.EQUALS, "IN, NOT_IN", "identifier").getMessage());
+        new FileValueNotAllowedException(ConfigOperator.EQUALS, "IN, NOT_IN", "identifier")
+            .getMessage());
   }
 }

@@ -1,11 +1,11 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import java.util.Collection;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,7 +25,7 @@ public class ExistsNodeEvaluator implements NodeEvaluator<ExistsNode> {
     return nodeOutcome;
   }
 
-  private boolean isMissingValue(Object value) {
+  private boolean isMissingValue(@Nullable Object value) {
     return value == null || (value instanceof Collection<?> && ((Collection<?>) value).isEmpty());
   }
 }

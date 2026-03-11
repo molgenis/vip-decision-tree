@@ -6,11 +6,10 @@ import org.molgenis.vcf.decisiontree.filter.SampleAnnotatorImpl;
 
 public class SampleAnnotatorFactory {
 
-  private SampleAnnotatorFactory() {
-  }
+  private SampleAnnotatorFactory() {}
 
   public static SampleAnnotator create(Settings settings) {
-    return new SampleAnnotatorImpl(settings.getWriterSettings().isWriteLabels(),
-        settings.getWriterSettings().isWritePath());
+    return new SampleAnnotatorImpl(
+        settings.getWriterSettings().isWriteLabels(), settings.getWriterSettings().isWritePath());
   }
 }

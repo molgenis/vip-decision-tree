@@ -64,7 +64,8 @@ class ExistsNodeEvaluatorTest {
   @Test
   void evaluateExistsFalseValueCountVariable() {
     FieldImpl field = mock(FieldImpl.class);
-    when(field.getValueCount()).thenReturn(ValueCount.builder().type(ValueCount.Type.VARIABLE).build());
+    when(field.getValueCount())
+        .thenReturn(ValueCount.builder().type(ValueCount.Type.VARIABLE).build());
 
     NodeOutcome outcomeTrue = mock(NodeOutcome.class);
     NodeOutcome outcomeFalse = mock(NodeOutcome.class);

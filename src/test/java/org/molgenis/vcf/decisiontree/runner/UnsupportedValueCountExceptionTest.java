@@ -16,8 +16,14 @@ class UnsupportedValueCountExceptionTest {
     assertEquals(
         "Unsupported number of values (3) for field 'test' for combination of decision type 'CATEGORICAL' and operator of type 'CONTAINS'.",
         new UnsupportedValueCountException(
-            FieldImpl.builder().id("test").fieldType(FieldType.INFO).valueType(ValueType.FLOAT)
-                .valueCount(
-                    ValueCount.builder().type(ValueCount.Type.FIXED).count(3).build()).build(), DecisionType.CATEGORICAL, ConfigOperator.CONTAINS).getMessage());
+                FieldImpl.builder()
+                    .id("test")
+                    .fieldType(FieldType.INFO)
+                    .valueType(ValueType.FLOAT)
+                    .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(3).build())
+                    .build(),
+                DecisionType.CATEGORICAL,
+                ConfigOperator.CONTAINS)
+            .getMessage());
   }
 }

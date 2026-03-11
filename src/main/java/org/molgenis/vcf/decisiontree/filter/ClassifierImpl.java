@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.filter;
 
 import static java.util.Objects.requireNonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +24,13 @@ public class ClassifierImpl implements Classifier {
   private final ConsequenceAnnotator consequenceAnnotator;
   private final RecordWriter recordWriter;
 
-  public ClassifierImpl(DecisionTreeExecutor decisionTreeExecutor, VepHelper vepHelper,
-      DecisionTree decisionTree, ConsequenceAnnotator consequenceAnnotator,
-      RecordWriter recordWriter, VcfMetadata vcfMetadata) {
+  public ClassifierImpl(
+      DecisionTreeExecutor decisionTreeExecutor,
+      VepHelper vepHelper,
+      DecisionTree decisionTree,
+      ConsequenceAnnotator consequenceAnnotator,
+      RecordWriter recordWriter,
+      VcfMetadata vcfMetadata) {
     this.decisionTreeExecutor = requireNonNull(decisionTreeExecutor);
     this.vepHelper = requireNonNull(vepHelper);
     this.decisionTree = requireNonNull(decisionTree);
@@ -38,34 +43,33 @@ public class ClassifierImpl implements Classifier {
   public void classify(VcfReader vcfReader) {
     AtomicInteger nrRecord = new AtomicInteger(0);
     vcfReader.stream()
-        .map(
-            this::processRecord).forEach(vcfRecord -> {
-          recordWriter.write(vcfRecord);
-          if (nrRecord.incrementAndGet() % 25000 == 0) {
-            LOGGER.debug("processed {} records", nrRecord);
-          }
-        });
+        .map(this::processRecord)
+        .forEach(
+            vcfRecord -> {
+              recordWriter.write(vcfRecord);
+              if (nrRecord.incrementAndGet() % 25000 == 0) {
+                LOGGER.debug("processed {} records", nrRecord);
+              }
+            });
   }
 
-  private VcfRecord processRecord(
-      VcfRecord vcfRecord) {
+  private VcfRecord processRecord(VcfRecord vcfRecord) {
     NestedHeaderLine nestedHeaderLine = vcfMetadata.getVepHeaderLine();
-    Map<Integer, List<VcfRecord>> alleleCsqMap = vepHelper.getRecordPerConsequence(vcfRecord,
-        nestedHeaderLine);
+    Map<Integer, List<VcfRecord>> alleleCsqMap =
+        vepHelper.getRecordPerConsequence(vcfRecord, nestedHeaderLine);
     List<String> annotatedCsqs = new ArrayList<>();
     for (int alleleIndex = 0; alleleIndex < vcfRecord.getNrAltAlleles(); alleleIndex++) {
       Integer vepAlleleIndex = alleleIndex + 1;
       Allele allele = vcfRecord.getAltAllele(alleleIndex);
       List<VcfRecord> singleCsqRecords = alleleCsqMap.get(vepAlleleIndex);
       if (singleCsqRecords == null || singleCsqRecords.isEmpty()) {
-        singleCsqRecords = List.of(
-            vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, nestedHeaderLine));
+        singleCsqRecords =
+            List.of(vepHelper.createEmptyCsqRecord(vcfRecord, vepAlleleIndex, nestedHeaderLine));
       }
       for (VcfRecord singleCsqRecord : singleCsqRecords) {
         Variant variant = new Variant(vcfMetadata, singleCsqRecord, allele);
         Decision decision = decisionTreeExecutor.execute(decisionTree, variant);
-        String csqString = singleCsqRecord.getVepValues(nestedHeaderLine.getParentField())
-            .get(0);
+        String csqString = singleCsqRecord.getVepValues(nestedHeaderLine.getParentField()).get(0);
         annotatedCsqs.add(consequenceAnnotator.annotate(decision, csqString));
       }
     }

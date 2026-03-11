@@ -561,8 +561,7 @@ class BoolNodeEvaluatorTest {
             .build();
 
     Variant variant = mock(Variant.class);
-    assertThrows(EvaluationException.class, () -> boolNodeEvaluator.evaluate(node, variant,
-        null));
+    assertThrows(EvaluationException.class, () -> boolNodeEvaluator.evaluate(node, variant, null));
   }
 
   @Test
@@ -594,7 +593,8 @@ class BoolNodeEvaluatorTest {
   void evaluateMissingValueCountVariable() {
     FieldImpl field = mock(FieldImpl.class);
     when(field.getValueType()).thenReturn(ValueType.STRING);
-    when(field.getValueCount()).thenReturn(ValueCount.builder().type(ValueCount.Type.VARIABLE).build());
+    when(field.getValueCount())
+        .thenReturn(ValueCount.builder().type(ValueCount.Type.VARIABLE).build());
 
     Operator operator = Operator.EQUALS;
     List<String> queryValue = List.of("PASS");

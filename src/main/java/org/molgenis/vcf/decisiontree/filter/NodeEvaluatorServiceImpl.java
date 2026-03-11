@@ -1,5 +1,6 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
@@ -9,7 +10,6 @@ import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -29,7 +29,8 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
 
   // Testability
   NodeEvaluatorServiceImpl(
-      BoolNodeEvaluator boolNodeEvaluator, BoolMultiNodeEvaluator boolMultiNodeEvaluator,
+      BoolNodeEvaluator boolNodeEvaluator,
+      BoolMultiNodeEvaluator boolMultiNodeEvaluator,
       CategoricalNodeEvaluator categoricalNodeEvaluator,
       ExistsNodeEvaluator existsNodeEvaluator) {
     this.boolNodeEvaluator = boolNodeEvaluator;
@@ -39,8 +40,8 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
   }
 
   @Override
-  public NodeOutcome evaluate(DecisionNode node, Variant variant,
-      @Nullable SampleContext sampleContext) {
+  public NodeOutcome evaluate(
+      DecisionNode node, Variant variant, @Nullable SampleContext sampleContext) {
     NodeOutcome nodeOutcome;
     DecisionType decisionType = node.getDecisionType();
     switch (decisionType) {
@@ -54,8 +55,8 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
         nodeOutcome = boolMultiNodeEvaluator.evaluate((BoolMultiNode) node, variant, sampleContext);
         break;
       case CATEGORICAL:
-        nodeOutcome = categoricalNodeEvaluator.evaluate((CategoricalNode) node, variant
-            , sampleContext);
+        nodeOutcome =
+            categoricalNodeEvaluator.evaluate((CategoricalNode) node, variant, sampleContext);
         break;
       default:
         throw new UnexpectedEnumException(decisionType);

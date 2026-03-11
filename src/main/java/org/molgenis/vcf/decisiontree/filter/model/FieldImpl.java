@@ -2,6 +2,7 @@ package org.molgenis.vcf.decisiontree.filter.model;
 
 import lombok.*;
 import lombok.experimental.NonFinal;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.utils.metadata.ValueCount;
 import org.molgenis.vcf.utils.metadata.ValueType;
 
@@ -12,18 +13,14 @@ import org.molgenis.vcf.utils.metadata.ValueType;
 @EqualsAndHashCode
 public class FieldImpl implements Field {
 
-  @NonNull String id;
-  @NonNull FieldType fieldType;
-  @NonNull
+  String id;
+  FieldType fieldType;
   ValueType valueType;
-  @NonNull
   ValueCount valueCount;
-  /**
-   * Returns count for FIXED value type, null otherwise
-   */
-  Integer count;
-  /**
-   * Returns separator for INFO_NESTED type, null otherwise
-   */
-  Character separator;
+
+  /** Returns count for FIXED value type, null otherwise */
+  @Nullable Integer count;
+
+  /** Returns separator for INFO_NESTED type, null otherwise */
+  @Nullable Character separator;
 }

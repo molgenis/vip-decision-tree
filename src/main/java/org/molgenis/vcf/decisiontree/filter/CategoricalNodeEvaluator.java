@@ -1,10 +1,10 @@
 package org.molgenis.vcf.decisiontree.filter;
 
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.model.CategoricalNode;
 import org.molgenis.vcf.decisiontree.filter.model.MissingField;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
-import org.springframework.lang.Nullable;
 
 public class CategoricalNodeEvaluator implements NodeEvaluator<CategoricalNode> {
 
@@ -20,6 +20,10 @@ public class CategoricalNodeEvaluator implements NodeEvaluator<CategoricalNode> 
       }
     }
     Object value = variant.getValue(node.getField(), sampleContext);
+    if (node.getOutcomeMap() == null) {
+      throw new IllegalStateException(
+          String.format("'null' outcomeMap encountered for node '%s'", node.getId()));
+    }
     if (value != null) {
       nodeOutcome = node.getOutcomeMap().get(value);
       if (nodeOutcome == null) {

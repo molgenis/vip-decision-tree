@@ -3,20 +3,15 @@ package org.molgenis.vcf.decisiontree.filter;
 import static org.molgenis.vcf.decisiontree.filter.model.BoolNode.FIELD_PREFIX;
 
 import java.util.Collection;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
-import org.springframework.lang.Nullable;
 
-interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
-    NodeEvaluator<T> {
-
-  default boolean isMissingValue(Object value) {
-    return value == null || (value instanceof Collection<?> && ((Collection<?>) value).isEmpty());
-  }
+interface BaseBoolNodeEvaluator<T extends DecisionNode> extends NodeEvaluator<T> {
 
   default boolean executeQuery(BoolQuery boolQuery, Object value) {
     boolean matches;
@@ -24,6 +19,7 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
     Field field = boolQuery.getField();
     Operator operator = boolQuery.getOperator();
     Object queryValue = boolQuery.getValue();
+
     switch (operator) {
       case EQUALS:
         matches = value.equals(queryValue);
@@ -133,9 +129,13 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends
     String stringQueryValue = query.getValue().toString();
     if (stringQueryValue.startsWith(FIELD_PREFIX)) {
       String fieldId = stringQueryValue.substring(FIELD_PREFIX.length());
-      query = BoolQuery.builder().field(query.getField()).operator(query.getOperator())
-          .value(variant.getValue(variant.getVcfMetadata().getField(fieldId), sampleContext))
-          .build();
+      Object value = variant.getValue(variant.getVcfMetadata().getField(fieldId), sampleContext);
+      query =
+          BoolQuery.builder()
+              .field(query.getField())
+              .operator(query.getOperator())
+              .value(value != null ? value : "")
+              .build();
     }
     return query;
   }

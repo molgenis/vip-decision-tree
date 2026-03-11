@@ -1,7 +1,6 @@
 package org.molgenis.vcf.decisiontree.loader.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

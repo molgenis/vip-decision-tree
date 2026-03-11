@@ -2,31 +2,25 @@ package org.molgenis.vcf.decisiontree.filter.model;
 
 import java.util.Map;
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import org.jspecify.annotations.Nullable;
 
 @Value
 @Builder
 @NonFinal
 public class CategoricalNode implements DecisionNode {
 
-  @NonNull DecisionType decisionType = DecisionType.CATEGORICAL;
-  @NonNull String id;
-  @NonNull String label;
-  String description;
+  DecisionType decisionType = DecisionType.CATEGORICAL;
+  String id;
+  String label;
+  @Nullable String description;
 
-  @NonNull NodeType nodeType = NodeType.DECISION;
-  @NonNull Field field;
+  NodeType nodeType = NodeType.DECISION;
+  Field field;
   // @NonFinal and nullable to allow for two-pass construction
-  @NonFinal
-  @Setter
-  Map<String, NodeOutcome> outcomeMap;
-  @NonFinal
-  @Setter
-  NodeOutcome outcomeMissing;
-  @NonFinal
-  @Setter
-  NodeOutcome outcomeDefault;
+  @Nullable @NonFinal @Setter Map<String, NodeOutcome> outcomeMap;
+  @Nullable @NonFinal @Setter NodeOutcome outcomeMissing;
+  @Nullable @NonFinal @Setter NodeOutcome outcomeDefault;
 }

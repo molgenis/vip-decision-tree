@@ -11,10 +11,17 @@ import org.molgenis.vcf.decisiontree.filter.model.SamplesContext;
 
 interface ClassifierFactory {
 
-  Classifier create(Settings settings, DecisionTree decisionTree,
-      ConsequenceAnnotator consequenceAnnotator, RecordWriter recordWriter,
+  Classifier create(
+      Settings settings,
+      DecisionTree decisionTree,
+      ConsequenceAnnotator consequenceAnnotator,
+      RecordWriter recordWriter,
       VcfMetadata vcfMetadata);
 
-  Classifier create(Settings settings, DecisionTree decisionTree,
-      RecordWriter recordWriter, SampleAnnotator sampleAnnotator, SamplesContext samplesContext);
+  Classifier create(
+      Settings settings,
+      DecisionTree decisionTree,
+      RecordWriter recordWriter,
+      SampleAnnotator sampleAnnotator,
+      SamplesContext samplesContext);
 }

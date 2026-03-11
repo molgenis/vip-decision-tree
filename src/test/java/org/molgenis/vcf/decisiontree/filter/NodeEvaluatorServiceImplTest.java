@@ -19,20 +19,18 @@ import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 
 @ExtendWith(MockitoExtension.class)
 class NodeEvaluatorServiceImplTest {
-  @Mock
-  private BoolNodeEvaluator boolNodeEvaluator;
-  @Mock
-  private BoolMultiNodeEvaluator boolMultiNodeEvaluator;
-  @Mock
-  private CategoricalNodeEvaluator categoricalNodeEvaluator;
-  @Mock
-  private ExistsNodeEvaluator existsNodeEvaluator;
+  @Mock private BoolNodeEvaluator boolNodeEvaluator;
+  @Mock private BoolMultiNodeEvaluator boolMultiNodeEvaluator;
+  @Mock private CategoricalNodeEvaluator categoricalNodeEvaluator;
+  @Mock private ExistsNodeEvaluator existsNodeEvaluator;
   private NodeEvaluatorServiceImpl nodeEvaluatorService;
 
   @BeforeEach
   void setUp() {
     nodeEvaluatorService =
-        new NodeEvaluatorServiceImpl(boolNodeEvaluator, boolMultiNodeEvaluator,
+        new NodeEvaluatorServiceImpl(
+            boolNodeEvaluator,
+            boolMultiNodeEvaluator,
             categoricalNodeEvaluator,
             existsNodeEvaluator);
   }
@@ -48,8 +46,8 @@ class NodeEvaluatorServiceImplTest {
 
   @Test
   void evaluateExistsNode() {
-    ExistsNode existsNode = when(mock(ExistsNode.class).getDecisionType()).thenReturn(EXISTS)
-        .getMock();
+    ExistsNode existsNode =
+        when(mock(ExistsNode.class).getDecisionType()).thenReturn(EXISTS).getMock();
     Variant variant = mock(Variant.class);
     NodeOutcome nodeOutcome = mock(NodeOutcome.class);
     when(existsNodeEvaluator.evaluate(existsNode, variant, null)).thenReturn(nodeOutcome);

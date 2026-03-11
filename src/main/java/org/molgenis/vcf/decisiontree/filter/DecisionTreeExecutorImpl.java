@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.model.Decision;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionNode;
 import org.molgenis.vcf.decisiontree.filter.model.DecisionTree;
@@ -22,9 +23,7 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
   private final boolean storeLabels;
   private final boolean storePaths;
 
-  /**
-   * Constructs a DecisionTreeExecutor that doesn't store labels and paths.
-   */
+  /** Constructs a DecisionTreeExecutor that doesn't store labels and paths. */
   public DecisionTreeExecutorImpl(NodeEvaluatorService nodeEvaluatorService) {
     this(nodeEvaluatorService, false, false);
   }
@@ -37,7 +36,8 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
   }
 
   @Override
-  public Decision execute(DecisionTree tree, Variant variant, SampleContext sampleContext) {
+  public Decision execute(
+      DecisionTree tree, Variant variant, @Nullable SampleContext sampleContext) {
     List<Node> nodePath = storePaths ? new ArrayList<>() : List.of();
     Set<Label> labels = storeLabels ? new HashSet<>() : Set.of();
 
@@ -51,8 +51,8 @@ public class DecisionTreeExecutorImpl implements DecisionTreeExecutor {
         break;
       }
 
-      NodeOutcome nodeOutcome = nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant,
-          sampleContext);
+      NodeOutcome nodeOutcome =
+          nodeEvaluatorService.evaluate((DecisionNode) currentNode, variant, sampleContext);
       if (storeLabels) {
         storeLabel(nodeOutcome, labels);
       }

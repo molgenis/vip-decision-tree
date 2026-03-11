@@ -21,20 +21,18 @@ public class SampleAnnotatorImpl implements SampleAnnotator {
   }
 
   @Override
-  public void annotate(List<Decision> decisions, Integer sampleIndex,
-      VariantContextBuilder vcBuilder) {
+  public void annotate(
+      List<Decision> decisions, Integer sampleIndex, VariantContextBuilder vcBuilder) {
     GenotypesContext genotypeContext = GenotypesContext.copy(vcBuilder.getGenotypes());
     Genotype genotype = genotypeContext.get(sampleIndex);
     GenotypeBuilder gtBuilder = new GenotypeBuilder(genotype);
-    gtBuilder.attribute(VIPC_S,
-        decisions.stream().map(DecisionUtils::getDecisionClass).toList());
+    gtBuilder.attribute(VIPC_S, decisions.stream().map(DecisionUtils::getDecisionClass).toList());
     if (writePaths) {
-      gtBuilder.attribute(VIPP_S,
-          decisions.stream().map(DecisionUtils::getDecisionsPath).toList());
+      gtBuilder.attribute(VIPP_S, decisions.stream().map(DecisionUtils::getDecisionsPath).toList());
     }
     if (writeLabels) {
-      gtBuilder.attribute(VIPL_S,
-          decisions.stream().map(DecisionUtils::getDecisionLabelsString).toList());
+      gtBuilder.attribute(
+          VIPL_S, decisions.stream().map(DecisionUtils::getDecisionLabelsString).toList());
     }
     genotypeContext.replace(gtBuilder.make());
     vcBuilder.genotypes(genotypeContext);

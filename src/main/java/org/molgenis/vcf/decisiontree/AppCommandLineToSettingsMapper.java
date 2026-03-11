@@ -1,5 +1,13 @@
 package org.molgenis.vcf.decisiontree;
 
+import static java.util.Arrays.asList;
+import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.*;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
@@ -7,22 +15,12 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
-import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.*;
-
 @Component
 class AppCommandLineToSettingsMapper {
 
   private final String appName;
   private final String appVersion;
   private final ConfigDecisionTreeLoader configDecisionTreeLoader;
-
 
   AppCommandLineToSettingsMapper(
       @Value("${app.name}") String appName,

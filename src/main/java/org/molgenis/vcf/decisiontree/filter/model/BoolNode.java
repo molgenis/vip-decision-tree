@@ -1,10 +1,10 @@
 package org.molgenis.vcf.decisiontree.filter.model;
 
 import lombok.Builder;
-import lombok.NonNull;
 import lombok.Setter;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import org.jspecify.annotations.Nullable;
 
 @Value
 @Builder
@@ -13,15 +13,15 @@ public class BoolNode implements DecisionNode {
   public static final String FILE_PREFIX = "file:";
   public static final String FIELD_PREFIX = "field:";
 
-  @NonNull NodeType nodeType = NodeType.DECISION;
-  @NonNull String id;
-  @NonNull String label;
-  String description;
+  NodeType nodeType = NodeType.DECISION;
+  String id;
+  String label;
+  @Nullable String description;
 
-  @NonNull DecisionType decisionType = DecisionType.BOOL;
-  @NonNull BoolQuery query;
+  DecisionType decisionType = DecisionType.BOOL;
+  BoolQuery query;
   // @NonFinal and nullable to allow for two-pass construction
-  @NonFinal @Setter NodeOutcome outcomeTrue;
-  @NonFinal @Setter NodeOutcome outcomeFalse;
-  @NonFinal @Setter NodeOutcome outcomeMissing;
+  @Nullable @NonFinal @Setter NodeOutcome outcomeTrue;
+  @Nullable @NonFinal @Setter NodeOutcome outcomeFalse;
+  @Nullable @NonFinal @Setter NodeOutcome outcomeMissing;
 }

@@ -15,10 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.Settings;
+import org.molgenis.vcf.decisiontree.filter.MissingRootNodeException;
+import org.molgenis.vcf.decisiontree.filter.UnknownNodeException;
 import org.molgenis.vcf.decisiontree.filter.VcfMetadata;
-import org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolMultiNode;
+import org.molgenis.vcf.decisiontree.filter.model.BoolMultiQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolNode;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery;
 import org.molgenis.vcf.decisiontree.filter.model.BoolQuery.Operator;
@@ -31,8 +34,8 @@ import org.molgenis.vcf.decisiontree.filter.model.LeafNode;
 import org.molgenis.vcf.decisiontree.filter.model.Node;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.NodeType;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiNode;
+import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolMultiQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigBoolQuery;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
@@ -45,7 +48,6 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigOperator;
 import org.molgenis.vcf.utils.UnexpectedEnumException;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -63,9 +65,12 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     ConfigDecisionTree configDecisionTree = settings.getConfigDecisionTree();
     Map<String, Label> labelMap = mapLabels(configDecisionTree.getLabels());
     Map<String, Set<String>> filesMap = mapFiles(configDecisionTree.getFiles());
-    Map<String, Node> nodeMap = mapNodes(vcfMetadata, configDecisionTree.getNodes(), labelMap,
-        filesMap);
+    Map<String, Node> nodeMap =
+        mapNodes(vcfMetadata, configDecisionTree.getNodes(), labelMap, filesMap);
     Node rootNode = nodeMap.get(configDecisionTree.getRootNode());
+    if (rootNode == null) {
+      throw new MissingRootNodeException();
+    }
     return DecisionTree.builder().rootNode(rootNode).build();
   }
 
@@ -75,7 +80,8 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       filesMap = emptyMap();
     } else {
       filesMap = new HashMap<>();
-      files.entrySet()
+      files
+          .entrySet()
           .forEach(entry -> filesMap.put(entry.getKey(), this.mapFile(entry.getValue())));
     }
     return filesMap;
@@ -109,7 +115,9 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
   }
 
   private Map<String, Node> mapNodes(
-      VcfMetadata vcfMetadata, Map<String, ConfigNode> configNodeMap, Map<String, Label> labelMap,
+      VcfMetadata vcfMetadata,
+      Map<String, ConfigNode> configNodeMap,
+      Map<String, Label> labelMap,
       Map<String, Set<String>> files) {
     // first pass: create nodes
     Map<String, Node> nodeMap =
@@ -123,13 +131,16 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .forEach(
             node -> {
               ConfigNode configNode = configNodeMap.get(node.getId());
+              if (configNode == null) {
+                throw new UnknownNodeException(node.getId());
+              }
               updateNode(node, configNode, nodeMap, labelMap);
             });
     return nodeMap;
   }
 
-  private Node toNode(VcfMetadata vcfMetadata, String id, ConfigNode configNode,
-      Map<String, Set<String>> files) {
+  private Node toNode(
+      VcfMetadata vcfMetadata, String id, ConfigNode configNode, Map<String, Set<String>> files) {
     Node node;
     switch (configNode.getType()) {
       case EXISTS:
@@ -164,7 +175,10 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .build();
   }
 
-  private BoolNode toBoolNode(VcfMetadata vcfMetadata, String id, ConfigBoolNode nodeConfig,
+  private BoolNode toBoolNode(
+      VcfMetadata vcfMetadata,
+      String id,
+      ConfigBoolNode nodeConfig,
       Map<String, Set<String>> files) {
     BoolQuery boolQuery = toBoolQuery(vcfMetadata, nodeConfig.getQuery(), files);
     return BoolNode.builder()
@@ -175,29 +189,32 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .build();
   }
 
-  private BoolQuery toBoolQuery(VcfMetadata vcfMetadata, ConfigBoolQuery configBoolQuery,
-      Map<String, Set<String>> files) {
+  private BoolQuery toBoolQuery(
+      VcfMetadata vcfMetadata, ConfigBoolQuery configBoolQuery, Map<String, Set<String>> files) {
     Operator operator = toOperator(configBoolQuery.getOperator());
     Field field = vcfMetadata.getField(configBoolQuery.getField());
     queryValidator.validateBooleanNode(configBoolQuery, field);
     Object value = configBoolQuery.getValue();
     if (value.toString().startsWith(FILE_PREFIX)) {
-      value = files.get(((String) value).substring(FILE_PREFIX.length()));
+      Set<String> fileValue = files.get(((String) value).substring(FILE_PREFIX.length()));
+      if (fileValue == null) {
+        throw new MissingFileException(value.toString());
+      }
+      value = fileValue;
     }
-    return BoolQuery.builder()
-        .field(field)
-        .operator(operator)
-        .value(value)
-        .build();
+    return BoolQuery.builder().field(field).operator(operator).value(value).build();
   }
 
-  private BoolMultiNode toBoolMultiNode(VcfMetadata vcfMetadata, String id,
+  private BoolMultiNode toBoolMultiNode(
+      VcfMetadata vcfMetadata,
+      String id,
       ConfigBoolMultiNode nodeConfig,
       Map<String, Set<String>> files) {
-    List<BoolMultiQuery> boolMultiQueries = nodeConfig.getOutcomes().stream()
-        .map(clause -> toBoolClause(vcfMetadata, clause, files)).toList();
-    List<Field> fields = nodeConfig.getFields().stream().map(vcfMetadata::getField)
-        .toList();
+    List<BoolMultiQuery> boolMultiQueries =
+        nodeConfig.getOutcomes().stream()
+            .map(clause -> toBoolClause(vcfMetadata, clause, files))
+            .toList();
+    List<Field> fields = nodeConfig.getFields().stream().map(vcfMetadata::getField).toList();
     return BoolMultiNode.builder()
         .id(id)
         .label(nodeConfig.getLabel())
@@ -207,17 +224,23 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         .build();
   }
 
-  private BoolMultiQuery toBoolClause(VcfMetadata vcfMetadata,
+  private BoolMultiQuery toBoolClause(
+      VcfMetadata vcfMetadata,
       ConfigBoolMultiQuery configBoolMultiQuery,
       Map<String, Set<String>> files) {
-    List<BoolQuery> queries = configBoolMultiQuery.getQueries().stream()
-        .map(query -> toBoolQuery(vcfMetadata, query, files)).toList();
-    return BoolMultiQuery.builder().id(configBoolMultiQuery.getId()).queryList(queries)
+    List<BoolQuery> queries =
+        configBoolMultiQuery.getQueries().stream()
+            .map(query -> toBoolQuery(vcfMetadata, query, files))
+            .toList();
+    return BoolMultiQuery.builder()
+        .id(configBoolMultiQuery.getId())
+        .queryList(queries)
         .operator(toMultiQueryOperator(configBoolMultiQuery.getOperator()))
         .build();
   }
 
-  private BoolMultiQuery.Operator toMultiQueryOperator(ConfigClauseOperator configOperator) {
+  private BoolMultiQuery.@Nullable Operator toMultiQueryOperator(
+      ConfigClauseOperator configOperator) {
     BoolMultiQuery.Operator operator;
     if (configOperator == null) {
       return null;
@@ -318,8 +341,8 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
         updateBoolNode((BoolNode) node, (ConfigBoolNode) configNode, nodeMap, labelMap);
         break;
       case BOOL_MULTI:
-        updateBoolMultiNode((BoolMultiNode) node, (ConfigBoolMultiNode) configNode, nodeMap,
-            labelMap);
+        updateBoolMultiNode(
+            (BoolMultiNode) node, (ConfigBoolMultiNode) configNode, nodeMap, labelMap);
         break;
       case CATEGORICAL:
         updateEnumNode(
@@ -337,9 +360,15 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       Map<String, Node> nodeMap,
       Map<String, Label> labelMap) {
     NodeOutcome outcomeTrue = toNodeOutcome(configNode.getOutcomeTrue(), nodeMap, labelMap);
+    if (outcomeTrue == null) {
+      throw new UnknownNodeException(configNode.getOutcomeTrue().getLabel());
+    }
     node.setOutcomeTrue(outcomeTrue);
 
     NodeOutcome outcomeFalse = toNodeOutcome(configNode.getOutcomeFalse(), nodeMap, labelMap);
+    if (outcomeFalse == null) {
+      throw new UnknownNodeException(configNode.getOutcomeFalse().getLabel());
+    }
     node.setOutcomeFalse(outcomeFalse);
   }
 
@@ -363,25 +392,46 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       ConfigBoolMultiNode configNode,
       Map<String, Node> nodeMap,
       Map<String, Label> labelMap) {
-    Map<String, ConfigBoolMultiQuery> clauses = configNode.getOutcomes().stream()
-        .collect(Collectors.toMap(ConfigBoolMultiQuery::getId, clause -> clause));
-    node.setClauses(node.getClauses().stream()
-        .map(clause -> updateClause(clause, clauses.get(clause.getId()), nodeMap, labelMap))
-        .toList());
+    Map<String, ConfigBoolMultiQuery> clauses =
+        configNode.getOutcomes().stream()
+            .collect(Collectors.toMap(ConfigBoolMultiQuery::getId, clause -> clause));
+    node.setClauses(
+        node.getClauses().stream()
+            .map(
+                clause -> {
+                  var clauseUpdate = clauses.get(clause.getId());
+                  if (clauseUpdate == null) {
+                    throw new IllegalStateException(
+                        String.format("Missing clause '%s'", clause.getId()));
+                  }
+                  return updateClause(clause, clauseUpdate, nodeMap, labelMap);
+                })
+            .toList());
 
     NodeOutcome outcomeMissing = toNodeOutcome(configNode.getOutcomeMissing(), nodeMap, labelMap);
+    if (outcomeMissing == null) {
+      throw new UnknownNodeException(configNode.getOutcomeMissing().getLabel());
+    }
     node.setOutcomeMissing(outcomeMissing);
 
     NodeOutcome outcomeDefault = toNodeOutcome(configNode.getOutcomeDefault(), nodeMap, labelMap);
+    if (outcomeDefault == null) {
+      throw new UnknownNodeException(configNode.getOutcomeDefault().getLabel());
+    }
     node.setOutcomeDefault(outcomeDefault);
   }
 
-  private BoolMultiQuery updateClause(BoolMultiQuery clause,
+  private BoolMultiQuery updateClause(
+      BoolMultiQuery clause,
       ConfigBoolMultiQuery configBoolMultiQuery,
-      Map<String, Node> nodeMap, Map<String, Label> labelMap) {
-    NodeOutcome outcomeDefault = toNodeOutcome(configBoolMultiQuery.getOutcomeTrue(), nodeMap,
-        labelMap);
-    clause.setOutcomeTrue(outcomeDefault);
+      Map<String, Node> nodeMap,
+      Map<String, Label> labelMap) {
+    NodeOutcome outcomeTrue =
+        toNodeOutcome(configBoolMultiQuery.getOutcomeTrue(), nodeMap, labelMap);
+    if (outcomeTrue == null) {
+      throw new UnknownNodeException(configBoolMultiQuery.getOutcomeTrue().getLabel());
+    }
+    clause.setOutcomeTrue(outcomeTrue);
     return clause;
   }
 
@@ -407,15 +457,19 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     node.setOutcomeDefault(outcomeDefault);
   }
 
-  private NodeOutcome toNodeOutcome(
+  private @Nullable NodeOutcome toNodeOutcome(
       @Nullable ConfigNodeOutcome configNodeOutcome,
       Map<String, Node> nodeMap,
       Map<String, Label> labelMap) {
     NodeOutcome nodeOutcome;
     if (configNodeOutcome != null) {
       Node nextNode = nodeMap.get(configNodeOutcome.getNextNode());
-      Label label = labelMap.get(configNodeOutcome.getLabel());
-      nodeOutcome = NodeOutcome.builder().nextNode(nextNode).label(label).build();
+      if (nextNode == null) {
+        nodeOutcome = null;
+      } else {
+        Label label = labelMap.get(configNodeOutcome.getLabel());
+        nodeOutcome = NodeOutcome.builder().nextNode(nextNode).label(label).build();
+      }
     } else {
       nodeOutcome = null;
     }
