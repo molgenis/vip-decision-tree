@@ -1,9 +1,9 @@
 package org.molgenis.vcf.decisiontree.runner.info;
 
+import java.io.Serial;
+
 public class NotParentFieldException extends RuntimeException {
-  private static final long serialVersionUID = 1L;
-  private static final String MESSAGE =
-      "Field '%s' is not a parent field, it has no nested fields.";
+  @Serial private static final long serialVersionUID = 1L;
   private final String id;
 
   public NotParentFieldException(String id) {
@@ -12,6 +12,6 @@ public class NotParentFieldException extends RuntimeException {
 
   @Override
   public String getMessage() {
-    return String.format(MESSAGE, id);
+    return String.format("Field '%s' is not a parent field, it has no nested fields.", id);
   }
 }

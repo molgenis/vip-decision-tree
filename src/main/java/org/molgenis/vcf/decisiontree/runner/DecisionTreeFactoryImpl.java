@@ -80,9 +80,7 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       filesMap = emptyMap();
     } else {
       filesMap = new HashMap<>();
-      files
-          .entrySet()
-          .forEach(entry -> filesMap.put(entry.getKey(), this.mapFile(entry.getValue())));
+      files.forEach((key, value) -> filesMap.put(key, this.mapFile(value)));
     }
     return filesMap;
   }
@@ -141,28 +139,13 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
 
   private Node toNode(
       VcfMetadata vcfMetadata, String id, ConfigNode configNode, Map<String, Set<String>> files) {
-    Node node;
-    switch (configNode.getType()) {
-      case EXISTS:
-        node = toExistsNode(vcfMetadata, id, (ConfigExistsNode) configNode);
-        break;
-      case BOOL:
-        node = toBoolNode(vcfMetadata, id, (ConfigBoolNode) configNode, files);
-        break;
-      case BOOL_MULTI:
-        node = toBoolMultiNode(vcfMetadata, id, (ConfigBoolMultiNode) configNode, files);
-        break;
-      case CATEGORICAL:
-        node = toCategoricalNode(vcfMetadata, id, (ConfigCategoricalNode) configNode);
-        break;
-      case LEAF:
-        node = toLeafNode(id, (ConfigLeafNode) configNode);
-        break;
-      default:
-        throw new IllegalArgumentException(
-            String.format("unexpected enum '%s'", configNode.getType().toString()));
-    }
-    return node;
+    return switch (configNode.getType()) {
+      case EXISTS -> toExistsNode(vcfMetadata, id, (ConfigExistsNode) configNode);
+      case BOOL -> toBoolNode(vcfMetadata, id, (ConfigBoolNode) configNode, files);
+      case BOOL_MULTI -> toBoolMultiNode(vcfMetadata, id, (ConfigBoolMultiNode) configNode, files);
+      case CATEGORICAL -> toCategoricalNode(vcfMetadata, id, (ConfigCategoricalNode) configNode);
+      case LEAF -> toLeafNode(id, (ConfigLeafNode) configNode);
+    };
   }
 
   private Node toExistsNode(VcfMetadata vcfMetadata, String id, ConfigExistsNode configNode) {
@@ -246,64 +229,29 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
       return null;
     }
     switch (configOperator) {
-      case AND:
-        operator = BoolMultiQuery.Operator.AND;
-        break;
-      case OR:
-        operator = BoolMultiQuery.Operator.OR;
-        break;
-      default:
-        throw new UnexpectedEnumException(configOperator);
+      case AND -> operator = BoolMultiQuery.Operator.AND;
+      case OR -> operator = BoolMultiQuery.Operator.OR;
+      default -> throw new UnexpectedEnumException(configOperator);
     }
     return operator;
   }
 
   private Operator toOperator(ConfigOperator configOperator) {
-    Operator operator;
-    switch (configOperator) {
-      case EQUALS:
-        operator = Operator.EQUALS;
-        break;
-      case NOT_EQUALS:
-        operator = Operator.NOT_EQUALS;
-        break;
-      case LESS:
-        operator = Operator.LESS;
-        break;
-      case LESS_OR_EQUAL:
-        operator = Operator.LESS_OR_EQUAL;
-        break;
-      case GREATER:
-        operator = Operator.GREATER;
-        break;
-      case GREATER_OR_EQUAL:
-        operator = Operator.GREATER_OR_EQUAL;
-        break;
-      case IN:
-        operator = Operator.IN;
-        break;
-      case NOT_IN:
-        operator = Operator.NOT_IN;
-        break;
-      case CONTAINS:
-        operator = Operator.CONTAINS;
-        break;
-      case NOT_CONTAINS:
-        operator = Operator.NOT_CONTAINS;
-        break;
-      case CONTAINS_ALL:
-        operator = Operator.CONTAINS_ALL;
-        break;
-      case CONTAINS_ANY:
-        operator = Operator.CONTAINS_ANY;
-        break;
-      case CONTAINS_NONE:
-        operator = Operator.CONTAINS_NONE;
-        break;
-      default:
-        throw new UnexpectedEnumException(configOperator);
-    }
-    return operator;
+    return switch (configOperator) {
+      case EQUALS -> Operator.EQUALS;
+      case NOT_EQUALS -> Operator.NOT_EQUALS;
+      case LESS -> Operator.LESS;
+      case LESS_OR_EQUAL -> Operator.LESS_OR_EQUAL;
+      case GREATER -> Operator.GREATER;
+      case GREATER_OR_EQUAL -> Operator.GREATER_OR_EQUAL;
+      case IN -> Operator.IN;
+      case NOT_IN -> Operator.NOT_IN;
+      case CONTAINS -> Operator.CONTAINS;
+      case NOT_CONTAINS -> Operator.NOT_CONTAINS;
+      case CONTAINS_ALL -> Operator.CONTAINS_ALL;
+      case CONTAINS_ANY -> Operator.CONTAINS_ANY;
+      case CONTAINS_NONE -> Operator.CONTAINS_NONE;
+    };
   }
 
   private CategoricalNode toCategoricalNode(
@@ -334,23 +282,18 @@ class DecisionTreeFactoryImpl implements DecisionTreeFactory {
     }
 
     switch (configNode.getType()) {
-      case EXISTS:
-        updateExistsNode((ExistsNode) node, (ConfigExistsNode) configNode, nodeMap, labelMap);
-        break;
-      case BOOL:
-        updateBoolNode((BoolNode) node, (ConfigBoolNode) configNode, nodeMap, labelMap);
-        break;
-      case BOOL_MULTI:
-        updateBoolMultiNode(
-            (BoolMultiNode) node, (ConfigBoolMultiNode) configNode, nodeMap, labelMap);
-        break;
-      case CATEGORICAL:
-        updateEnumNode(
-            (CategoricalNode) node, (ConfigCategoricalNode) configNode, nodeMap, labelMap);
-        break;
-      default:
-        throw new IllegalArgumentException(
-            String.format("unexpected enum '%s'", configNode.getType().toString()));
+      case EXISTS ->
+          updateExistsNode((ExistsNode) node, (ConfigExistsNode) configNode, nodeMap, labelMap);
+      case BOOL -> updateBoolNode((BoolNode) node, (ConfigBoolNode) configNode, nodeMap, labelMap);
+      case BOOL_MULTI ->
+          updateBoolMultiNode(
+              (BoolMultiNode) node, (ConfigBoolMultiNode) configNode, nodeMap, labelMap);
+      case CATEGORICAL ->
+          updateEnumNode(
+              (CategoricalNode) node, (ConfigCategoricalNode) configNode, nodeMap, labelMap);
+      default ->
+          throw new IllegalArgumentException(
+              String.format("unexpected enum '%s'", configNode.getType().toString()));
     }
   }
 

@@ -13,6 +13,7 @@ import htsjdk.variant.vcf.VCFHeaderLineCount;
 import htsjdk.variant.vcf.VCFHeaderLineType;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.decisiontree.filter.model.Field;
@@ -71,7 +72,7 @@ public class VcfMetadata {
     ValueType valueType;
     ValueCount valueCount;
     String field = fieldTokens.get(1);
-    switch (field.toUpperCase()) {
+    switch (field.toUpperCase(Locale.ROOT)) {
       case "PROBAND" -> {
         valueType = ValueType.FLAG;
         valueCount = ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build();
@@ -125,7 +126,7 @@ public class VcfMetadata {
 
     ValueType valueType;
     ValueCount valueCount;
-    String field = fieldTokens.get(0);
+    String field = fieldTokens.getFirst();
     switch (field) {
       case "#CHROM", "REF" -> {
         valueType = ValueType.STRING;

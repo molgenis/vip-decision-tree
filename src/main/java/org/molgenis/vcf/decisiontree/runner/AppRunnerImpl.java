@@ -22,6 +22,7 @@ class AppRunnerImpl implements AppRunner {
     this.recordWriter = requireNonNull(recordWriter);
   }
 
+  @Override
   public void run() {
     LOGGER.info("classifying variants with decision tree ...");
     classifier.classify(vcfReader);

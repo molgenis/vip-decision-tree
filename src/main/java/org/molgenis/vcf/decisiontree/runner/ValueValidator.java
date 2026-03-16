@@ -48,11 +48,11 @@ public class ValueValidator {
 
   private static void validateValue(String nodeId, ConfigNode node, VcfMetadata vcfMetadata) {
     switch (node.getType()) {
-      case BOOL:
+      case BOOL -> {
         ConfigBoolNode boolNode = (ConfigBoolNode) node;
         validateQueryValue(nodeId, boolNode.getQuery(), vcfMetadata);
-        break;
-      case BOOL_MULTI:
+      }
+      case BOOL_MULTI -> {
         ConfigBoolMultiNode boolMultiNode = (ConfigBoolMultiNode) node;
         boolMultiNode
             .getOutcomes()
@@ -61,11 +61,9 @@ public class ValueValidator {
                     configBoolMultiQuery
                         .getQueries()
                         .forEach(query -> validateQueryValue(nodeId, query, vcfMetadata)));
-        break;
-      case CATEGORICAL, EXISTS, LEAF:
-        break;
-      default:
-        throw new UnexpectedEnumException(node.getType());
+      }
+      case CATEGORICAL, EXISTS, LEAF -> {}
+      default -> throw new UnexpectedEnumException(node.getType());
     }
   }
 
@@ -152,29 +150,29 @@ public class ValueValidator {
 
   private static void validateValueTypes(String nodeId, Object singleValue, ValueType valueType) {
     switch (valueType) {
-      case INTEGER, FLOAT:
+      case INTEGER, FLOAT -> {
         if (!Number.class.isAssignableFrom(singleValue.getClass())) {
           throw new ConfigDecisionTreeValidationException(
               format(
                   MESSAGE, singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
         }
-        break;
-      case FLAG:
+      }
+      case FLAG -> {
         if (!Boolean.class.isAssignableFrom(singleValue.getClass())) {
           throw new ConfigDecisionTreeValidationException(
               format(
                   MESSAGE, singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
         }
-        break;
-      case STRING, CATEGORICAL:
-        if (!(String.class.isAssignableFrom(singleValue.getClass()))) {
+      }
+      case STRING, CATEGORICAL -> {
+        if (!String.class.isAssignableFrom(singleValue.getClass())) {
           throw new ConfigDecisionTreeValidationException(
               format(
                   MESSAGE, singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
         }
-        break;
-      case CHARACTER:
-        if (!(String.class.isAssignableFrom(singleValue.getClass()))) {
+      }
+      case CHARACTER -> {
+        if (!String.class.isAssignableFrom(singleValue.getClass())) {
           throw new ConfigDecisionTreeValidationException(
               format(
                   MESSAGE, singleValue, singleValue.getClass().getSimpleName(), valueType, nodeId));
@@ -185,9 +183,8 @@ public class ValueValidator {
                   "Value '%s' is more than one character long while the fieldtype of the field is 'CHARACTER' for node '%s'.",
                   singleValue, nodeId));
         }
-        break;
-      default:
-        throw new UnexpectedEnumException(valueType);
+      }
+      default -> throw new UnexpectedEnumException(valueType);
     }
   }
 }

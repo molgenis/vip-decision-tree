@@ -5,13 +5,11 @@ import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_DEBUG;
 import static org.molgenis.vcf.decisiontree.AppCommandLineOptions.OPT_DEBUG_LONG;
 
 import ch.qos.logback.classic.Level;
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Locale.Category;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.molgenis.vcf.decisiontree.runner.AppRunner;
 import org.molgenis.vcf.decisiontree.runner.AppRunnerFactory;
 import org.slf4j.Logger;
@@ -62,10 +60,10 @@ class AppCommandLineRunner implements CommandLineRunner {
     for (String arg : args) {
       if (arg.equals('-' + OPT_DEBUG) || arg.equals('-' + OPT_DEBUG_LONG)) {
         Logger rootLogger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
-        if (!(rootLogger instanceof ch.qos.logback.classic.Logger)) {
+        if (!(rootLogger instanceof ch.qos.logback.classic.Logger logger)) {
           throw new ClassCastException("Expected root logger to be a logback logger");
         }
-        ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.DEBUG);
+        logger.setLevel(Level.DEBUG);
         break;
       }
     }
@@ -101,11 +99,15 @@ class AppCommandLineRunner implements CommandLineRunner {
 
     // following information is only logged to system out
     System.out.println();
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.setOptionComparator(null);
+    HelpFormatter formatter = HelpFormatter.builder().setComparator(null).get();
     String cmdLineSyntax = "java -jar " + appName + ".jar";
-    formatter.printHelp(cmdLineSyntax, AppCommandLineOptions.getAppOptions(), true);
-    System.out.println();
-    formatter.printHelp(cmdLineSyntax, AppCommandLineOptions.getAppVersionOptions(), true);
+    try {
+      formatter.printHelp(cmdLineSyntax, "", AppCommandLineOptions.getAppOptions(), "", true);
+      System.out.println();
+      formatter.printHelp(
+          cmdLineSyntax, "", AppCommandLineOptions.getAppVersionOptions(), "", true);
+    } catch (IOException ex) {
+      LOGGER.error("failed to log exception");
+    }
   }
 }

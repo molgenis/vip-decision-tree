@@ -25,20 +25,13 @@ public class QueryValidatorImpl implements QueryValidator {
   public void validateBooleanNode(ConfigBoolQuery configBoolQuery, Field field) {
     if (!(field instanceof MissingField)) {
       switch (configBoolQuery.getOperator()) {
-        case GREATER, LESS, LESS_OR_EQUAL, GREATER_OR_EQUAL:
-          validateLesserGreater(field, configBoolQuery);
-          break;
-        case IN, NOT_IN:
-          validateIn(field);
-          break;
-        case CONTAINS, NOT_CONTAINS, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_NONE:
-          validateContains(field, configBoolQuery);
-          break;
-        case EQUALS, NOT_EQUALS:
-          validateEquals(field, configBoolQuery);
-          break;
-        default:
-          throw new UnexpectedEnumException(configBoolQuery.getOperator());
+        case GREATER, LESS, LESS_OR_EQUAL, GREATER_OR_EQUAL ->
+            validateLesserGreater(field, configBoolQuery);
+        case IN, NOT_IN -> validateIn(field);
+        case CONTAINS, NOT_CONTAINS, CONTAINS_ALL, CONTAINS_ANY, CONTAINS_NONE ->
+            validateContains(field, configBoolQuery);
+        case EQUALS, NOT_EQUALS -> validateEquals(field, configBoolQuery);
+        default -> throw new UnexpectedEnumException(configBoolQuery.getOperator());
       }
     }
   }

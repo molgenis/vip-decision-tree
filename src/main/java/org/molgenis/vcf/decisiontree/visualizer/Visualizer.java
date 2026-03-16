@@ -1,6 +1,7 @@
 package org.molgenis.vcf.decisiontree.visualizer;
 
 import static java.lang.String.format;
+import static org.molgenis.vcf.decisiontree.loader.model.ConfigNode.Type.*;
 import static org.molgenis.vcf.decisiontree.loader.model.ConfigNode.Type.LEAF;
 
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.Map.Entry;
 import org.apache.commons.cli.*;
+import org.apache.commons.cli.help.HelpFormatter;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoaderImpl;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeValidator;
@@ -23,7 +25,6 @@ import org.molgenis.vcf.decisiontree.loader.model.ConfigCategoricalNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigDecisionTree;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigExistsNode;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNode;
-import org.molgenis.vcf.decisiontree.loader.model.ConfigNode.Type;
 import org.molgenis.vcf.decisiontree.loader.model.ConfigNodeOutcome;
 import org.molgenis.vcf.decisiontree.visualizer.model.Edge;
 import org.molgenis.vcf.decisiontree.visualizer.model.Node;
@@ -88,20 +89,20 @@ public class Visualizer {
             .desc("Input .json decision tree file.")
             .hasArg()
             .required()
-            .build());
+            .get());
     options.addOption(
         Option.builder(OPT_OUTPUT)
             .longOpt(OPT_OUTPUT_LONG)
             .desc("Output .html file.")
             .hasArg()
-            .build());
+            .get());
     options.addOption(
-        Option.builder(OPT_FORCE).longOpt(OPT_FORCE_LONG).desc("Overwrite output file.").build());
+        Option.builder(OPT_FORCE).longOpt(OPT_FORCE_LONG).desc("Overwrite output file.").get());
     options.addOption(
         Option.builder(OPT_MERMAID)
             .longOpt(OPT_MERMAID_LONG)
             .desc("Also output mermaid text file.")
-            .build());
+            .get());
 
     try {
       commandLine = commandLineParser.parse(options, args);
@@ -115,23 +116,23 @@ public class Visualizer {
 
   private static void createEdges(
       List<Edge> edges, Entry<String, ConfigNode> entry, ConfigNode node) {
-    if (node.getType() == Type.BOOL) {
+    if (node.getType() == BOOL) {
       ConfigBoolNode boolNode = (ConfigBoolNode) node;
       Map<String, String> boolOutcomes = new HashMap<>();
       boolOutcomes.put(TRUE, boolNode.getOutcomeTrue().getNextNode());
       boolOutcomes.put(FALSE, boolNode.getOutcomeFalse().getNextNode());
       boolOutcomes.put(MISSING, boolNode.getOutcomeMissing().getNextNode());
       processOutcomes(edges, entry, boolOutcomes);
-    } else if (node.getType() == Type.EXISTS) {
+    } else if (node.getType() == EXISTS) {
       ConfigExistsNode boolNode = (ConfigExistsNode) node;
       Map<String, String> boolOutcomes = new HashMap<>();
       boolOutcomes.put(TRUE, boolNode.getOutcomeTrue().getNextNode());
       boolOutcomes.put(FALSE, boolNode.getOutcomeFalse().getNextNode());
       processOutcomes(edges, entry, boolOutcomes);
-    } else if (node.getType() == Type.BOOL_MULTI) {
+    } else if (node.getType() == BOOL_MULTI) {
       Map<String, String> boolOutcomes = getBoolOutcomes((ConfigBoolMultiNode) node);
       processOutcomes(edges, entry, boolOutcomes);
-    } else if (node.getType() == Type.CATEGORICAL) {
+    } else if (node.getType() == CATEGORICAL) {
       Map<String, String> categoricalOutcomes =
           getCategoricalOutcomes((ConfigCategoricalNode) node);
       processOutcomes(edges, entry, categoricalOutcomes);
@@ -255,9 +256,13 @@ public class Visualizer {
   }
 
   private static void logException(Options options) {
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.setOptionComparator(null);
+    org.apache.commons.cli.help.HelpFormatter formatter =
+        HelpFormatter.builder().setComparator(null).get();
     String cmdLineSyntax = "java -jar vcf-decision-tree-visualizer.jar";
-    formatter.printHelp(cmdLineSyntax, options, true);
+    try {
+      formatter.printHelp(cmdLineSyntax, "", options, "", true);
+    } catch (IOException ex) {
+      LOGGER.error("failed to log exception");
+    }
   }
 }

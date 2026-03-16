@@ -18,6 +18,7 @@ public class ConsequenceAnnotatorFactoryImpl implements ConsequenceAnnotatorFact
     this.vepMetadataMapperFactory = requireNonNull(vepMetadataMapperFactory);
   }
 
+  @Override
   public ConsequenceAnnotator create(Settings settings, VCFHeader header) {
     return new ConsequenceAnnotatorImpl(
         settings.getWriterSettings().isWriteLabels(),

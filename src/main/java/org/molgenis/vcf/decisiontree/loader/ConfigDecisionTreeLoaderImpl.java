@@ -19,6 +19,7 @@ public class ConfigDecisionTreeLoaderImpl implements ConfigDecisionTreeLoader {
     this.configDecisionTreeValidator = requireNonNull(configDecisionTreeValidator);
   }
 
+  @Override
   public ConfigDecisionTree load(Path decisionTreeConfigPath) {
     ObjectMapper mapper = new ObjectMapper();
     SimpleModule module = new SimpleModule();

@@ -1,7 +1,9 @@
 package org.molgenis.vcf.decisiontree.runner;
 
-import java.io.FileReader;
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +53,8 @@ public class SamplesContextFactory {
     List<SampleContext> sampleContexts = new ArrayList<>();
     Set<String> processedSamples = new LinkedHashSet<>();
     for (Path pedigreePath : sampleSettings.getPedigreePaths()) {
-      try (PedReader reader = new PedReader(new FileReader(pedigreePath.toFile()))) {
+      try (PedReader reader =
+          new PedReader(Files.newBufferedReader(pedigreePath.toFile().toPath(), UTF_8))) {
         Map<String, SampleContext> sampleContextMap =
             parse(reader, probands, phenotypesPerSample, defaultPhenotypes, vcfSampleNames);
         sampleContexts.addAll(sampleContextMap.values());
@@ -91,12 +94,12 @@ public class SamplesContextFactory {
 
   private static Map<String, List<String>> parseSamplePhenotypes(String phenotypesString) {
     Map<String, List<String>> result = new HashMap<>();
-    for (String samplePhenotypes : phenotypesString.split(",")) {
+    for (String samplePhenotypes : phenotypesString.split(",", -1)) {
       if (samplePhenotypes.contains("/")) {
-        String[] split = samplePhenotypes.split("/");
+        String[] split = samplePhenotypes.split("/", -1);
         if (split.length == 2) {
           String sampleId = split[0];
-          String[] phenotypes = split[1].split(";");
+          String[] phenotypes = split[1].split(";", -1);
           result.put(sampleId, Arrays.asList(phenotypes));
         } else {
           throw new InvalidSamplePhenotypesException(samplePhenotypes);
@@ -191,26 +194,19 @@ public class SamplesContextFactory {
   }
 
   private static Sex map(PedIndividual.Sex sex) {
-    switch (sex) {
-      case MALE:
-        return Sex.MALE;
-      case FEMALE:
-        return Sex.FEMALE;
-      default:
-        return Sex.UNKNOWN;
-    }
+    return switch (sex) {
+      case MALE -> Sex.MALE;
+      case FEMALE -> Sex.FEMALE;
+      default -> Sex.UNKNOWN;
+    };
   }
 
   private static AffectedStatus map(AffectionStatus affectionStatus) {
-    switch (affectionStatus) {
-      case AFFECTED:
-        return AffectedStatus.AFFECTED;
-      case UNAFFECTED:
-        return AffectedStatus.UNAFFECTED;
-      case UNKNOWN:
-      default:
-        return AffectedStatus.MISSING;
-    }
+    return switch (affectionStatus) {
+      case AFFECTED -> AffectedStatus.AFFECTED;
+      case UNAFFECTED -> AffectedStatus.UNAFFECTED;
+      default -> AffectedStatus.MISSING;
+    };
   }
 
   private static boolean isProband(List<String> probands, String sampleId) {
