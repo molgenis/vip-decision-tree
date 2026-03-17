@@ -1,36 +1,50 @@
+arch: amd64
 os: linux
-dist: jammy
-language: java
-jdk: openjdk25
+dist: noble
+language: minimal
 cache:
   directories:
     - "$HOME/.m2"
+    - "$HOME/jdk"
+    - "$HOME/mvn"
 branches:
   only:
     - main
-    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+    - "/^v\\d+\\.\\d+(\\.\\d+)?(-\\S*)?$/"
 before_install:
-  - cp travis.settings.xml $HOME/.m2/settings.xml
+  # install temurin 25
+  - |
+    if [ ! -f "$HOME/jdk/bin/java" ]; then
+      curl --fail --silent --show-error --location --output "$HOME/jdk.tar.gz" \
+        https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.2%2B10/OpenJDK25U-jdk_x64_linux_hotspot_25.0.2_10.tar.gz
+      echo "987387933b64b9833846dee373b640440d3e1fd48a04804ec01a6dbf718e8ab8  $HOME/jdk.tar.gz" | sha256sum --check          
+      tar --extract --gunzip --strip-components=1 --directory="$HOME/jdk" -f "$HOME/jdk.tar.gz"
+      rm "$HOME/jdk.tar.gz"
+    fi
+  # install maven 3.9.11
+  - |
+    if [ ! -f "$HOME/mvn/bin/mvn" ]; then
+      curl --fail --silent --show-error --location --output "$HOME/mvn.tar.gz" \
+        https://archive.apache.org/dist/maven/maven-3/3.9.11/binaries/apache-maven-3.9.11-bin.tar.gz
+      echo "4b7195b6a4f5c81af4c0212677a32ee8143643401bc6e1e8412e6b06ea82beac  $HOME/mvn.tar.gz" | sha256sum --check
+      tar --extract --gunzip --strip-components=1 --directory="$HOME/mvn" -f "$HOME/mvn.tar.gz"
+      rm "$HOME/mvn.tar.gz"
+    fi
+  # sync maven settings
+  - rsync --archive --checksum travis.settings.xml $HOME/.m2/settings.xml
 script:
-  - mvn clean install -Pcoverage
-before_deploy:
-  # workaround for: https://travis-ci.community/t/deployments-are-failing-due-to-uri-dependency/14375
-  - yes | gem update --system --force
-  - gem install faraday-net_http -v '3.3.0' # workaround for the workaround - https://travis-ci.community/t/cannot-load-such-file-faraday-net-http-loaderror/14455/3
-  - gem install bundler
-  - gem install uri
-  - gem install logger
+  - mvn verify --batch-mode --no-transfer-progress --activate-profiles coverage -Djacoco.skip.report=true
 deploy:
   provider: releases
-  api_key:
+  token:
     secure: kFbDNwRWsLpEeTS0LrFrOiHL/YDyX3D/0GddXhLyEv/cBINRNqPw55s0T1P6k5yUBQvB5AnAeo+wb76Phy6gogDls8gZCdaf0SEg8X6DmyihH2aSypWxyi8pcLQIwpNvFlNLFhVCkMdI6EsZ5n8lNNszEWwWK0RR+cCDP5y0Otzni3Z/w0YhMv9eaKTvby6uHXm7szSRGN6R9Bhwrxa29111mcO3HTd2L3EPLDvnf9rygCb/w0ONfTFFaWFholJu/zwuw7TFlFQKeFhsJp52uuwV2JPezvW/YsgUUxTREJynL1wCbzWoMTyuiUTnFR32tGtMtpwjy2TsZ8UFPNioNMknBJzCIq8VL/0Q0qkvoJVWPWOL0QQBfytPUOHOYYL+q+j4awVzWpkUIwAor+UylfH+kLszki0V/62FpTuIVe8Bhss5XVoTx5LzMu7ZsA93VDObjVBa9l5xW5MiI88hm8E208wdVjJKXENhda7WtqCD+n0khYXdHxQRDOOmSJeulnlEhvYD5oJ48+8257TiEu4ZVYECBYY1mutZnBXzXH4bE+G+MjgJpnblpUS1HLxOwEIcSjbApP/27LdmvuVBoR5/oDHaBSJiPAHg2Aj+04CT2tNgLkTlCwbInULvlo1fhSLdqJT9RE2K1yeXdz+dDMsRstcqMDbaOgYK3IVvuzo=
   file:
-   - target/vcf-decision-tree.jar
-   - target/vcf-decision-tree-visualizer.jar
-  prerelease: true
+    - target/vcf-decision-tree.jar
+    - target/vcf-decision-tree-visualizer.jar
   on:
     tags: true
-  edge: true # opt in to dpl v2
 env:
   global:
-    secure: qx9Yp1tRXfUEOcgTwmbIgHlxqceXG+/Hmo+doPlKNF1zt9t89HjFe1QzKMBh5WCz8+C4jtJJeQ6i6WUL0WWgV54h3KJeSgwIMHxwoX2iYS8BIGBSqeKO4zidqYTbjzyNeh01wqNMgUjoBe91mtQtvhlnVOoPr+cS7UbcgPRAspLukancqRfWvnUx+XQNqCz79+RuGOdE7l+L1iUaAI40YPUVCsjiwyJeoIgdVI1T9t8rjZ9ARjLvrb3Kd94JFiTuBmadDkLe5ZYQ26f6E52RAULqZIInceXwUHwmuRRTajcWSdl8BoOVNLf7ey+CCVcSyb4Yy0m35n+yUui2//6UzwvhTpWTzhlWCP7Rx2rdis1UPy+nwK9Ci2gCfHZF7MW16T57PD3gXU3sBvTsCOt2AxY0UQWtq6/VY+KFuZcUW/lZydWTRwBLGFFCH4NeQWwFz+4WsuAQI+hYI/ukDsX4tUsnPXK4OwP4M391x9GT34eDuCFGtR1Th72V592h+tcV9zp1LhTylVGJVFcbh/tPhY65iFITdxE9fd9lGNNYkJlrA5YvL/yOOo4vRh7ZxUMXepcAecGWnSkeInXbl/nbSJ1RGI8Bxk6r1vqGqp/wkgJdFsTaOz5BXqjR3ZQA/ZgLOMMR2OE+LPzYUbSa6IPIl6UbezEoIY1Nqy0col4axWc=
+    - JAVA_HOME=$HOME/jdk
+    - PATH=$HOME/jdk/bin:$HOME/mvn/bin:$PATH
+    - secure: qx9Yp1tRXfUEOcgTwmbIgHlxqceXG+/Hmo+doPlKNF1zt9t89HjFe1QzKMBh5WCz8+C4jtJJeQ6i6WUL0WWgV54h3KJeSgwIMHxwoX2iYS8BIGBSqeKO4zidqYTbjzyNeh01wqNMgUjoBe91mtQtvhlnVOoPr+cS7UbcgPRAspLukancqRfWvnUx+XQNqCz79+RuGOdE7l+L1iUaAI40YPUVCsjiwyJeoIgdVI1T9t8rjZ9ARjLvrb3Kd94JFiTuBmadDkLe5ZYQ26f6E52RAULqZIInceXwUHwmuRRTajcWSdl8BoOVNLf7ey+CCVcSyb4Yy0m35n+yUui2//6UzwvhTpWTzhlWCP7Rx2rdis1UPy+nwK9Ci2gCfHZF7MW16T57PD3gXU3sBvTsCOt2AxY0UQWtq6/VY+KFuZcUW/lZydWTRwBLGFFCH4NeQWwFz+4WsuAQI+hYI/ukDsX4tUsnPXK4OwP4M391x9GT34eDuCFGtR1Th72V592h+tcV9zp1LhTylVGJVFcbh/tPhY65iFITdxE9fd9lGNNYkJlrA5YvL/yOOo4vRh7ZxUMXepcAecGWnSkeInXbl/nbSJ1RGI8Bxk6r1vqGqp/wkgJdFsTaOz5BXqjR3ZQA/ZgLOMMR2OE+LPzYUbSa6IPIl6UbezEoIY1Nqy0col4axWc=
