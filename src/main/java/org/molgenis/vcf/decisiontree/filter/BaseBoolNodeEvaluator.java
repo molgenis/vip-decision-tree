@@ -20,83 +20,45 @@ interface BaseBoolNodeEvaluator<T extends DecisionNode> extends NodeEvaluator<T>
     Operator operator = boolQuery.getOperator();
     Object queryValue = boolQuery.getValue();
 
-    switch (operator) {
-      case EQUALS:
-        matches = value.equals(queryValue);
-        break;
-      case NOT_EQUALS:
-        matches = !value.equals(queryValue);
-        break;
-      case LESS:
-        matches = executeLessQuery(field, value, queryValue);
-        break;
-      case LESS_OR_EQUAL:
-        matches = !executeGreaterQuery(field, value, queryValue);
-        break;
-      case GREATER:
-        matches = executeGreaterQuery(field, value, queryValue);
-        break;
-      case GREATER_OR_EQUAL:
-        matches = !executeLessQuery(field, value, queryValue);
-        break;
-      case IN:
-        matches = executeInQuery(value, (Collection<?>) queryValue);
-        break;
-      case NOT_IN:
-        matches = !executeInQuery(value, (Collection<?>) queryValue);
-        break;
-      case CONTAINS:
-        matches = executeContainsQuery((Collection<?>) value, queryValue);
-        break;
-      case NOT_CONTAINS:
-        matches = !executeContainsQuery((Collection<?>) value, queryValue);
-        break;
-      case CONTAINS_ALL:
-        matches = executeContainsAllQuery((Collection<?>) value, (Collection<?>) queryValue);
-        break;
-      case CONTAINS_ANY:
-        matches = executeContainsAnyQuery((Collection<?>) value, (Collection<?>) queryValue);
-        break;
-      case CONTAINS_NONE:
-        matches = executeContainsNoneQuery((Collection<?>) value, (Collection<?>) queryValue);
-        break;
-      default:
-        throw new UnexpectedEnumException(operator);
-    }
+    matches =
+        switch (operator) {
+          case EQUALS -> value.equals(queryValue);
+          case NOT_EQUALS -> !value.equals(queryValue);
+          case LESS -> executeLessQuery(field, value, queryValue);
+          case LESS_OR_EQUAL -> !executeGreaterQuery(field, value, queryValue);
+          case GREATER -> executeGreaterQuery(field, value, queryValue);
+          case GREATER_OR_EQUAL -> !executeLessQuery(field, value, queryValue);
+          case IN -> executeInQuery(value, (Collection<?>) queryValue);
+          case NOT_IN -> !executeInQuery(value, (Collection<?>) queryValue);
+          case CONTAINS -> executeContainsQuery((Collection<?>) value, queryValue);
+          case NOT_CONTAINS -> !executeContainsQuery((Collection<?>) value, queryValue);
+          case CONTAINS_ALL ->
+              executeContainsAllQuery((Collection<?>) value, (Collection<?>) queryValue);
+          case CONTAINS_ANY ->
+              executeContainsAnyQuery((Collection<?>) value, (Collection<?>) queryValue);
+          case CONTAINS_NONE ->
+              executeContainsNoneQuery((Collection<?>) value, (Collection<?>) queryValue);
+        };
 
     return matches;
   }
 
   @SuppressWarnings("DuplicatedCode")
   default boolean executeLessQuery(Field field, Object value, Object queryValue) {
-    boolean matches;
-    switch (field.getValueType()) {
-      case INTEGER:
-        matches = ((Integer) value) < ((Integer) queryValue);
-        break;
-      case FLOAT:
-        matches = ((Double) value) < ((Double) queryValue);
-        break;
-      default:
-        throw new UnexpectedEnumException(field.getValueType());
-    }
-    return matches;
+    return switch (field.getValueType()) {
+      case INTEGER -> ((Integer) value) < ((Integer) queryValue);
+      case FLOAT -> ((Double) value) < ((Double) queryValue);
+      default -> throw new UnexpectedEnumException(field.getValueType());
+    };
   }
 
   @SuppressWarnings("DuplicatedCode")
   default boolean executeGreaterQuery(Field field, Object value, Object queryValue) {
-    boolean matches;
-    switch (field.getValueType()) {
-      case INTEGER:
-        matches = ((Integer) value) > ((Integer) queryValue);
-        break;
-      case FLOAT:
-        matches = ((Double) value) > ((Double) queryValue);
-        break;
-      default:
-        throw new UnexpectedEnumException(field.getValueType());
-    }
-    return matches;
+    return switch (field.getValueType()) {
+      case INTEGER -> ((Integer) value) > ((Integer) queryValue);
+      case FLOAT -> ((Double) value) > ((Double) queryValue);
+      default -> throw new UnexpectedEnumException(field.getValueType());
+    };
   }
 
   default boolean executeContainsQuery(Collection<?> values, Object queryValue) {

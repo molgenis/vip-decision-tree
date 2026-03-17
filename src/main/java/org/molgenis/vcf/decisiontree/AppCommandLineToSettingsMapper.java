@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.molgenis.vcf.decisiontree.filter.model.Mode;
 import org.molgenis.vcf.decisiontree.loader.ConfigDecisionTreeLoader;
@@ -56,7 +57,7 @@ class AppCommandLineToSettingsMapper {
   private Mode getType(CommandLine commandLine) {
     Mode mode;
     if (commandLine.hasOption(OPT_TYPE)) {
-      mode = Mode.valueOf(commandLine.getOptionValue(OPT_TYPE).toUpperCase());
+      mode = Mode.valueOf(commandLine.getOptionValue(OPT_TYPE).toUpperCase(Locale.ROOT));
     } else {
       mode = Mode.VARIANT;
     }
@@ -113,7 +114,7 @@ class AppCommandLineToSettingsMapper {
 
   private static List<Path> parsePaths(String optionValue) {
     List<Path> result = new ArrayList<>();
-    String[] paths = optionValue.split(",");
+    String[] paths = optionValue.split(",", -1);
     for (String path : paths) {
       result.add(Path.of(path));
     }

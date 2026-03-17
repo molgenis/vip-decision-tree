@@ -9,7 +9,6 @@ import org.molgenis.vcf.decisiontree.filter.model.DecisionType;
 import org.molgenis.vcf.decisiontree.filter.model.ExistsNode;
 import org.molgenis.vcf.decisiontree.filter.model.NodeOutcome;
 import org.molgenis.vcf.decisiontree.filter.model.SampleContext;
-import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,23 +43,15 @@ public class NodeEvaluatorServiceImpl implements NodeEvaluatorService {
       DecisionNode node, Variant variant, @Nullable SampleContext sampleContext) {
     NodeOutcome nodeOutcome;
     DecisionType decisionType = node.getDecisionType();
-    switch (decisionType) {
-      case EXISTS:
-        nodeOutcome = existsNodeEvaluator.evaluate((ExistsNode) node, variant, sampleContext);
-        break;
-      case BOOL:
-        nodeOutcome = boolNodeEvaluator.evaluate((BoolNode) node, variant, sampleContext);
-        break;
-      case BOOL_MULTI:
-        nodeOutcome = boolMultiNodeEvaluator.evaluate((BoolMultiNode) node, variant, sampleContext);
-        break;
-      case CATEGORICAL:
-        nodeOutcome =
-            categoricalNodeEvaluator.evaluate((CategoricalNode) node, variant, sampleContext);
-        break;
-      default:
-        throw new UnexpectedEnumException(decisionType);
-    }
+    nodeOutcome =
+        switch (decisionType) {
+          case EXISTS -> existsNodeEvaluator.evaluate((ExistsNode) node, variant, sampleContext);
+          case BOOL -> boolNodeEvaluator.evaluate((BoolNode) node, variant, sampleContext);
+          case BOOL_MULTI ->
+              boolMultiNodeEvaluator.evaluate((BoolMultiNode) node, variant, sampleContext);
+          case CATEGORICAL ->
+              categoricalNodeEvaluator.evaluate((CategoricalNode) node, variant, sampleContext);
+        };
     return nodeOutcome;
   }
 }

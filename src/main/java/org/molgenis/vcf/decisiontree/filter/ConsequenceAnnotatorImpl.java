@@ -60,7 +60,7 @@ public class ConsequenceAnnotatorImpl implements ConsequenceAnnotator {
 
   private static String[] annotateField(String annotation, Field field, String[] consequenceArray) {
     if (field instanceof NestedField nestedField) {
-      int index = (nestedField).getIndex();
+      int index = nestedField.getIndex();
       if (index >= consequenceArray.length) {
         consequenceArray = Arrays.copyOf(consequenceArray, index + 1);
         // Fill newly added items with empty string by default to prevent |null| values in the VEP

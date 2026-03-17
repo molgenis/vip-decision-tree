@@ -8,7 +8,6 @@ import org.molgenis.vcf.decisiontree.filter.model.FieldType;
 
 public class UnknownFieldException extends RuntimeException {
   @Serial private static final long serialVersionUID = 1L;
-  private static final String MESSAGE = "Unknown '%s' field '%s'.";
   private final String field;
   private final FieldType type;
 
@@ -19,6 +18,6 @@ public class UnknownFieldException extends RuntimeException {
 
   @Override
   public String getMessage() {
-    return format(MESSAGE, type.toString(), field);
+    return format("Unknown '%s' field '%s'.", type.toString(), field);
   }
 }

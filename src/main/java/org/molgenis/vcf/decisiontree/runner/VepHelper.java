@@ -35,7 +35,7 @@ public class VepHelper {
       } else {
         throw new UnknownFieldException(ALLELE_NUM, FieldType.INFO_VEP);
       }
-      int index = Integer.parseInt(consequence.split("\\|")[alleleNumIndex]);
+      int index = Integer.parseInt(consequence.split("\\|", -1)[alleleNumIndex]);
       List<VcfRecord> singleCsqRecord;
       if (records.containsKey(index)) {
         singleCsqRecord = records.get(index);

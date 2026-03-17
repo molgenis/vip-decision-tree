@@ -31,7 +31,7 @@ class SamplesContextFactoryTest {
   void create() throws FileNotFoundException {
     Path pedFile = ResourceUtils.getFile("classpath:example_samples.ped").toPath();
     SampleSettings sampleSettings =
-        new SampleSettings(List.of("Patient"), List.of(pedFile), "Patient/HP:123,Mother/HP:234,");
+        new SampleSettings(List.of("Patient"), List.of(pedFile), "Patient/HP:123,Mother/HP:234");
     Settings settings = Settings.builder().sampleSettings(sampleSettings).build();
     SampleContext patient =
         SampleContext.builder()
@@ -60,8 +60,7 @@ class SamplesContextFactoryTest {
 
     SamplesContext expected =
         SamplesContext.builder().sampleContexts(Set.of(patient, mother)).build();
-    HashMap<String, Integer> sampleMap =
-        new HashMap<>(Map.of("Patient", Integer.valueOf(0), "Mother", Integer.valueOf(1)));
+    HashMap<String, Integer> sampleMap = new HashMap<>(Map.of("Patient", 0, "Mother", 1));
     when(vcfMetadata.getSampleNameToOffset()).thenReturn(sampleMap);
 
     assertEquals(expected, SamplesContextFactory.create(settings, vcfMetadata));

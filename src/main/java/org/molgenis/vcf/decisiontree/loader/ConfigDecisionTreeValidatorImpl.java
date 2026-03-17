@@ -67,23 +67,12 @@ public class ConfigDecisionTreeValidatorImpl implements ConfigDecisionTreeValida
     validateAlphanumericValue("id", id);
     validateLabel(node, id);
     switch (node.getType()) {
-      case EXISTS:
-        validateExistsNode(id, (ConfigExistsNode) node, nodes);
-        break;
-      case BOOL:
-        validateBoolNode(id, (ConfigBoolNode) node, nodes, files);
-        break;
-      case BOOL_MULTI:
-        validateBoolMultiNode(id, (ConfigBoolMultiNode) node, nodes, files);
-        break;
-      case CATEGORICAL:
-        validateCategoricalNode(id, (ConfigCategoricalNode) node, nodes);
-        break;
-      case LEAF:
-        validateLeafNode(id, (ConfigLeafNode) node);
-        break;
-      default:
-        throw new UnexpectedEnumException(node.getType());
+      case EXISTS -> validateExistsNode(id, (ConfigExistsNode) node, nodes);
+      case BOOL -> validateBoolNode(id, (ConfigBoolNode) node, nodes, files);
+      case BOOL_MULTI -> validateBoolMultiNode(id, (ConfigBoolMultiNode) node, nodes, files);
+      case CATEGORICAL -> validateCategoricalNode(id, (ConfigCategoricalNode) node, nodes);
+      case LEAF -> validateLeafNode(id, (ConfigLeafNode) node);
+      default -> throw new UnexpectedEnumException(node.getType());
     }
   }
 

@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -52,79 +53,79 @@ class AppCommandLineOptions {
             .required()
             .longOpt(OPT_INPUT_LONG)
             .desc("VEP* annotated input VCF file.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_CONFIG)
             .hasArg(true)
             .required()
             .longOpt(OPT_CONFIG_LONG)
             .desc("Input decision tree file (.json).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_METADATA)
             .hasArg(true)
             .required()
             .longOpt(OPT_METADATA_LONG)
             .desc("VCF metadata file (.json).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_OUTPUT)
             .hasArg(true)
             .longOpt(OPT_OUTPUT_LONG)
             .desc("Output VCF file (.vcf or .vcf.gz).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_FORCE)
             .longOpt(OPT_FORCE_LONG)
             .desc("Override the output file if it already exists.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_STRICT)
             .longOpt(OPT_STRICT_LONG)
             .desc(
                 "Throw exception if field from the decision tree is missing entirely in the input VCF.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_LABELS)
             .longOpt(OPT_LABELS_LONG)
             .desc("Write decision tree outcome labels to output VCF file.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_PATH)
             .longOpt(OPT_PATH_LONG)
             .desc("Write decision tree node path to output VCF file.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_DEBUG)
             .longOpt(OPT_DEBUG_LONG)
             .desc("Enable debug mode (additional logging).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_PROBANDS)
             .hasArg(true)
             .longOpt(OPT_PROBANDS_LONG)
             .desc("Comma-separated list of proband names.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_PED)
             .hasArg(true)
             .longOpt(OPT_PED_LONG)
             .desc("Comma-separated list of pedigree files (.ped).")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_PHENOTYPES)
             .hasArg(true)
             .longOpt(OPT_PHENOTYPES_LONG)
             .desc(
                 "Comma-separated list of sample-phenotypes (e.g. HP:123 or HP:123;HP:234 or sample0/HP:123,sample1/HP:234). Phenotypes are CURIE formatted (prefix:reference) and separated by a semicolon.")
-            .build());
+            .get());
     appOptions.addOption(
         Option.builder(OPT_TYPE)
             .hasArg(true)
             .longOpt(OPT_TYPE_LONG)
             .desc(
                 "Type: 'variant' (default) or 'sample', 'sample' classifies provided probands, or all samples if no probands given.")
-            .build());
+            .get());
     APP_OPTIONS = appOptions;
     Options appVersionOptions = new Options();
     appVersionOptions.addOption(
@@ -132,7 +133,7 @@ class AppCommandLineOptions {
             .required()
             .longOpt(OPT_VERSION_LONG)
             .desc("Print version.")
-            .build());
+            .get());
     APP_VERSION_OPTIONS = appVersionOptions;
   }
 
@@ -231,7 +232,7 @@ class AppCommandLineOptions {
     String mode = commandLine.getOptionValue(OPT_TYPE);
     List<String> modes = Arrays.stream(Mode.values()).map(Mode::toString).toList();
 
-    if (!modes.contains(mode.toUpperCase())) {
+    if (!modes.contains(mode.toUpperCase(Locale.ROOT))) {
       throw new IllegalArgumentException(
           "Illegal 'type' argument '%s', only 'variant' and 'sample' are allowed.".formatted(mode));
     }
