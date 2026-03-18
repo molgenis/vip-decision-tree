@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import lombok.experimental.NonFinal;
+import org.jspecify.annotations.Nullable;
 import org.molgenis.vcf.utils.metadata.ValueCount;
 import org.molgenis.vcf.utils.metadata.ValueType;
 
@@ -13,9 +14,8 @@ import org.molgenis.vcf.utils.metadata.ValueType;
 @NonFinal
 @EqualsAndHashCode(callSuper = false)
 public class NestedField extends FieldImpl implements Comparable<NestedField> {
-
-  final int index;
-  final Field parent;
+  int index;
+  Field parent;
 
   // Suppress 'Methods should not have too many parameters'
   @SuppressWarnings("java:S107")
@@ -25,8 +25,8 @@ public class NestedField extends FieldImpl implements Comparable<NestedField> {
       FieldType fieldType,
       ValueType valueType,
       ValueCount valueCount,
-      Integer count,
-      Character separator,
+      @Nullable Integer count,
+      @Nullable Character separator,
       int index,
       Field parent) {
     super(id, fieldType, valueType, valueCount, count, separator);
@@ -36,6 +36,6 @@ public class NestedField extends FieldImpl implements Comparable<NestedField> {
 
   @Override
   public int compareTo(NestedField o) {
-    return Integer.valueOf(getIndex()).compareTo(o.getIndex());
+    return Integer.compare(getIndex(), o.getIndex());
   }
 }

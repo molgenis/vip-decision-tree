@@ -63,6 +63,7 @@ public class VepMetadataMapperImpl implements VepMetadataMapper {
     return NestedHeaderLine.builder().parentField(vepField).nestedFields(nestedFields).build();
   }
 
+  @SuppressWarnings("NullAway")
   private NestedField mapNestedFieldMetadata(
       String id, NestedFieldMetadata nestedMeta, Field parent) {
     return new NestedField(
