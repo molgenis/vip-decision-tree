@@ -659,6 +659,36 @@ class VcfRecordTest {
     assertEquals(argument, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
+  @Test
+  void getValueFormatPerAllele1() {
+    Field field =
+        FieldImpl.builder()
+            .id("TEST")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(ValueCount.Type.A).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getExtendedAttribute("TEST")).thenReturn("A,B");
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals("A", vcfRecord.getValue(field, createAllele(1), sampleContext));
+  }
+
+  @Test
+  void getValueFormatPerAllele2() {
+    Field field =
+        FieldImpl.builder()
+            .id("TEST")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(ValueCount.Type.A).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getExtendedAttribute("TEST")).thenReturn("A,B");
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals("B", vcfRecord.getValue(field, createAllele(2), sampleContext));
+  }
+
   @ParameterizedTest
   @CsvSource({"CALLED, false", "NON_INFORMATIVE, false", "PHASED, false"})
   void getValueFormatGenotype(String fieldName, boolean expected) {
@@ -737,7 +767,6 @@ class VcfRecordTest {
             .valueType(ValueType.STRING)
             .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
-    Genotype gt = mock(Genotype.class);
     assertEquals("test", vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
@@ -751,7 +780,6 @@ class VcfRecordTest {
             .valueType(ValueType.STRING)
             .valueCount(ValueCount.builder().type(ValueCount.Type.FIXED).count(1).build())
             .build();
-    Genotype gt = mock(Genotype.class);
     assertEquals(expected, vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
@@ -764,7 +792,6 @@ class VcfRecordTest {
             .valueType(ValueType.STRING)
             .valueCount(ValueCount.builder().type(ValueCount.Type.VARIABLE).build())
             .build();
-    Genotype gt = mock(Genotype.class);
     assertEquals(List.of("HP1", "HP2"), vcfRecord.getValue(field, createAllele(), sampleContext));
   }
 
