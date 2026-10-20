@@ -121,6 +121,24 @@
         "value": "0|0"
       },
       "outcomeTrue": {
+        "nextNode": "freq"
+      },
+      "outcomeFalse": {
+        "nextNode": "exit_false"
+      },
+      "outcomeMissing": {
+        "nextNode": "freq"
+      }
+    },
+    "freq": {
+      "label": "Freq",
+      "type": "BOOL",
+      "query": {
+        "field": "FORMAT/AF",
+        "operator": "<",
+        "value": 0.5
+      },
+      "outcomeTrue": {
         "nextNode": "phenotype"
       },
       "outcomeFalse": {

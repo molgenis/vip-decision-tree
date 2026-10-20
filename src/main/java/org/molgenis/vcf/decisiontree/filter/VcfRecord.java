@@ -29,7 +29,7 @@ import org.molgenis.vcf.utils.UnexpectedEnumException;
 import org.molgenis.vcf.utils.metadata.ValueCount;
 import org.molgenis.vcf.utils.metadata.ValueType;
 
-/** {@link VariantContext} wrapper that works with nested data (e.g. CSQ INFO fields).. */
+/** {@link VariantContext} wrapper that works with nested data (e.g. CSQ INFO fields). */
 @Getter
 public class VcfRecord {
 
@@ -71,7 +71,7 @@ public class VcfRecord {
               throw new UnsupportedOperationException(
                   "Cannot filter on FORMAT fields when running in variant filter mode.");
             }
-            yield getFormatField(field, sampleContext);
+            yield getFormatField(field, sampleContext, allele);
           }
           case SAMPLE -> sampleContext != null ? getSampleValue(field, sampleContext) : null;
         };
@@ -140,7 +140,7 @@ public class VcfRecord {
 
   @SuppressWarnings("java:S1612")
   // suggested use of methode reference Integer::toString is not possible due to ambiguity
-  private @Nullable Object getFormatField(Field field, SampleContext sampleContext) {
+  private @Nullable Object getFormatField(Field field, SampleContext sampleContext, Allele allele) {
     Genotype genotype = variantContext.getGenotype(sampleContext.getIndex());
     if (genotype == null) {
       return null;
@@ -154,7 +154,7 @@ public class VcfRecord {
             String.join(
                 separator,
                 genotype.getAlleles().stream()
-                    .map(allele -> variantContext.getAlleles().indexOf(allele))
+                    .map(gtAllele -> variantContext.getAlleles().indexOf(gtAllele))
                     .map(this::mapAlleleString)
                     .toList());
       }
@@ -176,7 +176,7 @@ public class VcfRecord {
         int[] pl = genotype.getPL();
         typedValue = pl != null ? IntStream.of(pl).boxed().toList() : null;
       }
-      default -> typedValue = getExtendedAttributeValue(field, genotype);
+      default -> typedValue = getExtendedAttributeValue(field, genotype, allele);
     }
     return typedValue;
   }
@@ -185,7 +185,8 @@ public class VcfRecord {
     return index != -1 ? Integer.toString(index) : ".";
   }
 
-  private @Nullable Object getExtendedAttributeValue(Field field, Genotype genotype) {
+  private @Nullable Object getExtendedAttributeValue(
+      Field field, Genotype genotype, Allele allele) {
     Object typedValue;
     Object value;
     value = genotype.getExtendedAttribute(field.getId());
@@ -196,7 +197,13 @@ public class VcfRecord {
     ValueCount valueCount = field.getValueCount();
     ValueCount.Type valueCountType = valueCount.getType();
     switch (valueCountType) {
-      case A, R, VARIABLE ->
+      case A -> {
+        return getFormatList(field, value, allele.getIndex() - 1);
+      }
+      case R -> {
+        return getFormatList(field, value, allele.getIndex());
+      }
+      case VARIABLE ->
           typedValue =
               value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
       case FIXED -> {
@@ -210,6 +217,12 @@ public class VcfRecord {
       default -> throw new UnexpectedEnumException(valueCountType);
     }
     return typedValue;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static @Nullable Object getFormatList(Field field, Object value, int index) {
+    List<Object> list = (List<Object>) VcfUtils.getTypedVcfListValue(field, value.toString());
+    return list != null ? list.get(index) : null;
   }
 
   public List<String> getVepValues(Field vepField) {
