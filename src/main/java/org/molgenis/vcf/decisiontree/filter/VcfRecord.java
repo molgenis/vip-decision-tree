@@ -3,6 +3,7 @@ package org.molgenis.vcf.decisiontree.filter;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
+import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getMissingValues;
 import static org.molgenis.vcf.decisiontree.utils.VcfUtils.getTypedVcfValue;
 
 import htsjdk.variant.variantcontext.Genotype;
@@ -196,22 +197,27 @@ public class VcfRecord {
 
     ValueCount valueCount = field.getValueCount();
     ValueCount.Type valueCountType = valueCount.getType();
+    Set<String> missingValues = getMissingValues(field);
     switch (valueCountType) {
       case A -> {
-        return getFormatList(field, value, allele.getIndex() - 1);
+        return getFormatList(field, value, allele.getIndex() - 1, missingValues);
       }
       case R -> {
-        return getFormatList(field, value, allele.getIndex());
+        return getFormatList(field, value, allele.getIndex(), missingValues);
       }
       case VARIABLE ->
           typedValue =
-              value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
+              value != null
+                  ? VcfUtils.getTypedVcfListValue(field, value.toString(), missingValues)
+                  : null;
       case FIXED -> {
         if (valueCount.getCount() == 1) {
           typedValue = value != null ? VcfUtils.getTypedVcfValue(field, value.toString()) : null;
         } else {
           typedValue =
-              value != null ? VcfUtils.getTypedVcfListValue(field, value.toString()) : null;
+              value != null
+                  ? VcfUtils.getTypedVcfListValue(field, value.toString(), missingValues)
+                  : null;
         }
       }
       default -> throw new UnexpectedEnumException(valueCountType);
@@ -220,8 +226,13 @@ public class VcfRecord {
   }
 
   @SuppressWarnings("unchecked")
-  private static @Nullable Object getFormatList(Field field, Object value, int index) {
-    List<Object> list = (List<Object>) VcfUtils.getTypedVcfListValue(field, value.toString());
+  private static @Nullable Object getFormatList(
+      Field field, Object value, int index, Set<String> defaultValues) {
+    if (value == null) {
+      return null;
+    }
+    List<Object> list =
+        (List<Object>) VcfUtils.getTypedVcfListValue(field, value.toString(), defaultValues);
     return list != null ? list.get(index) : null;
   }
 
@@ -236,7 +247,8 @@ public class VcfRecord {
     int index = nestedField.getIndex();
     String parentId = nestedField.getParent().getId();
     List<String> infoValues =
-        VcfUtils.getInfoAsStringList(variantContext, parentId, VCFConstants.MISSING_VALUE_v4);
+        VcfUtils.getInfoAsStringList(
+            variantContext, parentId, Set.of(VCFConstants.MISSING_VALUE_v4));
     if (!infoValues.isEmpty()) {
       String singleValue = infoValues.getFirst();
       String[] split = singleValue.split(separator, -1);
