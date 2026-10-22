@@ -689,6 +689,21 @@ class VcfRecordTest {
     assertEquals("B", vcfRecord.getValue(field, createAllele(2), sampleContext));
   }
 
+  @Test
+  void getValueFormatPerAlleleMissing() {
+    Field field =
+        FieldImpl.builder()
+            .id("TEST")
+            .fieldType(FieldType.FORMAT)
+            .valueType(ValueType.STRING)
+            .valueCount(ValueCount.builder().type(ValueCount.Type.A).build())
+            .build();
+    Genotype gt = mock(Genotype.class);
+    when(gt.getExtendedAttribute("TEST")).thenReturn(".");
+    when(variantContext.getGenotype(0)).thenReturn(gt);
+    assertEquals(null, vcfRecord.getValue(field, createAllele(2), sampleContext));
+  }
+
   @ParameterizedTest
   @CsvSource({"CALLED, false", "NON_INFORMATIVE, false", "PHASED, false"})
   void getValueFormatGenotype(String fieldName, boolean expected) {
