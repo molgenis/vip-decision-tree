@@ -118,7 +118,9 @@ public class VcfUtils {
   }
 
   public static Set<String> getMissingValues(Field field) {
-    return field.getFieldType() == FORMAT ? Set.of("", VCFConstants.MISSING_VALUE_v4) : Set.of(VCFConstants.MISSING_VALUE_v4);
+    return field.getFieldType() == FORMAT
+        ? Set.of("", VCFConstants.MISSING_VALUE_v4)
+        : Set.of(VCFConstants.MISSING_VALUE_v4);
   }
 
   private static @Nullable Double getVcfValueAsDouble(
@@ -255,11 +257,12 @@ public class VcfUtils {
     return typedValue;
   }
 
-  public static Object getTypedVcfListValue(Field field, String stringValue, Set<String> missingValues) {
+  public static Object getTypedVcfListValue(
+      Field field, String stringValue, Set<String> missingValues) {
     String[] stringValues = stringValue.split(",", -1);
     List<Object> values = new ArrayList<>();
     for (String value : stringValues) {
-      if(value == null || missingValues.contains(value)){
+      if (value == null || missingValues.contains(value)) {
         values.add(null);
       }
       values.add(getTypedVcfValue(field, value));

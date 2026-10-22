@@ -207,13 +207,17 @@ public class VcfRecord {
       }
       case VARIABLE ->
           typedValue =
-              value != null ? VcfUtils.getTypedVcfListValue(field, value.toString(), missingValues) : null;
+              value != null
+                  ? VcfUtils.getTypedVcfListValue(field, value.toString(), missingValues)
+                  : null;
       case FIXED -> {
         if (valueCount.getCount() == 1) {
           typedValue = value != null ? VcfUtils.getTypedVcfValue(field, value.toString()) : null;
         } else {
           typedValue =
-              value != null ? VcfUtils.getTypedVcfListValue(field, value.toString(), missingValues) : null;
+              value != null
+                  ? VcfUtils.getTypedVcfListValue(field, value.toString(), missingValues)
+                  : null;
         }
       }
       default -> throw new UnexpectedEnumException(valueCountType);
@@ -222,11 +226,13 @@ public class VcfRecord {
   }
 
   @SuppressWarnings("unchecked")
-  private static @Nullable Object getFormatList(Field field, Object value, int index, Set<String> defaultValues) {
-    if(value == null){
+  private static @Nullable Object getFormatList(
+      Field field, Object value, int index, Set<String> defaultValues) {
+    if (value == null) {
       return null;
     }
-    List<Object> list = (List<Object>) VcfUtils.getTypedVcfListValue(field, value.toString(), defaultValues);
+    List<Object> list =
+        (List<Object>) VcfUtils.getTypedVcfListValue(field, value.toString(), defaultValues);
     return list != null ? list.get(index) : null;
   }
 
@@ -241,7 +247,8 @@ public class VcfRecord {
     int index = nestedField.getIndex();
     String parentId = nestedField.getParent().getId();
     List<String> infoValues =
-        VcfUtils.getInfoAsStringList(variantContext, parentId, Set.of(VCFConstants.MISSING_VALUE_v4));
+        VcfUtils.getInfoAsStringList(
+            variantContext, parentId, Set.of(VCFConstants.MISSING_VALUE_v4));
     if (!infoValues.isEmpty()) {
       String singleValue = infoValues.getFirst();
       String[] split = singleValue.split(separator, -1);
