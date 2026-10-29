@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.3</version>
+        <version>4.1.2</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -45,7 +45,7 @@
         <samtools.htsjdk.version>4.3.0</samtools.htsjdk.version>
         <jacoco-maven-plugin.version>0.8.16</jacoco-maven-plugin.version>
         <jacoco.skip.report>false</jacoco.skip.report>
-        <vip.utils.version>4.0.1</vip.utils.version>
+        <vip.utils.version>4.0.3</vip.utils.version>
         <errorprone.version>2.48.0</errorprone.version>
         <maven.compiler.plugin.version>3.16.0</maven.compiler.plugin.version>
         <maven.clean.plugin.version>3.5.0</maven.clean.plugin.version>
